@@ -74,13 +74,6 @@ class StubSpeedMeter:
 # ── Fixtures ──
 
 
-@pytest.fixture(scope="session")
-def qapp():
-    from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication([])
-    yield app
-
-
 @pytest.fixture()
 def service(qapp, monkeypatch, tmp_path):
     from app.config.cfg import cfg
