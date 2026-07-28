@@ -141,7 +141,7 @@ class HuggingFaceProxySiteCard(SettingCard):
             if latency is None:
                 label = displayName
             elif latency < 0:
-                label = f"{displayName} ({self.tr("Timeout")})"
+                label = f"{displayName} ({self.tr('Timeout')})"
             else:
                 label = f"{displayName} ({latency} ms)"
             self.comboBox.setItemText(i, label)
@@ -151,9 +151,9 @@ class HuggingFaceProxySiteCard(SettingCard):
         if customLatency is None:
             customLabel = self.tr("Custom")
         elif customLatency < 0:
-            customLabel = f"{self.tr("Custom")} ({self.tr("Timeout")})"
+            customLabel = f"{self.tr('Custom')} ({self.tr('Timeout')})"
         else:
-            customLabel = f"{self.tr("Custom")} ({customLatency} ms)"
+            customLabel = f"{self.tr('Custom')} ({customLatency} ms)"
         self.comboBox.setItemText(len(HF_PROXY_SITES), customLabel)
 
     def _onCurrentIndexChanged(self, index: int) -> None:

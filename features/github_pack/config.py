@@ -154,7 +154,7 @@ class GitHubProxySiteCard(SettingCard):
         customSite = githubConfig.customSite.value
         customLatency = self._latencies.get(customSite) if customSite else None
         tag = self._latencyTag(customLatency)
-        customLabel = f"{self.tr("Custom")} ({tag})" if tag else self.tr("Custom")
+        customLabel = f"{self.tr('Custom')} ({tag})" if tag else self.tr("Custom")
         self.comboBox.setItemText(len(GITHUB_PROXY_SITES), customLabel)
 
     def _onCurrentIndexChanged(self, index: int):
