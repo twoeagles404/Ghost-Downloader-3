@@ -115,7 +115,7 @@ async def test_duplicate_info_hash_rejected(session, torrent_env):
     task1 = asyncio.create_task(session.run("dup-1", params))
     await asyncio.sleep(1)
 
-    with pytest.raises(Exception, match="Already downloading"):
+    with pytest.raises(Exception, match="already downloading"):
         await session.run("dup-2", params)
 
     task1.cancel()
