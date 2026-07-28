@@ -74,7 +74,7 @@ class BTTask(Task):
 
     def setSelection(self, selectedIndexes: set[int]):
         if not selectedIndexes:
-            raise ValueError("至少需要选择一个文件")
+            raise ValueError("You must select at least one file")
         changed = False
         for f in self.files:
             selected = f.index in selectedIndexes
@@ -141,7 +141,7 @@ class BTTaskStep(TaskStep):
         task: BTTask = self.task
 
         if task.countSelected <= 0:
-            raise TaskError("至少需要选择一个文件")
+            raise TaskError("You must select at least one file")
 
         target = Path(task.outputPath)
         if not target.exists():
@@ -153,7 +153,7 @@ class BTTaskStep(TaskStep):
                 task.magnetTorrentPath.write_bytes(b64decode(task.torrentData))
             except Exception as e:
                 from loguru import logger
-                logger.opt(exception=e).warning("保存 magnet 种子文件失败 {}", task.name)
+                logger.opt(exception=e).warning("Failed to save magnet torrent file {}", task.name)
 
         fileRenames = {}
         for f in task.files:
@@ -205,7 +205,7 @@ class BTTaskStep(TaskStep):
             cached = btSession.lastResumeData(task.taskId)
             if cached:
                 task.resumeData = b64encode(cached).decode()
-            task.stateText = "已暂停做种" if task.isSeeding else "已暂停下载"
+            task.stateText = "Seeding paused" if task.isSeeding else "Download paused"
             task.isSeeding = False
             raise
         except Exception:

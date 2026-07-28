@@ -135,7 +135,7 @@ if sys.platform == "win32":
                 self.winId(),
                 "00000030" if dark else "FFFFFF30",
             )
-            # 无 parent 时 fontMetrics 在首次显示前不准，基于正确屏幕重算
+            # without a parent, fontMetrics is inaccurate before first show; recompute based on the correct screen
             for action in self._actions:
                 item = action.property('item')
                 if item:
@@ -178,14 +178,14 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.setToolTip(self.NAME)
 
         self._menu = TrayMenu()
-        self._menu.addAction(Action(GhostIcon.GHOST, self.tr("仪表盘"), self._menu,
+        self._menu.addAction(Action(GhostIcon.GHOST, self.tr("Dashboard"), self._menu,
                                     triggered=lambda: signalBus.activationRequested.emit()))
-        self._menu.addAction(Action(FluentIcon.PLAY, self.tr("全部开始"), self._menu,
+        self._menu.addAction(Action(FluentIcon.PLAY, self.tr("Start All"), self._menu,
                                     triggered=self._taskService.startAll))
-        self._menu.addAction(Action(FluentIcon.PAUSE, self.tr("全部暂停"), self._menu,
+        self._menu.addAction(Action(FluentIcon.PAUSE, self.tr("Pause All"), self._menu,
                                     triggered=self._taskService.pauseAll))
         self._menu.addSeparator()
-        self._menu.addAction(Action(FluentIcon.CLOSE, self.tr("退出程序"), self._menu,
+        self._menu.addAction(Action(FluentIcon.CLOSE, self.tr("Exit"), self._menu,
                                     triggered=QApplication.instance().quit))
         self.setContextMenu(self._menu)
         self.destroyed.connect(self._menu.deleteLater)

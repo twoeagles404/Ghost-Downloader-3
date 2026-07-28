@@ -21,14 +21,14 @@ class EditTaskDialog(MessageBoxBase):
         super().__init__(parent)
         self._task = task
 
-        self.titleLabel = SubtitleLabel(self.tr("编辑任务参数"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Edit Task Options"), self)
         self.cardGroup = OptionCardGroup(self)
         self.progressBar = IndeterminateProgressBar(self)
 
         self.widget.setMinimumWidth(680)
         self.progressBar.hide()
-        self.yesButton.setText(self.tr("应用"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Application"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         for card in cards:
             self.cardGroup.addCard(card)
@@ -100,8 +100,8 @@ class LiveEditDialog(EditTaskDialog):
         receivedBytes = self._task.currentSnapshot()[2]
         if receivedBytes > 0:
             confirm = MessageBox(
-                self.tr("确认更换链接"),
-                self.tr("新链接与原链接的内容不一致，将清除已下载的 {0} 数据，是否继续？").format(
+                self.tr("Confirm URL Update"),
+                self.tr("The new URL differs from the original; {0} of existing data will be cleared. Continue?").format(
                     toReadableSize(receivedBytes)
                 ),
                 self,
@@ -117,7 +117,7 @@ class LiveEditDialog(EditTaskDialog):
         self._pendingParseId = ""
         self._setInteractive(True)
         InfoBar.error(
-            title=self.tr("链接解析失败"),
+            title=self.tr("Link Parsing Failed"),
             content=error,
             duration=4000,
             position=InfoBarPosition.TOP,

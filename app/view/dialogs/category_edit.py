@@ -25,7 +25,7 @@ class CategoryEditDialog(MessageBoxBase):
         self._category = category
 
         self.titleLabel = SubtitleLabel(
-            self.tr("编辑分类") if category else self.tr("添加分类"), self
+            self.tr("Edit Category") if category else self.tr("Add"), self
         )
         self.nameEdit = LineEdit(self)
         self.iconCombo = ComboBox(self)
@@ -42,12 +42,12 @@ class CategoryEditDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(480)
-        self.yesButton.setText(self.tr("确定"))
-        self.cancelButton.setText(self.tr("取消"))
-        self.nameEdit.setPlaceholderText(self.tr("分类名称"))
-        self.extensionsEdit.setPlaceholderText(self.tr("输入扩展名后按回车添加"))
-        self.folderEdit.setPlaceholderText(self.tr("留空则使用默认下载路径；可用 {default} 代表默认下载文件夹"))
-        self.folderBrowseButton.setToolTip(self.tr("选择文件夹"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
+        self.nameEdit.setPlaceholderText(self.tr("Category name"))
+        self.extensionsEdit.setPlaceholderText(self.tr("Enter extension and press Enter to add"))
+        self.folderEdit.setPlaceholderText(self.tr("Leave empty to use default download path; use {default} to represent the default download folder"))
+        self.folderBrowseButton.setToolTip(self.tr("Select Folder"))
         self.folderBrowseButton.installEventFilter(ToolTipFilter(self.folderBrowseButton))
 
         for name in self.ICON_CHOICES:
@@ -62,13 +62,13 @@ class CategoryEditDialog(MessageBoxBase):
         self.viewLayout.setSpacing(8)
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.addSpacing(8)
-        self.viewLayout.addWidget(BodyLabel(self.tr("名称"), self))
+        self.viewLayout.addWidget(BodyLabel(self.tr("Name"), self))
         self.viewLayout.addWidget(self.nameEdit)
-        self.viewLayout.addWidget(BodyLabel(self.tr("图标"), self))
+        self.viewLayout.addWidget(BodyLabel(self.tr("Icon"), self))
         self.viewLayout.addWidget(self.iconCombo)
-        self.viewLayout.addWidget(BodyLabel(self.tr("扩展名"), self))
+        self.viewLayout.addWidget(BodyLabel(self.tr("File Extension(s)"), self))
         self.viewLayout.addWidget(self.extensionsEdit)
-        self.viewLayout.addWidget(BodyLabel(self.tr("下载文件夹"), self))
+        self.viewLayout.addWidget(BodyLabel(self.tr("Download Folder"), self))
         self.viewLayout.addWidget(self.folderRow)
 
     def _bind(self) -> None:
@@ -85,12 +85,12 @@ class CategoryEditDialog(MessageBoxBase):
 
     def _onBrowseClicked(self) -> None:
         start = self.folderEdit.text() or str(Path.home())
-        selected = QFileDialog.getExistingDirectory(self, self.tr("选择下载文件夹"), start)
+        selected = QFileDialog.getExistingDirectory(self, self.tr("Choose Download Folder"), start)
         if selected:
             self.folderEdit.setText(selected)
 
     def category(self) -> Category:
-        name = self.nameEdit.text().strip() or self.tr("未命名分类")
+        name = self.nameEdit.text().strip() or self.tr("Unnamed Category")
         extensions = [
             ext for token in self.extensionsEdit.tokens()
             if (ext := token.strip().lstrip(".").lower())

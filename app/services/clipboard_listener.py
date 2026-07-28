@@ -51,7 +51,7 @@ class ClipboardListener(QObject):
             try:
                 parsed = urlparse(url)
             except ValueError as error:
-                logger.warning("跳过无效剪贴板链接 {}: {}", url, error)
+                logger.warning("Skipping invalid clipboard link {}: {}", url, error)
                 continue
             if not parsed.scheme or parsed.geturl() != url:
                 continue

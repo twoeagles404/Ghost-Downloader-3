@@ -45,7 +45,7 @@ class ED2kTaskStep(TaskStep):
                 transfer = await client.addLink(task.url, task.outputFolder)
             except Error as e:
                 if e.code != ErrorCode.TRANSFER_EXISTS:
-                    raise TaskError("ED2k 错误：{detail}", detail=str(e)) from e
+                    raise TaskError("ED2k error: {detail}", detail=str(e)) from e
                 _, _, linkHash = parseEd2kLink(task.url)
                 await client.remove(linkHash, deleteFile=False)
                 transfer = await client.addLink(task.url, task.outputFolder)
@@ -73,7 +73,7 @@ class ED2kTaskStep(TaskStep):
                 try:
                     await ed2kSession.client().pause(task.fileHash)
                 except Exception as e:
-                    logger.opt(exception=e).warning("暂停 eD2k 传输失败")
+                    logger.opt(exception=e).warning("Failed to pause eD2k transfer")
             raise
 
 
@@ -85,7 +85,7 @@ class ED2kInstallStep(TaskStep):
     async def run(self, reportSpeed, waitForSpeedLimit) -> None:
         path = Path(self.binaryPath)
         if not path.is_file():
-            raise TaskError("{name} 未安装，请在设置中安装", name="goed2kd")
+            raise TaskError("{name} is not installed, please install it in settings", name="goed2kd")
         if sys.platform != "win32":
             path.chmod(path.stat().st_mode | 0o755)
         self.setStatus(TaskStatus.COMPLETED)
@@ -94,10 +94,10 @@ class ED2kInstallStep(TaskStep):
 def parseEd2kLink(link: str) -> tuple[str, int, str]:
     link = link.strip()
     if not link.lower().startswith("ed2k://"):
-        raise ValueError("不是有效的 eD2k 链接")
+        raise ValueError("Not a valid eD2k link")
     parts = link.strip("/").split("|")
     if len(parts) < 5 or parts[1].lower() != "file":
-        raise ValueError("不支持的 eD2k 链接格式")
+        raise ValueError("Unsupported eD2k link format")
     name = unquote(parts[2])
     try:
         size = int(parts[3])

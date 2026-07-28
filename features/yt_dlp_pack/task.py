@@ -20,14 +20,14 @@ from app.models.task import SpecialFileSize, Task, TaskError, TaskFile, TaskStep
 from ffmpeg_pack.task import FFmpegResourceStep, FFmpegStep, mediaStem
 
 ERROR_HINTS = (
-    ("is not available in your country", "该视频在您所在地区不可用，请尝试配置代理（{detail}）"),
-    ("video unavailable", "视频不可用，可能已被删除或设为私密（{detail}）"),
-    ("private video", "私密视频，需要已授权账号的 Cookie。请通过浏览器扩展下载或在设置中手动导入 Cookie（{detail}）"),
-    ("members-only", "会员专属视频，需要会员账号的 Cookie。请通过浏览器扩展下载或在设置中手动导入 Cookie（{detail}）"),
-    ("confirm your age", "年龄限制视频，需要登录。请通过浏览器扩展下载或在设置中手动导入 Cookie（{detail}）"),
-    ("confirm you're not a bot", "YouTube 需要人机验证。请通过浏览器扩展下载或在设置中手动导入 Cookie（{detail}）"),
-    ("requested format is not available", "请求的格式不可用，请稍后重试（{detail}）"),
-    ("http error 403", "下载被拒绝（403），链接可能已失效（{detail}）"),
+    ("is not available in your country", "This video is not available in your region, try configuring a proxy ({detail})"),
+    ("video unavailable", "Video unavailable, it may have been deleted or set to private ({detail})"),
+    ("private video", "Private video, requires an authorized account's cookies. Download via the browser extension or manually import cookies in settings ({detail})"),
+    ("members-only", "Members-only video, requires a member account's cookies. Download via the browser extension or manually import cookies in settings ({detail})"),
+    ("confirm your age", "Age-restricted video, requires login. Download via the browser extension or manually import cookies in settings ({detail})"),
+    ("confirm you're not a bot", "YouTube requires human verification. Download via the browser extension or manually import cookies in settings ({detail})"),
+    ("requested format is not available", "The requested format is unavailable, please retry later ({detail})"),
+    ("http error 403", "Download rejected (403), the link may have expired ({detail})"),
 )
 
 STEPS_PER_VIDEO = 5
@@ -128,7 +128,7 @@ class YouTubeTask(Task):
         self.files = [
             YouTubeFile(
                 index=i,
-                relativePath=toSafeFilename(str(video.get("title") or f"视频 {i + 1}")),
+                relativePath=toSafeFilename(str(video.get("title") or f"Video {i + 1}")),
                 videoId=str(video.get("id") or ""),
                 duration=int(video.get("duration") or 0),
             )
@@ -145,7 +145,7 @@ class YouTubeTask(Task):
 
     def setSelection(self, selectedIndexes) -> None:
         super().setSelection(selectedIndexes)
-        # 视频大小在 extract 前未知，files 的 size 恒为 0，改从资源步骤汇总
+        # the video size is unknown before extract, files' size is always 0, so sum it from the resource step instead
         totalSize = sum(
             s.fileSize for s in self.steps
             if isinstance(s, FFmpegResourceStep) and self._isStepSelected(s)
@@ -199,7 +199,7 @@ class YouTubeExtractStep(TaskStep):
 
         from .config import youTubeRuntime
         if not youTubeRuntime.path():
-            raise TaskError("{name} 未安装，请在设置中安装", name="YouTube 运行环境")
+            raise TaskError("{name} is not installed, please install it in settings", name="YouTube runtime")
 
         url = self.videoUrl or self.task.url
         try:
@@ -211,12 +211,12 @@ class YouTubeExtractStep(TaskStep):
             hint = next((h for needle, h in ERROR_HINTS if needle in lowered), "")
             if hint:
                 raise TaskError(hint, detail=detail)
-            raise TaskError("视频信息提取失败：{detail}", detail=detail or "unknown")
+            raise TaskError("Video info extraction failed: {detail}", detail=detail or "unknown")
 
         videoFmt, audioFmt = self._buildFormatPair(info)
         if not videoFmt and not audioFmt:
             logger.warning("no formats found for {} (formats count: {})", url, len(info.get("formats") or []))
-            raise TaskError("未找到可用的视频格式")
+            raise TaskError("No usable video format found")
 
         self._updateSiblingSteps(videoFmt, audioFmt, info)
         logger.info("selected video={} audio={} for {}",
@@ -492,7 +492,7 @@ class YouTubeMergeStep(FFmpegStep):
         ffmpegPath = ffmpegRuntime.path()
         ffprobePath = ffmpegRuntime.ffprobePath()
         if not ffmpegPath or not ffprobePath:
-            raise TaskError("{name} 未安装，请在设置中安装", name="FFmpeg")
+            raise TaskError("{name} is not installed, please install it in settings", name="FFmpeg")
 
         Path(self.outputFile).parent.mkdir(parents=True, exist_ok=True)
         totalDuration = await self._probeDuration(ffprobePath, self._videoPath)
@@ -536,7 +536,7 @@ class YouTubeMergeStep(FFmpegStep):
             if process.returncode != 0:
                 stderr = (await process.stderr.read()).decode("utf-8", errors="ignore").strip()
                 raise TaskError(
-                    "FFmpeg 合并失败（{code}）：{detail}",
+                    "FFmpeg merge failed ({code}): {detail}",
                     code=process.returncode,
                     detail=stderr or "unknown error",
                 )

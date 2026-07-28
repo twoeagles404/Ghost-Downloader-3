@@ -1,6 +1,6 @@
-"""从 SVG 源重新生成各平台文件图标 (.png/.ico/.icns)。
+"""Regenerate per-platform file icons (.png/.ico/.icns) from the SVG source.
 
-图标按"预渲染并提交"策略管理: SVG 是唯一可编辑源, 改动后跑这个脚本重生成并提交产物。
+Icons follow a "pre-render and commit" strategy: the SVG is the only editable source; after changes, run this script to regenerate and commit the artifacts.
     QT_QPA_PLATFORM=offscreen python3 app/assets/file_icons/build_icons.py
 """
 
@@ -52,7 +52,7 @@ def writeIco(pngBySize: dict[int, bytes], outPath: Path) -> None:
     offset = 6 + 16 * len(sizes)
     for size in sizes:
         data = pngBySize[size]
-        edge = 0 if size >= 256 else size  # ICO 用 0 表示 256
+        edge = 0 if size >= 256 else size  # ICO uses 0 to mean 256
         entries += struct.pack("<BBBBHHII", edge, edge, 0, 0, 1, 32, len(data), offset)
         offset += len(data)
         blobs += data

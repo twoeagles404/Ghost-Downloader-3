@@ -39,8 +39,8 @@ def notifyDiskSpaceInsufficient(free: int, needed: int) -> None:
         return
     from app.format import toReadableSize
     _submit(notifier.send(
-        title=QCoreApplication.translate("Notifications", "磁盘空间不足"),
-        message=QCoreApplication.translate("Notifications", "剩余 {0}，需要 {1}，任务未自动开始").format(
+        title=QCoreApplication.translate("Notifications", "Insufficient disk space"),
+        message=QCoreApplication.translate("Notifications", "{0} free, {1} required, task did not auto-start").format(
             toReadableSize(free), toReadableSize(needed)),
     ))
 
@@ -64,16 +64,16 @@ def notifyTaskCompleted(task: Task) -> None:
             mode=Qt.TransformationMode.SmoothTransformation,
         ).save(str(iconPath), "PNG")
     except Exception as e:
-        logger.debug("提取文件图标失败: {}", e)
+        logger.debug("Failed to extract file icon: {}", e)
 
     from desktop_notifier import Icon, Button
 
     _submit(notifier.send(
-        title=QCoreApplication.translate("Notifications", "下载完成"),
+        title=QCoreApplication.translate("Notifications", "Download Complete"),
         message=task.name,
         buttons=[
-            Button(title=QCoreApplication.translate("Notifications", "打开文件"), on_pressed=lambda: openFile(outputPath)),
-            Button(title=QCoreApplication.translate("Notifications", "打开文件夹"), on_pressed=lambda: revealInFolder(outputPath)),
+            Button(title=QCoreApplication.translate("Notifications", "Open File"), on_pressed=lambda: openFile(outputPath)),
+            Button(title=QCoreApplication.translate("Notifications", "Open Folder"), on_pressed=lambda: revealInFolder(outputPath)),
         ],
         on_clicked=lambda: openFile(outputPath),
         icon=Icon(path=iconPath) if iconPath.exists() else None,

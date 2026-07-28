@@ -1,8 +1,8 @@
-"""文件选择过滤的逐分支测试（历史重构 4 次的重灾区）。
+"""Branch-by-branch tests for file-selection filtering (a hot spot refactored 4 times historically).
 
-Seam S3: Task.pendingSteps()     — 选择过滤 + 排序 + COMPLETED 跳过
-Seam S4: Task.currentSnapshot()  — 跨 step 的 progress/speed/receivedBytes 聚合
-Seam S6: Task.setSelection()     — 标志翻转 → 过滤联动
+Seam S3: Task.pendingSteps()     - selection filtering + sorting + COMPLETED skip
+Seam S4: Task.currentSnapshot()  - cross-step progress/speed/receivedBytes aggregation
+Seam S6: Task.setSelection()     - flag flip -> filtering linkage
 """
 from __future__ import annotations
 

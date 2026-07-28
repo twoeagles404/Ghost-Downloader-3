@@ -56,14 +56,14 @@ class TaskCommandBarView(CommandBarView):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.redownloadAction = Action(FluentIcon.UPDATE, self.tr("重新下载"), self)
-        self.deleteAction = Action(FluentIcon.DELETE, self.tr("删除"), self)
-        self.copyUrlAction = Action(FluentIcon.COPY, self.tr("复制链接"), self)
-        self.moveCategoryAction = Action(FluentIcon.TAG, self.tr("移动到分类"), self)
-        self.selectAllAction = Action(FluentIcon.CLEAR_SELECTION, self.tr("全选"), self)
-        self.selectMissingAction = Action(FluentIcon.REMOVE, self.tr("选择缺失"), self)
-        self.invertSelectAction = Action(FluentIcon.CUT, self.tr("反选"), self)
-        self.cancelAction = Action(FluentIcon.CLEAR_SELECTION, self.tr("取消全选"), self)
+        self.redownloadAction = Action(FluentIcon.UPDATE, self.tr("Redownload"), self)
+        self.deleteAction = Action(FluentIcon.DELETE, self.tr("Delete"), self)
+        self.copyUrlAction = Action(FluentIcon.COPY, self.tr("Copy Link"), self)
+        self.moveCategoryAction = Action(FluentIcon.TAG, self.tr("Assign Category"), self)
+        self.selectAllAction = Action(FluentIcon.CLEAR_SELECTION, self.tr("Select All"), self)
+        self.selectMissingAction = Action(FluentIcon.REMOVE, self.tr("Select Missing"), self)
+        self.invertSelectAction = Action(FluentIcon.CUT, self.tr("Invert Selection"), self)
+        self.cancelAction = Action(FluentIcon.CLEAR_SELECTION, self.tr("Deselect All"), self)
 
         self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         self.setIconSize(QSize(18, 18))
@@ -157,12 +157,12 @@ class TaskPage(QWidget):
 
         self.scrollArea = ScrollArea(self)
         self.scrollWidget = QWidget(self)
-        self.emptyStatusWidget = EmptyStatusWidget(FluentIcon.EMOJI_TAB_SYMBOLS, self.tr("暂无下载任务"), self)
+        self.emptyStatusWidget = EmptyStatusWidget(FluentIcon.EMOJI_TAB_SYMBOLS, self.tr("No download tasks"), self)
 
         # toolbar
         self.toolBar = QWidget(self)
-        self.startAllButton = PushButton(FluentIcon.PLAY, self.tr("全部开始"), self.toolBar)
-        self.pauseAllButton = PushButton(FluentIcon.PAUSE, self.tr("全部暂停"), self.toolBar)
+        self.startAllButton = PushButton(FluentIcon.PLAY, self.tr("Start All"), self.toolBar)
+        self.pauseAllButton = PushButton(FluentIcon.PAUSE, self.tr("Pause All"), self.toolBar)
         self.selectButton = ToolButton(FluentIcon.CLEAR_SELECTION, self.toolBar)
         self.planButton = ToggleToolButton(FluentIcon.DATE_TIME, self.toolBar)
         self.rateLimitButton = ToggleToolButton(FluentIcon.SPEED_OFF, self.toolBar)
@@ -174,12 +174,12 @@ class TaskPage(QWidget):
         self.sortMenu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
         self.sortFieldGroup = QActionGroup(self)
         self.sortOrderGroup = QActionGroup(self)
-        self.createdAtSortAction = Action(FluentIcon.DATE_TIME, self.tr("按添加时间"), self, checkable=True)
-        self.completedAtSortAction = Action(FluentIcon.HISTORY, self.tr("按完成时间"), self, checkable=True)
-        self.nameSortAction = Action(FluentIcon.FONT, self.tr("按名称排序"), self, checkable=True)
-        self.sizeSortAction = Action(FluentIcon.LIBRARY, self.tr("按大小排序"), self, checkable=True)
-        self.ascendingAction = Action(FluentIcon.UP, self.tr("顺序"), self, checkable=True)
-        self.descendingAction = Action(FluentIcon.DOWN, self.tr("倒序"), self, checkable=True)
+        self.createdAtSortAction = Action(FluentIcon.DATE_TIME, self.tr("Sort by Time Added"), self, checkable=True)
+        self.completedAtSortAction = Action(FluentIcon.HISTORY, self.tr("Sort by Completion Time"), self, checkable=True)
+        self.nameSortAction = Action(FluentIcon.FONT, self.tr("Sort by Name"), self, checkable=True)
+        self.sizeSortAction = Action(FluentIcon.LIBRARY, self.tr("Sort by Size"), self, checkable=True)
+        self.ascendingAction = Action(FluentIcon.UP, self.tr("Ascending"), self, checkable=True)
+        self.descendingAction = Action(FluentIcon.DOWN, self.tr("Descending"), self, checkable=True)
 
         # filter segment
         self.filterSegment = SegmentedToggleToolWidget(self.toolBar)
@@ -223,7 +223,7 @@ class TaskPage(QWidget):
         self.filterSegment.addItem("active", FluentIcon.DOWNLOAD)
         self.filterSegment.addItem("completed", FluentIcon.ACCEPT)
         self.filterSegment.setCurrentItem("all")
-        for key, tip in (("all", self.tr("全部任务")), ("active", self.tr("活动任务")), ("completed", self.tr("完成任务"))):
+        for key, tip in (("all", self.tr("All Tasks")), ("active", self.tr("Active Tasks")), ("completed", self.tr("Completed Tasks"))):
             w = self.filterSegment.widget(key)
             w.setToolTip(tip)
             w.installEventFilter(ToolTipFilter(w))
@@ -234,10 +234,10 @@ class TaskPage(QWidget):
         self.rateLimitButton.setChecked(cfg.isSpeedLimitEnabled.value)
 
         for btn, tip in (
-            (self.selectButton, self.tr("选择任务")),
-            (self.planButton, self.tr("计划任务")),
-            (self.rateLimitButton, self.tr("限速")),
-            (self.categoryFilterButton, self.tr("按分类筛选")),
+            (self.selectButton, self.tr("Select Tasks")),
+            (self.planButton, self.tr("Schedule Task")),
+            (self.rateLimitButton, self.tr("Speed Limit")),
+            (self.categoryFilterButton, self.tr("Filter By Category")),
         ):
             btn.setToolTip(tip)
             btn.installEventFilter(ToolTipFilter(btn))
@@ -337,7 +337,7 @@ class TaskPage(QWidget):
 
     @property
     def searchPlaceholder(self) -> str:
-        return self.tr("搜索任务")
+        return self.tr("Search Tasks")
 
     def setSearchText(self, text: str) -> None:
         self._searchText = text
@@ -455,7 +455,7 @@ class TaskPage(QWidget):
             self.categoryFilterGroup.removeAction(action)
             action.deleteLater()
 
-        allAction = Action(FluentIcon.FILTER, self.tr("全部分类"), self, checkable=True)
+        allAction = Action(FluentIcon.FILTER, self.tr("All Categories"), self, checkable=True)
         allAction.triggered.connect(lambda: self.setCategoryFilter(""))
         self.categoryFilterGroup.addAction(allAction)
         self.categoryFilterMenu.addAction(allAction)
@@ -496,8 +496,8 @@ class TaskPage(QWidget):
 
     def _onDeleteSelected(self) -> None:
         from qfluentwidgets import CheckBox, MessageBox
-        dialog = MessageBox(self.tr("删除任务"), self.tr("确定要删除选中的下载任务吗？"), self.window())
-        deleteFiles = CheckBox(self.tr("同时删除已下载的文件"))
+        dialog = MessageBox(self.tr("Delete Task"), self.tr("Are you sure you want to delete the selected download task(s)?"), self.window())
+        deleteFiles = CheckBox(self.tr("Also delete downloaded files"))
         deleteFiles.setChecked(cfg.shouldDeleteFilesOnRemove.value)
         dialog.textLayout.addWidget(deleteFiles)
         if dialog.exec():
@@ -519,7 +519,7 @@ class TaskPage(QWidget):
             self._refreshList()
 
         popup = RoundMenu(parent=self)
-        uncategorized = Action(FluentIcon.MORE, self.tr("未分类"), self)
+        uncategorized = Action(FluentIcon.MORE, self.tr("Uncategorized"), self)
         uncategorized.triggered.connect(lambda: moveTo(""))
         popup.addAction(uncategorized)
         popup.addSeparator()
@@ -586,27 +586,27 @@ class TaskPage(QWidget):
             self.emptyStatusWidget.hide()
         else:
             if not self._taskService.tasks:
-                text = self.tr("暂无下载任务")
+                text = self.tr("No download tasks")
             elif self._searchText and (self._filterMode != FilterMode.ALL or self._categoryFilter):
-                text = self.tr("没有匹配筛选条件的任务")
+                text = self.tr("No tasks match the current filters")
             elif self._searchText:
-                text = self.tr("没有匹配的任务")
+                text = self.tr("No matching tasks")
             elif self._categoryFilter:
-                text = self.tr("该分类下暂无任务")
+                text = self.tr("No tasks under this category")
             elif self._filterMode == FilterMode.ACTIVE:
-                text = self.tr("暂无活动任务")
+                text = self.tr("No active tasks")
             elif self._filterMode == FilterMode.COMPLETED:
-                text = self.tr("暂无完成任务")
+                text = self.tr("No completed tasks")
             else:
-                text = self.tr("暂无下载任务")
+                text = self.tr("No download tasks")
             self.emptyStatusWidget.setText(text)
             self.emptyStatusWidget.adjustSize()
             self.emptyStatusWidget.show()
 
     def _unmountCard(self, card: TaskCard) -> None:
         card.hide()
-        # 嵌套事件循环（对话框 exec 等）可能正挂在卡片的栈帧上，
-        # 此刻销毁会让栈回退进已删控件；推迟到回到主循环后的下次刷新
+        # a nested event loop (dialog exec, etc.) may be sitting on the card's stack frame,
+        # destroying now would unwind the stack into a deleted widget; defer to the next refresh after returning to the main loop
         if QThread.currentThread().loopLevel() > 1:
             self._pendingUnmounts.append(card)
         else:

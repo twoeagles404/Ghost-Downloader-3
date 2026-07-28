@@ -1,4 +1,4 @@
-"""TaskService 生命周期的逐分支测试。
+"""Branch-by-branch tests for the TaskService lifecycle.
 
 Seam S7: TaskService.add/pause/delete/redownload/edit/queue
 """

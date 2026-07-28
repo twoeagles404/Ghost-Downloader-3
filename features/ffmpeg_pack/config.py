@@ -28,7 +28,7 @@ def ffmpegAssetTarget() -> str:
         return "macos-arm64" if isArm else "macos-x64"
     if sys.platform == "linux":
         return "linux-arm64" if isArm else "linux-x64"
-    raise RuntimeError(f"当前平台暂不支持一键安装 FFmpeg: {sys.platform}")
+    raise RuntimeError(f"One-click FFmpeg installation is not supported on the current platform yet: {sys.platform}")
 
 
 class FFmpegConfig(PackConfig):
@@ -41,7 +41,7 @@ class FFmpegConfig(PackConfig):
         ffmpegGroup = CollapsibleSettingCardGroup(self.tr("FFmpeg"), "ffmpeg", parent)
         installFolderCard = SelectFolderSettingCard(
             ffmpegConfig.installFolder, f"{APP_DATA_DIR}/FFmpeg",
-            self.tr("FFmpeg 安装目录"),
+            self.tr("FFmpeg Install Location"),
             ffmpegGroup,
         )
         runtimeCard = self.createRuntimeCard(ffmpegRuntime, ffmpegGroup)
@@ -58,8 +58,8 @@ ffmpegConfig = FFmpegConfig()
 class FFmpegRuntime(BinaryRuntime):
     name = "FFmpeg"
     canInstall = not IS_ANDROID
-    title = N("BinaryRuntime", "视频合并")
-    description = N("BinaryRuntime", "哔哩哔哩、YouTube 等网站视频下载必备，合并音视频轨道为完整文件")
+    title = N("BinaryRuntime", "Video merge")
+    description = N("BinaryRuntime", "Essential for downloading videos from sites such as Bilibili and YouTube; merges audio and video tracks into a complete file")
     icon = FluentIcon.VIDEO
     isRecommended = True
 
@@ -124,7 +124,7 @@ class FFmpegRuntime(BinaryRuntime):
         return await self.parse(BinaryInstallOptions(
             url=url,
             outputFolder=Path(ffmpegConfig.installFolder.value),
-            name=f"FFmpeg 安装 ({target})",
+            name=f"FFmpeg installation ({target})",
             executableNames=executableNames,
             sha256Url=f"{url}.sha256",
         ))

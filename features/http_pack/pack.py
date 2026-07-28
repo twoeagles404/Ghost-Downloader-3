@@ -117,13 +117,13 @@ class HttpParser(TaskParser):
 
                 if canUseRangeRequests:
                     logger.info(
-                        "偏移 Range 探测成功, content-range: {}, fileSize: {}",
+                        "Offset Range probe succeeded, content-range: {}, fileSize: {}",
                         responseHeaders.get("content-range", ""), fileSize,
                     )
                 else:
                     fileSize = bodyLength(responseHeaders)
                     logger.info(
-                        "偏移 Range 探测返回 {}, content-length: {}",
+                        "Offset Range probe returned {}, content-length: {}",
                         statusCode, responseHeaders.get("content-length", ""),
                     )
 
@@ -132,7 +132,7 @@ class HttpParser(TaskParser):
                         fbSize = rangeTotal(fbHeaders)
                         if fbStatus == 206 and "content-range" in fbHeaders:
                             logger.info(
-                                "回退 Range 探测成功, content-range: {}, fileSize: {}",
+                                "Fallback Range probe succeeded, content-range: {}, fileSize: {}",
                                 fbHeaders.get("content-range", ""), fbSize,
                             )
                             fileSize = fbSize

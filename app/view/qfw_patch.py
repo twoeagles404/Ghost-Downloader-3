@@ -7,8 +7,8 @@ if TYPE_CHECKING:
 
 
 def patchStackedWidgetAnimation() -> None:
-    # show() 触发 layout activation → setGeometry 把 widget 拉回 (0,0)，DWM 会合成该帧。
-    # 禁用 layout 并预移 widget 到动画起点来规避。
+    # show() triggers layout activation -> setGeometry pulls the widget back to (0,0), and the DWM composites that frame.
+    # avoid it by disabling layout and pre-moving the widget to the animation start point.
     from PySide6.QtCore import QEasingCurve, QPoint
     from PySide6.QtGui import QResizeEvent
     from qfluentwidgets.components.widgets.stacked_widget import PopUpAniStackedWidget
@@ -26,7 +26,7 @@ def patchStackedWidgetAnimation() -> None:
             savedDX, savedDY = info.deltaX, info.deltaY
             widget.resize(self.size())
             widget.move(QPoint(widget.x(), 0) + QPoint(savedDX, savedDY))
-            # 暂零 delta，让原方法从预移后的 pos 算出正确的动画值
+            # temporarily zero the delta so the original method computes the correct animation value from the pre-moved pos
             info.deltaX, info.deltaY = 0, 0
             self.layout().setEnabled(False)
             try:
@@ -38,7 +38,7 @@ def patchStackedWidgetAnimation() -> None:
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         _originalResizeEvent(self, event)
-        # layout 禁用期间不会 resize 子 widget
+        # the layout won't resize child widgets while disabled
         current = self.currentWidget()
         if current and current.size() != event.size():
             current.resize(event.size())

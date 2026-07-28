@@ -452,7 +452,7 @@ class Task:
         except Exception as e:
             if currentStep is not None:
                 currentStep.setError(StepError(
-                    "发生了意外错误：{detail}",
+                    "An unexpected error occurred: {detail}",
                     {"detail": str(e) or type(e).__name__}
                 ))
             logger.opt(exception=e).error("{} failed", self.name)

@@ -100,14 +100,14 @@ def startApp(application, isSilent=False):
     shouldRunOobe = not cfg.hasCompletedOobe.value and not isSilent
 
     if shouldRunOobe:
-        # 首次启动：服务先就绪，主窗口等 OOBE 结束后按最终配置创建
+        # first launch: the service becomes ready first, and the main window is created by the final config after OOBE ends
         from PySide6.QtCore import QEventLoop
         from app.view.windows.oobe_window import OobeWindow
 
         startEngine(taskService, speedMeter, featureService, coroutineRunner)
 
         if cfg.isBrowserExtensionEnabled.value:
-            browserService.start()  # 提前启动，OOBE 期间可完成扩展配对
+            browserService.start()  # start early so extension pairing can complete during OOBE
 
         oobe = OobeWindow(browserService, coroutineRunner, featureService, taskService)
         browserService.pairRequested.connect(oobe.onPairRequested)
@@ -119,8 +119,8 @@ def startApp(application, isSilent=False):
         loop.exec()
 
         browserService.pairRequested.disconnect(oobe.onPairRequested)
-        # 必须在主线程显式销毁：闭包连接使窗口陷入循环引用，若留给
-        # Python GC 会在任意工作线程 delete，主线程定时器表悬空 → 闪退
+        # must be destroyed explicitly on the main thread: closure connections trap the window in a reference cycle, and if left to
+        # Python GC may delete on any worker thread; the main-thread timer table then dangles -> crash
         oobe.deleteLater()
 
         window = MainWindow(taskService, featureService, browserService, categoryService, speedMeter, coroutineRunner, plan)
@@ -183,7 +183,7 @@ def startApp(application, isSilent=False):
     def onExtensionUpdated(version):
         from qfluentwidgets import InfoBar, InfoBarPosition
         w = show()
-        InfoBar.success(w.tr("浏览器扩展已更新"), f"v{version}",
+        InfoBar.success(w.tr("Browser extension updated"), f"v{version}",
                         duration=3000, position=InfoBarPosition.BOTTOM_RIGHT, parent=w)
 
     browserService.extensionUpdated.connect(onExtensionUpdated)

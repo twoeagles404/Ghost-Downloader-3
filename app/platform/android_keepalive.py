@@ -61,7 +61,7 @@ class BackgroundKeepAlive:
                 self._startService(statusMessage)
                 self._running = True
             elif statusMessage != self._statusMessage:
-                notify(KEEPALIVE_CHANNEL, QCoreApplication.translate("KeepAlive", "后台任务"),
+                notify(KEEPALIVE_CHANNEL, QCoreApplication.translate("KeepAlive", "Background Tasks"),
                        KEEPALIVE_NOTIF_ID, "Ghost Downloader", statusMessage,
                        ongoing=True, lowImportance=True)
             self._statusMessage = statusMessage
@@ -75,8 +75,8 @@ class BackgroundKeepAlive:
             from app.format import toReadableSize
             return f"{toReadableSize(self._speed)}/s"
         if REASON_DOWNLOAD in self._activeReasons:
-            return QCoreApplication.translate("KeepAlive", "下载中")
-        return QCoreApplication.translate("KeepAlive", "浏览器扩展已连接")
+            return QCoreApplication.translate("KeepAlive", "Downloading")
+        return QCoreApplication.translate("KeepAlive", "Browser Extension Connected")
 
     def _startService(self, statusMessage: str) -> None:
         from jnius import autoclass

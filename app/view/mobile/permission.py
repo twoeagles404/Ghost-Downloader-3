@@ -14,8 +14,8 @@ class PermissionBanner(WarningBanner):
         super().__init__(parent, radius=0)
         self._onGrant = onGrant
         self.iconWidget = IconWidget(FluentIcon.INFO, self)
-        self.label = BodyLabel(text or self.tr("未授予存储权限，下载到公共目录将失败"), self)
-        self.grantButton = PrimaryPushButton(self.tr("去授权"), self)
+        self.label = BodyLabel(text or self.tr("Storage permission not granted, downloads to public directories may fail"), self)
+        self.grantButton = PrimaryPushButton(self.tr("Grant Permission"), self)
         self.hBoxLayout = QHBoxLayout(self)
         self._initWidget()
         self._initLayout()

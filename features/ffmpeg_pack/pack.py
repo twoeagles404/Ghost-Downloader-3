@@ -20,7 +20,7 @@ class MergeParser(TaskParser):
         assert isinstance(options, MergeTaskOptions)
 
         if not ffmpegRuntime.path() or not ffmpegRuntime.ffprobePath():
-            raise RuntimeError("未找到可用的 ffmpeg 和 ffprobe，请先在设置中安装或配置 FFmpeg")
+            raise RuntimeError("No usable ffmpeg and ffprobe found, please install or configure FFmpeg in settings first")
 
         videoTask = await self.delegate(options.video)
         audioTask = await self.delegate(options.audio)

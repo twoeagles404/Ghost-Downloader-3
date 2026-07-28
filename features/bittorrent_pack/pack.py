@@ -37,7 +37,7 @@ class TorrentParser(TaskParser):
                 try:
                     await trackerService.refresh()
                 except Exception as e:
-                    logger.opt(exception=e).warning("刷新 Web Tracker 失败,使用缓存")
+                    logger.opt(exception=e).warning("Failed to refresh Web Tracker, using cache")
             webTrackers = trackerService.mergedTrackers()
         else:
             webTrackers = []
@@ -53,15 +53,15 @@ class TorrentParser(TaskParser):
             sourceType, sourceUrl = "magnet", url
 
         else:
-            raise ValueError("无法解析 BitTorrent 来源")
+            raise ValueError("Cannot parse BitTorrent source")
 
         if not torrentBytes:
-            raise ValueError("种子文件为空")
+            raise ValueError("Torrent file is empty")
 
         try:
             ti = lt.torrent_info(torrentBytes)
         except Exception as e:
-            raise ValueError(f"无效的 BitTorrent 种子文件：{e}") from e
+            raise ValueError(f"Invalid BitTorrent torrent file: {e}") from e
 
         torrentTrackers = [str(t.url).strip() for t in ti.trackers()]
         allSources = (magnetTrackers, torrentTrackers, webTrackers) if sourceType == "magnet" else (torrentTrackers, webTrackers)
@@ -79,7 +79,7 @@ class TorrentParser(TaskParser):
         ]
 
         if not entries:
-            raise ValueError("该种子中没有可下载的普通文件")
+            raise ValueError("This torrent has no downloadable regular files")
 
         rootName = toSafeFilename(PurePosixPath(entries[0].relativePath).parts[0], fallback="torrent")
         name = toSafeFilename(Path(entries[0].relativePath).name, fallback="torrent") if len(entries) == 1 else rootName
@@ -114,7 +114,7 @@ class BitTorrentPack(FeaturePack):
         return [
             FileType(
                 extensions=(".torrent",),
-                displayName=self.tr("BitTorrent 种子文件"),
+                displayName=self.tr("BitTorrent Torrent File"),
                 mimeType="application/x-bittorrent",
                 icon="torrent",
             ),

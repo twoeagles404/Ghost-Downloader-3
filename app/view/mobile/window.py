@@ -39,7 +39,7 @@ class MobileMainWindow(QWidget):
         self.permissionBanner = PermissionBanner(requestStoragePermission, parent=self)
         self.notificationBanner = PermissionBanner(
             requestNotificationPermission,
-            text=self.tr("未开启通知权限，下载完成后将无法提醒"),
+            text=self.tr("Notification permission not enabled, you will not be notified when downloads complete"),
             parent=self,
         )
         self.taskPage = MobileTaskPage(taskService, featureService, categoryService, speedMeter, parent=self)
@@ -68,8 +68,8 @@ class MobileMainWindow(QWidget):
         self.addButton.setFixedSize(56, 56)
         self.addButton.setIconSize(QSize(22, 22))
         self.addButton.raise_()
-        self._addPage(self.taskPage, FluentIcon.DOWNLOAD, self.tr("任务"))
-        self._addPage(self.settingPage, FluentIcon.SETTING, self.tr("设置"))
+        self._addPage(self.taskPage, FluentIcon.DOWNLOAD, self.tr("Tasks"))
+        self._addPage(self.settingPage, FluentIcon.SETTING, self.tr("Settings"))
 
     def _initLayout(self):
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
@@ -169,7 +169,7 @@ class MobileMainWindow(QWidget):
                     task = await self._featureService.parse(TaskOptions(url=url))
                     self._taskService.add(task)
                 except Exception as e:
-                    logger.warning("自动下载失败 {}: {}", url, e)
+                    logger.warning("Auto download failed {}: {}", url, e)
 
         self._coroutineRunner.submit(parseAndAdd())
 
@@ -185,8 +185,8 @@ class MobileMainWindow(QWidget):
         if not isStorageGranted():
             requestStoragePermission()
             InfoBar.warning(
-                self.tr("需要存储权限"),
-                self.tr("请授予存储权限后再新建任务"),
+                self.tr("Storage permission required"),
+                self.tr("Grant storage permission before creating a new task"),
                 duration=4000,
                 position=InfoBarPosition.TOP,
                 parent=self,
@@ -205,18 +205,18 @@ class MobileMainWindow(QWidget):
 
         infoBar = InfoBar(
             icon=FluentIcon.CLOUD,
-            title=self.tr("检测到新版本"),
-            content=self.tr("最新版本: {0}").format(release.version),
+            title=self.tr("New Version Available"),
+            content=self.tr("Latest version: {0}").format(release.version),
             orient=Qt.Orientation.Vertical,
             isClosable=True,
             duration=-1,
             position=InfoBarPosition.BOTTOM_RIGHT,
             parent=self,
         )
-        downloadButton = PrimaryPushButton(FluentIcon.DOWNLOAD, self.tr("立即下载"))
+        downloadButton = PrimaryPushButton(FluentIcon.DOWNLOAD, self.tr("Download Now"))
         downloadButton.clicked.connect(lambda: addBestAssetTask(release, self))
         infoBar.addWidget(downloadButton)
-        detailButton = PushButton(FluentIcon.CHAT, self.tr("查看详情"))
+        detailButton = PushButton(FluentIcon.CHAT, self.tr("View Details"))
         detailButton.clicked.connect(lambda: showReleaseDialog(release, self))
         infoBar.addWidget(detailButton)
         infoBar.show()
@@ -232,12 +232,12 @@ class MobileMainWindow(QWidget):
         from app.platform.android import openFile
 
         dialog = MessageBox(
-            self.tr("程序发生异常"),
-            self.tr('点击"确定"后将复制错误信息并打开反馈页面。\n\n{0}').format(message),
+            self.tr("An exception occurred"),
+            self.tr('After clicking "OK", the error info will be copied and the feedback page will open.\n\n{0}').format(message),
             self,
         )
         logButton = TransparentToolButton(FluentIcon.DOCUMENT, dialog)
-        logButton.setToolTip(self.tr("查看日志"))
+        logButton.setToolTip(self.tr("View Logs"))
         logButton.installEventFilter(ToolTipFilter(logButton))
         logButton.clicked.connect(lambda: openFile(f"{APP_DATA_DIR}/GhostDownloader.log"))
 

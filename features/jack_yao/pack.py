@@ -49,7 +49,7 @@ async def fetchCatalog() -> list[dict]:
 
 class CatalogPage(PackPage, ScrollArea):
     icon = FluentIcon.CLOUD_DOWNLOAD
-    title = QCoreApplication.translate("CatalogPage", "资源下载")
+    title = QCoreApplication.translate("CatalogPage", "Resource Downloads")
 
     def __init__(self, pack, parent=None):
         super().__init__(parent)
@@ -108,7 +108,7 @@ class CatalogPage(PackPage, ScrollArea):
         self._layout.addStretch(1)
 
     def _onCatalogFailed(self, error: str):
-        self._loadingWidget.setError(self.tr("加载失败，请检查网络后重试\n") + str(error))
+        self._loadingWidget.setError(self.tr("Loading failed, please check the network and retry\n") + str(error))
 
     def _onDownloadRequested(self, items: list[dict]):
         CatalogDownloadDialog(self._pack, self.window(), items).exec()
@@ -121,11 +121,11 @@ class LoadingWidget(QWidget):
         super().__init__(parent)
         self._ring = IndeterminateProgressRing(self)
         self._ring.setFixedSize(48, 48)
-        self._label = CaptionLabel(self.tr("正在加载..."), self)
+        self._label = CaptionLabel(self.tr("Loading..."), self)
         self._errorIcon = IconWidget(FluentIcon.CANCEL, self)
         self._errorIcon.setFixedSize(48, 48)
         self._errorIcon.hide()
-        self._retryButton = PushButton(self.tr("重试"), self)
+        self._retryButton = PushButton(self.tr("Retry"), self)
         self._retryButton.hide()
 
         self._label.setTextColor(QColor(96, 96, 96), QColor(206, 206, 206))
@@ -145,7 +145,7 @@ class LoadingWidget(QWidget):
     def setLoading(self):
         self._ring.show()
         self._errorIcon.hide()
-        self._label.setText(self.tr("正在加载..."))
+        self._label.setText(self.tr("Loading..."))
         self._retryButton.hide()
         self.show()
 
@@ -178,11 +178,11 @@ class CatalogCard(SimpleCardWidget):
         self._bodyLabel.setMaximumHeight(61)
         self._bodyLabel.setWordWrap(True)
 
-        self._downloadButton = PrimaryPushButton(FluentIcon.DOWNLOAD, self.tr("下载"), self)
+        self._downloadButton = PrimaryPushButton(FluentIcon.DOWNLOAD, self.tr("Download"), self)
         self._downloadButton.setFixedWidth(100)
         self._videoButton = TransparentToolButton(FluentIcon.VIDEO, self)
         self._videoButton.installEventFilter(ToolTipFilter(self._videoButton))
-        self._videoButton.setToolTip(self.tr("观看视频"))
+        self._videoButton.setToolTip(self.tr("Watch Video"))
         self._videoButton.setEnabled(bool(self._videoUrl))
 
         self._initLayout()
@@ -222,14 +222,14 @@ class CatalogDownloadDialog(MessageBoxBase):
         versions = [item["Version"] for item in self._items]
         versionItem = OptionsConfigItem("Material", "Version", versions[0], OptionsValidator(versions))
 
-        self._versionGroup = SettingCardGroup(self.tr("选择版本"), self)
+        self._versionGroup = SettingCardGroup(self.tr("Select Version"), self)
         self._versionCard = ComboBoxSettingCard(
-            versionItem, FluentIcon.VIEW, self.tr("选择版本"), self.tr("选择你想下载的版本"),
+            versionItem, FluentIcon.VIEW, self.tr("Select Version"), self.tr("Choose the version you want to download"),
             texts=versions, parent=self._versionGroup,
         )
         self._versionGroup.addSettingCard(self._versionCard)
 
-        self._logGroup = SettingCardGroup(self.tr("更新日志"), self)
+        self._logGroup = SettingCardGroup(self.tr("Changelog"), self)
         self._logEdit = AutoSizingEdit(self._logGroup, minimumVisibleLines=3, maximumVisibleLines=8)
         self._logEdit.setReadOnly(True)
         self._logEdit.setPlainText(self._items[0]["Log"] if self._items else "")
@@ -239,8 +239,8 @@ class CatalogDownloadDialog(MessageBoxBase):
         self._optionGroup.addCard(OutputFolderCard(self._optionGroup))
         self._optionGroup.addCard(SubworkerCountCard(self._optionGroup))
 
-        self.yesButton.setText(self.tr("开始下载"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Start Download"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         self.viewLayout.addWidget(self._versionGroup)
         self.viewLayout.addWidget(self._logGroup)
@@ -262,7 +262,7 @@ class CatalogDownloadDialog(MessageBoxBase):
         item = self._items[index]
         options = self._optionGroup.options()
         window = self.window()
-        failedTitle = self.tr("下载失败")
+        failedTitle = self.tr("Download Failed")
 
         def onParsed(task):
             for step in task.steps:

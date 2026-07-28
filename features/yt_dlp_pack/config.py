@@ -83,7 +83,7 @@ class YtDlpConfig(PackConfig):
         from app.view.components.setting_card_group import CollapsibleSettingCardGroup
         from app.view.components.setting_cards import SelectFolderSettingCard
 
-        group = CollapsibleSettingCardGroup(self.tr("YouTube 下载"), "ytdlp", parent)
+        group = CollapsibleSettingCardGroup(self.tr("YouTube Download"), "ytdlp", parent)
 
         runtimeCard = self.createRuntimeCard(youTubeRuntime, group)
         cards = [runtimeCard]
@@ -91,7 +91,7 @@ class YtDlpConfig(PackConfig):
         if not IS_ANDROID:
             installFolderCard = SelectFolderSettingCard(
                 ytDlpConfig.installFolder, f"{APP_DATA_DIR}/YtDlp",
-                self.tr("运行环境安装目录"),
+                self.tr("Runtime install directory"),
                 group,
             )
             installFolderCard.pathChanged.connect(runtimeCard._onInstallFolderChanged)
@@ -102,22 +102,22 @@ class YtDlpConfig(PackConfig):
         cards.extend([
             SwitchSettingCard(
                 FluentIcon.VIDEO,
-                self.tr("优先 MP4 格式"),
-                self.tr("优先选择 H.264/MP4 编码，避免输出 WebM/MKV"),
+                self.tr("Prefer MP4 Format"),
+                self.tr("Prefer H.264/MP4 codec to avoid WebM/MKV output"),
                 self.shouldPreferMp4,
                 group,
             ),
             SwitchSettingCard(
                 FluentIcon.INFO,
-                self.tr("嵌入元数据"),
-                self.tr("下载完成后将标题、作者等信息嵌入文件"),
+                self.tr("Embed Metadata"),
+                self.tr("Embed metadata (title, author, etc.) into file after download"),
                 self.shouldEmbedMetadata,
                 group,
             ),
             SwitchSettingCard(
                 FluentIcon.BOOK_SHELF,
-                self.tr("嵌入章节"),
-                self.tr("下载完成后将章节标记嵌入文件"),
+                self.tr("Embed Chapters"),
+                self.tr("Embed chapter markers into file after download"),
                 self.shouldEmbedChapters,
                 group,
             ),
@@ -132,10 +132,10 @@ ytDlpConfig = YtDlpConfig()
 
 
 class YouTubeRuntime(BinaryRuntime):
-    name = "YouTube 运行环境"
+    name = "YouTube runtime"
     canInstall = True
-    title = N("BinaryRuntime", "YouTube 下载")
-    description = N("BinaryRuntime", "支持 YouTube、Twitter 等数百个视频网站")
+    title = N("BinaryRuntime", "YouTube Download")
+    description = N("BinaryRuntime", "Supports hundreds of video sites such as YouTube and Twitter")
     icon = FluentIcon.GLOBE
     isRecommended = True
 
@@ -240,7 +240,7 @@ class YouTubeRuntime(BinaryRuntime):
 
         if IS_ANDROID:
             task = InstallTask(
-                name="yt-dlp 安装",
+                name="yt-dlp installation",
                 url=whlUrl,
                 packId="disk",
                 fileSize=whlSize,
@@ -277,7 +277,7 @@ class YouTubeRuntime(BinaryRuntime):
         qjsStep.outputFile = str(installFolder / qjsBinaryName)
 
         task = InstallTask(
-            name="YouTube 运行环境安装",
+            name="YouTube runtime installation",
             url=whlUrl,
             packId="disk",
             fileSize=whlSize + max(0, qjsDownload.fileSize),
@@ -321,7 +321,7 @@ class YouTubeRuntime(BinaryRuntime):
         for entry in urls:
             if entry.get("packagetype") == "bdist_wheel" and entry.get("filename", "").endswith(".whl"):
                 return entry["url"], entry.get("size") or 0
-        raise RuntimeError("未找到 yt-dlp wheel 安装包")
+        raise RuntimeError("yt-dlp wheel package not found")
 
 def _qjsAssetName() -> str:
     machine = platform.machine().lower()
@@ -345,12 +345,12 @@ class CookieSettingCard(SettingCard):
             parent,
         )
         self._importButton = PushButton(
-            QCoreApplication.translate("YtDlpConfig", "导入"),
+            QCoreApplication.translate("YtDlpConfig", "Import"),
             self,
         )
         self._clearButton = ToolButton(FluentIcon.DELETE, self)
         self._clearButton.setToolTip(
-            QCoreApplication.translate("YtDlpConfig", "清除 Cookie")
+            QCoreApplication.translate("YtDlpConfig", "Clear Cookie")
         )
         self._clearButton.installEventFilter(ToolTipFilter(self._clearButton))
         self._clearButton.setVisible(hasCookieFile())
@@ -365,9 +365,9 @@ class CookieSettingCard(SettingCard):
 
     def _statusText(self) -> str:
         if hasCookieFile():
-            return QCoreApplication.translate("YtDlpConfig", "已导入")
+            return QCoreApplication.translate("YtDlpConfig", "Imported")
         return QCoreApplication.translate(
-            "YtDlpConfig", "下载需要登录的内容时需要 Cookie，推荐通过浏览器扩展自动导入"
+            "YtDlpConfig", "A cookie is required to download content that requires login. It is recommended to automatically import it using the browser extension."
         )
 
     def showEvent(self, event) -> None:
@@ -384,16 +384,16 @@ class CookieSettingCard(SettingCard):
         dialog = MessageBoxBase(self.window())
         dialog.widget.setMinimumWidth(500)
         dialog.viewLayout.addWidget(SubtitleLabel(
-            QCoreApplication.translate("YtDlpConfig", "导入 YouTube Cookie"),
+            QCoreApplication.translate("YtDlpConfig", "Import YouTube Cookie"),
             dialog,
         ))
 
         label = CaptionLabel(
             QCoreApplication.translate(
                 "YtDlpConfig",
-                "安装浏览器扩展后，下载 YouTube 视频时会自动携带登录信息，无需手动操作。\n"
-                "如需手动导入：打开 YouTube 并登录，按 F12 打开开发者工具，在 Network 标签中"
-                "找到任意请求，复制其 Cookie 请求头的值并粘贴到下方。",
+                "After installing the browser extension, downloading YouTube videos automatically includes login info, no manual steps needed.\n"
+                "To import manually: open YouTube and log in, press F12 to open DevTools, and in the Network tab"
+                "Find any request, copy the value of its Cookie request header and paste it below.",
             ),
             dialog,
         )

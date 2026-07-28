@@ -1,6 +1,6 @@
-"""TaskCard.refresh() 回归测试 — 历史上断过 2 次。
+"""TaskCard.refresh() regression test - historically broke twice.
 
-Seam S10: refresh() 在所有状态 × fileSize 组合下不抛异常。
+Seam S10: refresh() does not raise across all status x fileSize combinations.
 """
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ def makeCard(qapp, status, fileSize=1000, withError=False):
         step.progress = 100
         step.receivedBytes = fileSize
     if withError:
-        step.error = StepError("测试错误")
+        step.error = StepError("Test error")
 
     task = Task(name="test.txt", url="http://test", packId="test",
                 steps=[step], fileSize=fileSize)

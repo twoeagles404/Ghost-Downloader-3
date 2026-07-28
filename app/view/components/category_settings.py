@@ -32,9 +32,9 @@ class CategoryRowWidget(QWidget):
 
     def _initWidget(self) -> None:
         self.iconWidget.setFixedSize(16, 16)
-        self.editButton.setToolTip(self.tr("编辑"))
+        self.editButton.setToolTip(self.tr("Edit"))
         self.editButton.installEventFilter(ToolTipFilter(self.editButton))
-        self.removeButton.setToolTip(self.tr("删除"))
+        self.removeButton.setToolTip(self.tr("Delete"))
         self.removeButton.installEventFilter(ToolTipFilter(self.removeButton))
 
     def _initLayout(self) -> None:
@@ -55,10 +55,10 @@ class CategoryRowWidget(QWidget):
     def _toSummary(self, category: Category) -> str:
         count = len(category.extensions)
         if count == 0:
-            return self.tr("无扩展名")
+            return self.tr("None")
         head = ", ".join(category.extensions[:4])
         if count > 4:
-            return self.tr("{0} 等 {1} 项").format(head, count)
+            return self.tr("{0} & more totaling {1} items").format(head, count)
         return head
 
 
@@ -67,16 +67,16 @@ class CategoryRulesCard(CollapsibleSettingCard):
     def __init__(self, categoryService, parent=None):
         super().__init__(
             FluentIcon.TAG,
-            self.tr("下载分类规则"),
-            self.tr("根据扩展名自动归类，可为分类指定下载文件夹"),
+            self.tr("Categorization Rules"),
+            self.tr("Automatically categorize downloads by file extensions and specify download location for each category"),
             parent,
         )
         self._categoryService = categoryService
         self._rowWidgets: list[CategoryRowWidget] = []
         self.buttonContainer = QWidget(self.view)
         self.buttonLayout = QHBoxLayout(self.buttonContainer)
-        self.resetButton = PushButton(FluentIcon.SYNC, self.tr("恢复默认"), self.buttonContainer)
-        self.addButton = PushButton(FluentIcon.ADD, self.tr("添加分类"), self.buttonContainer)
+        self.resetButton = PushButton(FluentIcon.SYNC, self.tr("Restore Defaults"), self.buttonContainer)
+        self.addButton = PushButton(FluentIcon.ADD, self.tr("Add"), self.buttonContainer)
 
         self._initLayout()
         self._reload()
@@ -110,7 +110,7 @@ class CategoryRulesCard(CollapsibleSettingCard):
             self._rowWidgets.append(row)
 
         self.viewLayout.addWidget(self.buttonContainer)
-        self.card.setContent(self.tr("已配置 {0} 个分类").format(len(self._rowWidgets)))
+        self.card.setContent(self.tr("{0} categories configured").format(len(self._rowWidgets)))
 
     def _onAddClicked(self) -> None:
         from app.view.dialogs.category_edit import CategoryEditDialog

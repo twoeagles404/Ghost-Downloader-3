@@ -120,7 +120,7 @@ class HttpTaskStep(TaskStep):
                     index += 1
             return subworkers
         except Exception as e:
-            logger.opt(exception=e).error("恢复下载分片失败 {}", self.outputPath)
+            logger.opt(exception=e).error("Failed to resume download segment {}", self.outputPath)
             return []
 
     def _buildSubworkers(self) -> list[HttpSubworker]:
@@ -147,7 +147,7 @@ class HttpTaskStep(TaskStep):
             if target.is_file() or target.is_symlink():
                 target.unlink()
         except Exception as e:
-            logger.opt(exception=e).error("删除进度文件失败 {}", target)
+            logger.opt(exception=e).error("Failed to delete progress file {}", target)
 
     def _splitSlowest(self) -> HttpSubworker | None:
         slowest = max(self.subworkers, key=lambda sw: sw.end - sw.position + 1)
@@ -212,11 +212,11 @@ class HttpTaskStep(TaskStep):
 
             if speedRatio < 0.8 * workerRatio:
                 self.isAccelerated = True
-                logger.info("自动加速已禁用，subworker 增加比: {:.2%}, 速度提升比: {:.2%}",
+                logger.info("Auto speed-up disabled, subworker increase ratio: {:.2%}, speed gain ratio: {:.2%}",
                             workerRatio, speedRatio)
             else:
                 self._accelCheckTime = 0
-                logger.info("继续自动加速，subworker 增加比: {:.2%}, 速度提升比: {:.2%}",
+                logger.info("Continuing auto speed-up, subworker increase ratio: {:.2%}, speed gain ratio: {:.2%}",
                             workerRatio, speedRatio)
 
     async def _supervise(self) -> None:
@@ -272,7 +272,7 @@ class HttpTaskStep(TaskStep):
                         if status == 200:
                             raise RangeNotSupportedError()
                         if status != 206:
-                            raise Exception(f"服务器拒绝了范围请求，状态码：{status}")
+                            raise Exception(f"The server rejected the range request, status code: {status}")
                         async for chunk in response.stream():
                             if not chunk:
                                 continue
@@ -290,7 +290,7 @@ class HttpTaskStep(TaskStep):
                 except Exception as e:
                     if isinstance(e, OSError) and e.errno in FATAL_IO_ERRNO:
                         raise
-                    logger.opt(exception=e).error("下载分片失败，将在 5 秒后重试 {}", self.outputPath)
+                    logger.opt(exception=e).error("Failed to download segment, will retry in 5 seconds {}", self.outputPath)
                     await asyncio.sleep(5)
 
         elif subworker.end == SpecialFileSize.NOT_SUPPORTED:
@@ -304,7 +304,7 @@ class HttpTaskStep(TaskStep):
                         if status in PERMANENT_STATUS or response.headers.contains_key("cf-mitigated"):
                             raise PermanentDownloadError(status)
                         if status != 200:
-                            raise Exception(f"服务器返回了异常状态码：{status}")
+                            raise Exception(f"The server returned an abnormal status code: {status}")
                         async for chunk in response.stream():
                             if not chunk:
                                 continue
@@ -323,7 +323,7 @@ class HttpTaskStep(TaskStep):
                 except Exception as e:
                     if isinstance(e, OSError) and e.errno in FATAL_IO_ERRNO:
                         raise
-                    logger.opt(exception=e).error("下载分片失败，将在 5 秒后重试 {}", self.outputPath)
+                    logger.opt(exception=e).error("Failed to download segment, will retry in 5 seconds {}", self.outputPath)
                     await asyncio.sleep(5)
 
         else:
@@ -342,7 +342,7 @@ class HttpTaskStep(TaskStep):
                         if status == 200:
                             raise RangeNotSupportedError()
                         if status != 206:
-                            raise Exception(f"服务器拒绝了范围请求，状态码：{status}")
+                            raise Exception(f"The server rejected the range request, status code: {status}")
                         async for chunk in response.stream():
                             if not chunk:
                                 continue
@@ -368,7 +368,7 @@ class HttpTaskStep(TaskStep):
                 except Exception as e:
                     if isinstance(e, OSError) and e.errno in FATAL_IO_ERRNO:
                         raise
-                    logger.opt(exception=e).error("下载分片失败，将在 5 秒后重试 {}", self.outputPath)
+                    logger.opt(exception=e).error("Failed to download segment, will retry in 5 seconds {}", self.outputPath)
                     await asyncio.sleep(5)
 
             self._reassignSubworker()
@@ -423,7 +423,7 @@ class HttpTaskStep(TaskStep):
             try:
                 ftruncate(self._fd, self.fileSize)
             except Exception as e:
-                logger.opt(exception=e).error("{} 预分配文件大小失败", self.outputPath)
+                logger.opt(exception=e).error("{} failed to preallocate file size", self.outputPath)
 
         try:
             while True:
@@ -444,7 +444,7 @@ class HttpTaskStep(TaskStep):
                     if self.canUseRangeRequests and any(
                         isinstance(e, RangeNotSupportedError) for e in eg.exceptions
                     ):
-                        logger.warning("服务器不支持范围请求，降级为单流下载 {}", self.outputPath)
+                        logger.warning("Server does not support range requests, downgrading to single-stream download {}", self.outputPath)
                         self.canUseRangeRequests = False
                         self.subworkers = self._buildSubworkers()
                         ftruncate(self._fd, 0)
@@ -455,9 +455,9 @@ class HttpTaskStep(TaskStep):
 
                     cause = eg.exceptions[0]
                     if isinstance(cause, PermanentDownloadError):
-                        raise TaskError("服务器返回了错误（{status}）", status=cause.status) from eg
+                        raise TaskError("The server returned an error ({status})", status=cause.status) from eg
                     if isinstance(cause, OSError) and cause.errno in FATAL_IO_ERRNO:
-                        raise TaskError("磁盘空间不足") from eg
+                        raise TaskError("Insufficient disk space") from eg
                     raise cause from eg
                 finally:
                     if not supervisor.done():
@@ -474,4 +474,4 @@ class HttpTaskStep(TaskStep):
                         mtime = parsedate_to_datetime(self.lastModified).timestamp()
                         os.utime(self.outputPath, (mtime, mtime))
                     except Exception as e:
-                        logger.opt(exception=e).warning("设置文件修改时间失败 {}", self.outputPath)
+                        logger.opt(exception=e).warning("Failed to set file modification time {}", self.outputPath)

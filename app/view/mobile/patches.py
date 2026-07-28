@@ -152,7 +152,7 @@ def patchOptionCardLayout() -> None:
     expandingControls = (LineEdit, Slider, ComboBox)
 
     def reflowToVertical(card: QWidget) -> None:
-        # 窄屏横排会把路径框/滑块挤没
+        # a horizontal row on a narrow screen would squeeze out the path box/slider
         layout = card.layout()
         title = getattr(card, "titleLabel", None)
         if layout is None or title is None or getattr(card, "_usesMobileLayout", False):

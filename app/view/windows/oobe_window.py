@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 WINDOW_SIZE = QSize(960, 600)
 PREVIEW_GIF = ":/res/install_chrome_extension_guidance.webp"
-# 960 - 边距 36*2 - 右栏 280 - 间距 16 = 592，按 16:9 取整
+# 960 - margins 36*2 - right column 280 - spacing 16 = 592, rounded to 16:9
 PREVIEW_SIZE = QSize(592, 333)
 STORE_COLUMN_WIDTH = 280
 
@@ -262,16 +262,16 @@ class WelcomePage(QWidget):
         self.iconLabel.setPixmap(QIcon(":/image/logo.png").pixmap(88, 88))
         self.iconLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.titleLabel = TitleLabel(self.tr("欢迎使用 Ghost Downloader"), self)
+        self.titleLabel = TitleLabel(self.tr("Welcome to Ghost Downloader"), self)
         self.titleLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.subtitleLabel = BodyLabel(
-            self.tr("快速、智能的下载管理器。\n接下来的几步将帮助你完成基本配置。"), self
+            self.tr("A fast, smart download manager.\nThe next few steps will help you complete the basic setup."), self
         )
         self.subtitleLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.subtitleLabel.setWordWrap(True)
 
-        self.startButton = PrimaryPushButton(self.tr("开始配置"), self)
+        self.startButton = PrimaryPushButton(self.tr("Start Setup"), self)
         self.startButton.setFixedWidth(200)
 
     def _initLayout(self) -> None:
@@ -303,26 +303,26 @@ class BasicSettingsPage(QWidget):
 
     def _initWidget(self) -> None:
         self.header = PageHeader(
-            self.tr("基本设置"),
-            self.tr("选择你喜欢的外观，设置下载文件的保存位置"), self,
+            self.tr("Basic Settings"),
+            self.tr("Choose your preferred appearance and set the download location"), self,
         )
 
         self._themeCards: list[ThemeCard] = []
-        for theme, label in [(Theme.LIGHT, self.tr("浅色")),
-                              (Theme.DARK, self.tr("深色")),
-                              (Theme.AUTO, self.tr("跟随系统"))]:
+        for theme, label in [(Theme.LIGHT, self.tr("Light")),
+                              (Theme.DARK, self.tr("Dark")),
+                              (Theme.AUTO, self.tr("Follow System"))]:
             self._themeCards.append(ThemeCard(theme, label, self))
         self._refreshThemeCards()
 
-        self.settingsCard = GroupHeaderCardWidget(self.tr("偏好"), self)
+        self.settingsCard = GroupHeaderCardWidget(self.tr("Preferences"), self)
 
         self.langCombo = ComboBox(self)
         self.langCombo.setMinimumWidth(200)
         for lang in cfg.language.options:
-            self.langCombo.addItem(LANGUAGE_TEXTS.get(lang, self.tr("使用系统设置")))
+            self.langCombo.addItem(LANGUAGE_TEXTS.get(lang, self.tr("Use System Settings")))
         self.langCombo.setCurrentIndex(cfg.language.options.index(cfg.language.value))
 
-        self.browseButton = PushButton(self.tr("浏览..."), self)
+        self.browseButton = PushButton(self.tr("Browse..."), self)
 
     def _initLayout(self) -> None:
         layout = QVBoxLayout(self)
@@ -339,11 +339,11 @@ class BasicSettingsPage(QWidget):
         layout.addStretch(1)
 
         self.settingsCard.addGroup(
-            FluentIcon.LANGUAGE, self.tr("界面语言"),
-            self.tr("更改立即生效"), self.langCombo,
+            FluentIcon.LANGUAGE, self.tr("Interface Language"),
+            self.tr("Changes take effect immediately"), self.langCombo,
         )
         self._folderGroup = self.settingsCard.addGroup(
-            FluentIcon.FOLDER, self.tr("下载保存位置"),
+            FluentIcon.FOLDER, self.tr("Download Location"),
             str(cfg.downloadFolder.value), self.browseButton,
         )
         layout.addWidget(self.settingsCard)
@@ -374,7 +374,7 @@ class BasicSettingsPage(QWidget):
 
     def _onBrowseClicked(self) -> None:
         folder = QFileDialog.getExistingDirectory(
-            self, self.tr("选择下载目录"), str(cfg.downloadFolder.value)
+            self, self.tr("Choose Download Directory"), str(cfg.downloadFolder.value)
         )
         if folder:
             cfg.set(cfg.downloadFolder, folder)
@@ -395,8 +395,8 @@ class BrowserExtensionPage(QWidget):
 
     def _initWidget(self) -> None:
         self.header = PageHeader(
-            self.tr("安装浏览器扩展"),
-            self.tr("让浏览器中的下载自动接管到 Ghost Downloader"), self,
+            self.tr("Install Browser Extension"),
+            self.tr("Automatically take over downloads from your browser to Ghost Downloader"), self,
         )
 
         self.previewLabel = QLabel(self)
@@ -408,7 +408,7 @@ class BrowserExtensionPage(QWidget):
             self.previewLabel.setMovie(movie)
             movie.start()
         else:
-            self.previewLabel.setText(self.tr("安装教程动图"))
+            self.previewLabel.setText(self.tr("Installation Tutorial (GIF)"))
             if isDarkTheme():
                 bg, fg = "rgba(255,255,255,0.06)", "rgba(255,255,255,0.5)"
             else:
@@ -418,19 +418,19 @@ class BrowserExtensionPage(QWidget):
             )
 
         self.manualCard = ActionCard(
-            FluentIcon.DOWNLOAD, self.tr("手动安装"),
-            self.tr("随桌面端自动更新，适用于所有 Chromium 浏览器"),
+            FluentIcon.DOWNLOAD, self.tr("Manual Install"),
+            self.tr("Updates automatically with the desktop client; works with all Chromium-based browsers"),
             isRecommended=True, parent=self,
         )
         self.storeCards: list[tuple[ActionCard, str]] = []
         for title, url in [
-            (self.tr("Chrome 商店"), CHROME_WEBSTORE_URL),
-            (self.tr("Edge 商店"), EDGE_ADDONS_URL),
-            (self.tr("Firefox 商店"), FIREFOX_ADDONS_URL),
+            (self.tr("Chrome Store"), CHROME_WEBSTORE_URL),
+            (self.tr("Edge Store"), EDGE_ADDONS_URL),
+            (self.tr("Firefox Store"), FIREFOX_ADDONS_URL),
         ]:
             self.storeCards.append((ActionCard(FluentIcon.GLOBE, title, parent=self), url))
 
-        self.footnote = CaptionLabel(self.tr("商店版更新需等待审核，可能滞后于桌面端"), self)
+        self.footnote = CaptionLabel(self.tr("Store versions need to pass review before updates; may lag behind the desktop client"), self)
         self.footnote.setTextColor(Qt.GlobalColor.gray, Qt.GlobalColor.gray)
 
     def _initLayout(self) -> None:
@@ -492,28 +492,28 @@ class BrowserExtensionPage(QWidget):
         if self._browserService.boundPort:
             self._setBanner(
                 InfoBarIcon.INFORMATION,
-                self.tr("正在端口 {} 上等待扩展连接").format(self._browserService.boundPort),
+                self.tr("Waiting for extension connection on port {}").format(self._browserService.boundPort),
             )
         elif not cfg.isBrowserExtensionEnabled.value:
             self._setBanner(
                 InfoBarIcon.WARNING,
-                self.tr("浏览器扩展未启用，可稍后在设置中开启"),
+                self.tr("Browser extension is not enabled; you can turn it on later in Settings"),
             )
         else:
             self._setBanner(
                 InfoBarIcon.WARNING,
-                self.tr("端口 {} 被占用，请在设置中更换端口").format(
+                self.tr("Port {} is in use; please change the port in Settings").format(
                     cfg.browserExtensionPort.value
                 ),
             )
 
     def _setConnectedBanner(self, version: str) -> None:
         if version:
-            text = self.tr("已连接扩展 v{}，最新版本为 v{}").format(
+            text = self.tr("Extension v{} connected; latest version is v{}").format(
                 version, LATEST_EXTENSION_VERSION
             )
         else:
-            text = self.tr("已连接扩展，最新版本为 v{}").format(LATEST_EXTENSION_VERSION)
+            text = self.tr("Extension connected; latest version is v{}").format(LATEST_EXTENSION_VERSION)
         self._setBanner(InfoBarIcon.SUCCESS, text)
 
     def _onConnectionChanged(self) -> None:
@@ -540,14 +540,14 @@ class BrowserExtensionPage(QWidget):
         if not openChromiumUrl("chrome://extensions"):
             QApplication.clipboard().setText("chrome://extensions")
             InfoBar.info(
-                self.tr("请手动打开浏览器"),
-                self.tr("chrome://extensions 已复制到剪贴板"),
+                self.tr("Please manually open your browser"),
+                self.tr("chrome://extensions has been copied to clipboard"),
                 duration=5000, position=InfoBarPosition.TOP, parent=self,
             )
 
     def _onExtensionExtractFailed(self, error) -> None:
         InfoBar.error(
-            self.tr("解包失败"), str(error),
+            self.tr("Unpack failed"), str(error),
             duration=5000, position=InfoBarPosition.TOP, parent=self,
         )
 
@@ -559,7 +559,7 @@ class BrowserExtensionPage(QWidget):
     def _onProtocolMismatched(self) -> None:
         self._setBanner(
             InfoBarIcon.WARNING,
-            self.tr("协议版本不匹配，商店版可能滞后，请尝试手动安装"),
+            self.tr("Protocol version mismatch; the store version may be outdated, please try manual installation"),
         )
 
 
@@ -575,10 +575,10 @@ class RuntimeInstallPage(QWidget):
 
     def _initWidget(self) -> None:
         self.header = PageHeader(
-            self.tr("安装推荐组件"),
-            self.tr("点击下一步将自动安装勾选的组件，稍后可在设置中管理"), self,
+            self.tr("Install Recommended Components"),
+            self.tr("Click Next to install the selected components; you can manage them later in Settings"), self,
         )
-        self._card = GroupHeaderCardWidget(self.tr("推荐组件"), self)
+        self._card = GroupHeaderCardWidget(self.tr("Recommended Components"), self)
 
     def _initLayout(self) -> None:
         layout = QVBoxLayout(self)
@@ -608,7 +608,7 @@ class RuntimeInstallPage(QWidget):
             trailingLayout.addWidget(tag)
 
             if runtime.path():
-                installedLabel = CaptionLabel(self.tr("已安装"), trailing)
+                installedLabel = CaptionLabel(self.tr("Installed"), trailing)
                 installedLabel.setTextColor(Qt.GlobalColor.darkGreen, Qt.GlobalColor.green)
                 trailingLayout.addWidget(installedLabel)
             else:
@@ -638,37 +638,37 @@ class AdvancedOptionsPage(QWidget):
 
     def _initWidget(self) -> None:
         self.header = PageHeader(
-            self.tr("更多选项"),
-            self.tr("按需开启以下功能，也可以稍后在设置中修改"), self,
+            self.tr("More Options"),
+            self.tr("Enable the following features as needed; you can change them later in Settings"), self,
         )
         self.runAtLoginCard = OptionCard(
-            FluentIcon.POWER_BUTTON, self.tr("开机自启"),
-            self.tr("登录系统时自动在后台启动，随时接管下载"),
+            FluentIcon.POWER_BUTTON, self.tr("Start on Boot"),
+            self.tr("Run automatically at system startup to take over downloads anytime"),
             isChecked=cfg.shouldRunAtLogin.value, parent=self,
         )
         self.clipboardCard = OptionCard(
-            FluentIcon.PASTE, self.tr("剪贴板监听"),
-            self.tr("复制下载链接时自动弹出新任务提示"),
+            FluentIcon.PASTE, self.tr("Monitor Clipboard"),
+            self.tr("Automatically show new task prompt when a download link is copied"),
             isChecked=cfg.isClipboardListenerEnabled.value, parent=self,
         )
         self.categoryCard = OptionCard(
-            FluentIcon.TAG, self.tr("自动分类保存"),
-            self.tr("按文件类型自动保存到 视频、音频、文档 等子文件夹"),
+            FluentIcon.TAG, self.tr("Auto Categorize Downloads"),
+            self.tr("Automatically save files to subfolders (Videos, Audio, Documents, etc.) based on file type"),
             isChecked=cfg.isCategoryEnabled.value, parent=self,
         )
         self.fileAssocCard = OptionCard(
-            FluentIcon.DOCUMENT, self.tr("关联文件类型"),
-            self.tr("双击 .torrent 等文件时自动用 Ghost Downloader 打开"),
+            FluentIcon.DOCUMENT, self.tr("Associate File Types"),
+            self.tr("Automatically open .torrent and other supported files with Ghost Downloader"),
             isChecked=self._isFileAssociationEnabled(), parent=self,
         )
         self.urlSchemeCard = OptionCard(
-            FluentIcon.LINK, self.tr("注册 URL 协议"),
-            self.tr("允许网页通过 ghostdownloader:// 链接唤起本应用"),
+            FluentIcon.LINK, self.tr("Register URL Protocol"),
+            self.tr("Allow web pages to launch this app via ghostdownloader:// links"),
             isChecked=cfg.isUrlSchemeRegistered.value, parent=self,
         )
         self.aria2Card = OptionCard(
-            FluentIcon.COMMAND_PROMPT, self.tr("Aria2 RPC 兼容"),
-            self.tr("让支持 Aria2 的工具和网站把下载任务发给 Ghost Downloader"),
+            FluentIcon.COMMAND_PROMPT, self.tr("Aria2 RPC Compatibility"),
+            self.tr("Let Aria2-compatible tools and websites send download tasks to Ghost Downloader"),
             isChecked=cfg.isAria2RpcEnabled.value, parent=self,
         )
 
@@ -733,17 +733,17 @@ class CompletePage(QWidget):
     def _initWidget(self) -> None:
         self.checkIcon = IconChip(FluentIcon.ACCEPT, SUCCESS_CHIP_COLORS, size=80, parent=self)
 
-        self.titleLabel = TitleLabel(self.tr("一切就绪"), self)
+        self.titleLabel = TitleLabel(self.tr("All Set"), self)
         self.titleLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.descLabel = BodyLabel(
-            self.tr("Ghost Downloader 已准备好为你工作。\n你可以随时在设置中调整所有选项。"),
+            self.tr("Ghost Downloader is ready to work for you.\nYou can adjust all options in settings at any time."),
             self,
         )
         self.descLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.descLabel.setWordWrap(True)
 
-        self.finishButton = PrimaryPushButton(self.tr("开始使用"), self)
+        self.finishButton = PrimaryPushButton(self.tr("Get Started"), self)
         self.finishButton.setFixedWidth(200)
 
     def _initLayout(self) -> None:
@@ -814,9 +814,9 @@ class OobeWindow(FluentWidget):
         self.stackedWidget.addWidget(self.advancedOptionsPage)
         self.stackedWidget.addWidget(self.completePage)
 
-        self.backButton = PushButton(self.tr("上一步"), self)
-        self.skipButton = TransparentPushButton(self.tr("跳过全部"), self)
-        self.nextButton = PrimaryPushButton(self.tr("下一步"), self)
+        self.backButton = PushButton(self.tr("Previous"), self)
+        self.skipButton = TransparentPushButton(self.tr("Skip All"), self)
+        self.nextButton = PrimaryPushButton(self.tr("Next"), self)
         self.pipsPager = HorizontalPipsPager(self)
         self.pipsPager.setPageNumber(self.PAGE_COUNT)
         self.pipsPager.setVisibleNumber(self.PAGE_COUNT)
@@ -859,7 +859,7 @@ class OobeWindow(FluentWidget):
         self.browserExtensionPage.onPairRequested(request)
 
     def _onLanguageChanged(self) -> None:
-        # 延迟到信号栈外重建：发出信号的下拉框会随内容区一起销毁
+        # defer rebuild to outside the signal stack: the combo box emitting the signal is destroyed together with the content area
         from PySide6.QtCore import QTimer
         QTimer.singleShot(0, self._reloadLanguage)
 
@@ -937,7 +937,7 @@ class OobeWindow(FluentWidget):
             _taskService.add(task)
 
         def onFailed(error, name):
-            logger.error("OOBE 安装 {} 失败: {}", name, error)
+            logger.error("OOBE failed to install {}: {}", name, error)
 
         for runtime in runtimes:
             if runtime.path() or runtime.runtimeId in self._queuedRuntimeIds:
@@ -959,7 +959,7 @@ class OobeWindow(FluentWidget):
         self.close()
 
     def closeEvent(self, event) -> None:
-        # 用户直接关窗视为"跳过全部"
+        # the user directly closing the window is treated as "Skip All"
         if not self._isFinished:
             self._isFinished = True
             cfg.set(cfg.hasCompletedOobe, True)

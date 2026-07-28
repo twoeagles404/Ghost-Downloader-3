@@ -44,8 +44,8 @@ class M3U8Task(Task):
 
     def __post_init__(self):
         super().__post_init__()
-        # 直播流不存在断点：PAUSED/RUNNING 只可能是退出竞争或崩溃残留，
-        # 录制在进程结束的一刻就已终结，加载时校正为已完成
+        # live streams have no resume point: PAUSED/RUNNING can only be exit races or crash residue,
+        # recording already ended the moment the process exited; correct it to completed on load
         if self.isLive and self.status in {TaskStatus.PAUSED, TaskStatus.RUNNING}:
             for step in self.steps:
                 if isinstance(step, M3U8TaskStep) and step.status != TaskStatus.COMPLETED:
@@ -327,7 +327,7 @@ class M3U8TaskStep(TaskStep):
             buffer = lines.pop()
             for line in lines:
                 self._parseOutputLine(line)
-            # NonAnsiWriter 可能剥掉换行符，进度更新堆积在 buffer 里
+            # NonAnsiWriter may strip newlines, so progress updates pile up in the buffer
             self._parseOutputLine(buffer)
             if len(buffer) > 8192:
                 buffer = buffer[-4096:]
@@ -373,7 +373,7 @@ class M3U8TaskStep(TaskStep):
 
         execPath = m3u8Runtime.path()
         if not execPath:
-            raise TaskError("{name} 未安装，请在设置中安装", name="N_m3u8DL-RE")
+            raise TaskError("{name} is not installed, please install it in settings", name="N_m3u8DL-RE")
 
         self.task.outputFolder.mkdir(parents=True, exist_ok=True)
         Path(self._tempFolder).mkdir(parents=True, exist_ok=True)
@@ -401,7 +401,7 @@ class M3U8TaskStep(TaskStep):
 
             if self._process.returncode != 0 and not self._stopping:
                 raise TaskError(
-                    "进程异常退出（{code}）：{detail}",
+                    "Process exited abnormally ({code}): {detail}",
                     code=self._process.returncode,
                     detail=self.lastMessage or "N_m3u8DL-RE",
                 )

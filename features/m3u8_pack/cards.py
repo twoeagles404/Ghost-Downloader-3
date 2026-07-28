@@ -53,14 +53,14 @@ def toLiveSizeText(task, speed: int, received: int) -> str:
         return "--"
     from PySide6.QtCore import QCoreApplication
     if step.liveStatus == "Waiting":
-        return QCoreApplication.translate("M3U8LiveTaskCard", "等待中")
-    return QCoreApplication.translate("M3U8LiveTaskCard", "录制中")
+        return QCoreApplication.translate("M3U8LiveTaskCard", "Waiting")
+    return QCoreApplication.translate("M3U8LiveTaskCard", "Recording")
 
 
 LIVE_ETA_FIELD = FieldSpec("eta", FluentIcon.STOP_WATCH, {TaskStatus.RUNNING: toLiveEtaText})
 LIVE_SIZE_FIELD = FieldSpec("size", FluentIcon.LIBRARY, {TaskStatus.RUNNING: toLiveSizeText})
 
-LIVE_TOGGLE_BUTTON = ButtonSpec("toggle", FluentIcon.PLAY, "停止并定案", PrimaryToolButton, states={
+LIVE_TOGGLE_BUTTON = ButtonSpec("toggle", FluentIcon.PLAY, "Stop & Finalize", PrimaryToolButton, states={
     TaskStatus.RUNNING: lambda t: ButtonState(icon=FluentIcon.ACCEPT),
     TaskStatus.COMPLETED: lambda t: ButtonState(icon=FluentIcon.ACCEPT, enabled=False),
 })
@@ -83,7 +83,7 @@ class M3U8LiveTaskCard(TaskCard):
     def _refreshForStatus(self, task) -> None:
         super()._refreshForStatus(task)
         if task.status == TaskStatus.COMPLETED and not self._isFileMissing:
-            self._setStatus(self.tr("录制已结束"))
+            self._setStatus(self.tr("Recording Ended"))
 
 
 class StreamSelectCard(OptionCard):
@@ -98,7 +98,7 @@ class StreamSelectCard(OptionCard):
 
     def _initWidget(self):
         self.comboBox.setMinimumWidth(220)
-        self.comboBox.addItem(self.tr("默认（最佳）"), userData="")
+        self.comboBox.addItem(self.tr("Default (Best)"), userData="")
         selectedIndex = 0
         for index, stream in enumerate(self._streams, start=1):
             width = stream.get("width", 0)
@@ -174,7 +174,7 @@ class DecryptionKeyCard(OptionCard):
     def __init__(self, parent=None, *, keys: list | None = None, keyTextFile: str = ""):
         super().__init__(parent)
         self._keyTextFile = keyTextFile
-        self.titleLabel = BodyLabel(self.tr("解密密钥"), self)
+        self.titleLabel = BodyLabel(self.tr("Decryption key"), self)
         self.keyFileButton = TransparentToolButton(FluentIcon.FOLDER_ADD, self)
         self.keyFileLabel = BodyLabel(self)
         self.keysEdit = AutoSizingEdit(self, minimumVisibleLines=3, maximumVisibleLines=10)
@@ -184,7 +184,7 @@ class DecryptionKeyCard(OptionCard):
         self._bind()
 
     def _initWidget(self, keys: list):
-        self.keyFileButton.setToolTip(self.tr("选择 KEY 文本文件"))
+        self.keyFileButton.setToolTip(self.tr("Select KEY text file"))
         self.keyFileButton.installEventFilter(ToolTipFilter(self.keyFileButton))
         self.keysEdit.setPlaceholderText("KID1:KEY1\nKID2:KEY2")
         self.keysEdit.setPlainText("\n".join(keys))
@@ -208,7 +208,7 @@ class DecryptionKeyCard(OptionCard):
         self.keyFileButton.clicked.connect(self._onChooseKeyFile)
 
     def _onChooseKeyFile(self):
-        path, _ = QFileDialog.getOpenFileName(self, self.tr("选择 KEY 文本文件"))
+        path, _ = QFileDialog.getOpenFileName(self, self.tr("Select KEY text file"))
         if not path:
             return
         self._keyTextFile = path
@@ -222,7 +222,7 @@ class DecryptionKeyCard(OptionCard):
 class MuxImportCard(OptionCard):
     def __init__(self, parent=None, *, initial: list | None = None):
         super().__init__(parent)
-        self.titleLabel = BodyLabel(self.tr("导入音轨/字幕"), self)
+        self.titleLabel = BodyLabel(self.tr("Import audio track/subtitles"), self)
         self.importEdit = AutoSizingEdit(self, minimumVisibleLines=3, maximumVisibleLines=10)
 
         self._initWidget(initial or [])

@@ -23,9 +23,9 @@ class HeadersPresetEditDialog(MessageBoxBase):
 
     def _initWidget(self, preset: dict) -> None:
         self.widget.setMinimumWidth(500)
-        self.yesButton.setText(self.tr("确定"))
-        self.cancelButton.setText(self.tr("取消"))
-        self.nameEdit.setPlaceholderText(self.tr("预设名称"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
+        self.nameEdit.setPlaceholderText(self.tr("Preset Name"))
         self.nameEdit.setText(preset["name"])
         self.editor.setHeaders(preset["headers"])
 
@@ -45,14 +45,14 @@ class HeadersPresetEditDialog(MessageBoxBase):
         if self.nameEdit.text().strip():
             return True
         InfoBar.warning(
-            self.tr("请输入预设名称"),
-            self.tr("预设名称不能为空"),
+            self.tr("Enter preset name"),
+            self.tr("Preset name cannot be empty"),
             parent=self,
         )
         return False
 
     def preset(self) -> dict:
         return {
-            "name": self.nameEdit.text().strip() or self.tr("未命名预设"),
+            "name": self.nameEdit.text().strip() or self.tr("Unnamed Preset"),
             "headers": self.editor.headers(),
         }

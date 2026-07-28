@@ -64,7 +64,7 @@ class BilibiliParser(TaskParser):
         try:
             videoIdMatch = re.match(r"/video/(BV[a-zA-Z0-9]+|av\d+)", parsed.path)
             if not videoIdMatch:
-                raise ValueError("不是有效的 Bilibili 视频链接")
+                raise ValueError("Not a valid Bilibili video link")
             videoId = videoIdMatch.group(1)
 
             pageParam = parse_qs(parsed.query).get("p", [""])[0].strip()
@@ -91,18 +91,18 @@ class BilibiliParser(TaskParser):
             response.raise_for_status()
             viewPayload = await response.json()
             if viewPayload.get("code") not in {None, 0}:
-                raise ValueError(viewPayload.get("message") or "获取 Bilibili 视频信息失败")
+                raise ValueError(viewPayload.get("message") or "Failed to get Bilibili video info")
 
             viewData = viewPayload.get("data") or {}
             pages = list(viewData.get("pages") or [])
             if not pages:
-                raise ValueError("未获取到视频分P信息")
+                raise ValueError("No video part (P) info obtained")
 
             if selectedPages is None:
                 selectedPages = list(range(1, len(pages) + 1))
             selectedPages = [p for p in dict.fromkeys(selectedPages) if 1 <= p <= len(pages)]
             if not selectedPages:
-                raise ValueError("未找到有效的分P编号")
+                raise ValueError("No valid part (P) number found")
 
             videoTitle = str(viewData.get("title", "")).strip() or "bilibili_video"
             requestedQuality = bilibiliConfig.defaultQuality.value
@@ -139,7 +139,7 @@ class BilibiliParser(TaskParser):
                 response.raise_for_status()
                 playPayload = await response.json()
                 if playPayload.get("code") not in {None, 0}:
-                    raise ValueError(playPayload.get("message") or "获取 Bilibili 音视频流失败")
+                    raise ValueError(playPayload.get("message") or "Failed to get Bilibili audio/video streams")
 
                 pageData = playPayload.get("data") or {}
                 videoUrl = self._selectStream(
@@ -151,7 +151,7 @@ class BilibiliParser(TaskParser):
                     pageData.get("dash", {}).get("audio") or [],
                 )
                 if not videoUrl or not audioUrl:
-                    raise ValueError("未能解析出完整的音视频下载链接")
+                    raise ValueError("Could not parse a complete audio/video download link")
 
                 videoSize = await self._fetchSize(client, videoUrl, downloadHeaders)
                 audioSize = await self._fetchSize(client, audioUrl, downloadHeaders)
@@ -240,7 +240,7 @@ class BilibiliParser(TaskParser):
         acceptQuality: list[int] | None = None,
     ) -> str:
         if not streams:
-            raise ValueError("Bilibili 返回结果中不存在可用的媒体流")
+            raise ValueError("No usable media stream exists in the Bilibili response")
 
         def streamUrl(s: dict) -> str:
             url = s.get("baseUrl") or s.get("base_url")
@@ -266,7 +266,7 @@ class BilibiliParser(TaskParser):
             if url:
                 return url
 
-        raise ValueError("未找到可用的媒体流")
+        raise ValueError("No usable media stream found")
 
     async def _fetchSize(self, client, url: str, headers: dict) -> int:
         response = await client.get(url, headers={**headers, "range": "bytes=0-0"})
@@ -277,7 +277,7 @@ class BilibiliParser(TaskParser):
                 _, _, total = head["content-range"].rpartition("/")
                 if total != "*":
                     return int(total)
-            raise ValueError("音视频流不支持范围请求，当前实现无法下载")
+            raise ValueError("The audio/video stream does not support range requests; the current implementation cannot download it")
         finally:
             response.close()
 

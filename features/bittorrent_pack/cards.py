@@ -72,26 +72,26 @@ class BTTaskCard(MultiFileTaskCard):
             self.progressBar.hide()
             parts = []
             if task.shareRatioPercent > 0:
-                parts.append(self.tr("分享率 {0}").format(f"{task.shareRatioPercent:.1f}%"))
+                parts.append(self.tr("Seed Ratio: {0}").format(f"{task.shareRatioPercent:.1f}%"))
             if task.seedingTimeSeconds > 0:
-                parts.append(self.tr("做种 {0}").format(toReadableTime(task.seedingTimeSeconds)))
+                parts.append(self.tr("Seeded for {0}").format(toReadableTime(task.seedingTimeSeconds)))
             if task.peerCount > 0:
-                parts.append(self.tr("{0} peers").format(task.peerCount))
-            self._setStatus(self.tr("做种中") + "  " + " · ".join(parts))
-        elif task.status == TaskStatus.RUNNING and task.stateText and task.stateText != "下载中":
+                parts.append(self.tr("{0} Peers").format(task.peerCount))
+            self._setStatus(self.tr("Seeding") + "  " + " · ".join(parts))
+        elif task.status == TaskStatus.RUNNING and task.stateText and task.stateText != "Downloading":
             self.progressBar.hide()
             self._setStatus(task.stateText)
         elif task.status != TaskStatus.RUNNING:
             parts = []
             if task.stateText and task.stateText not in (
-                "下载中", "做种中", "检查续传状态", "校验已有文件",
-                "获取元数据", "分配文件中", "等待校验", "下载完成",
+                "Downloading", "Seeding", "Check resume status", "Verify existing file",
+                "Fetch metadata", "Allocating file", "Waiting for verification", "Download Complete",
             ):
                 parts.append(task.stateText)
             if task.shareRatioPercent > 0:
-                parts.append(self.tr("分享率 {0}").format(f"{task.shareRatioPercent:.1f}%"))
+                parts.append(self.tr("Seed Ratio: {0}").format(f"{task.shareRatioPercent:.1f}%"))
             if task.seedingTimeSeconds > 0:
-                parts.append(self.tr("做种 {0}").format(toReadableTime(task.seedingTimeSeconds)))
+                parts.append(self.tr("Seeded for {0}").format(toReadableTime(task.seedingTimeSeconds)))
             summary = " · ".join(parts)
             if summary and not self._isFileMissing:
                 self.statusLabel.setText(summary)

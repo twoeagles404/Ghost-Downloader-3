@@ -1,10 +1,10 @@
-"""HTTP subworker 边界情况测试——防止文件损坏和静默失败。
+"""HTTP subworker edge-case tests - prevent file corruption and silent failures.
 
-使用本地 aiohttp 服务器精确控制服务器行为。
+Uses a local aiohttp server to precisely control server behavior.
 
-Seam S13a: 范围正确性（无重叠、无间隙）
-Seam S13c: 服务器降级（200-for-range、403）
-Seam S13e: 请求构造（_effectiveHeaders 一致性）
+Seam S13a: range correctness (no overlap, no gaps)
+Seam S13c: server degradation (200-for-range, 403)
+Seam S13e: request construction (_effectiveHeaders consistency)
 """
 from __future__ import annotations
 
@@ -627,7 +627,7 @@ class TestDiskFull:
 
         monkeypatch.setattr("features.http_pack.task.pwrite", failing_pwrite)
 
-        with pytest.raises(TaskError, match="磁盘空间不足"):
+        with pytest.raises(TaskError, match="Insufficient disk space"):
             await runStep(step)
 
 

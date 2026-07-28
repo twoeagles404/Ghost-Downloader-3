@@ -79,7 +79,7 @@ class DraftCardGroup(TitledCardGroup):
         headerRow.addWidget(self._rightPad)
         self.layout().insertLayout(0, headerRow)
 
-        self.setTitle(self.tr("解析结果"))
+        self.setTitle(self.tr("Parse Results"))
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
@@ -100,7 +100,7 @@ class DraftCardGroup(TitledCardGroup):
             self._sizeLabel.setText(toReadableSize(totalSize))
             self._sizeLabel.show()
         elif successCount > 0:
-            self._sizeLabel.setText(self.tr("{0} 个任务").format(successCount))
+            self._sizeLabel.setText(self.tr("{0} Tasks").format(successCount))
             self._sizeLabel.show()
         else:
             self._sizeLabel.hide()
@@ -165,7 +165,7 @@ class OptionCardGroup(TitledCardGroup):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setTitle(self.tr("下载设置"))
+        self.setTitle(self.tr("Download Settings"))
         self._cards: list[QWidget] = []
 
     def addCard(self, card: QWidget) -> None:

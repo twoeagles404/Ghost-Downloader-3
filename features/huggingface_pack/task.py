@@ -57,7 +57,7 @@ class HuggingFaceTask(Task):
 
     def __post_init__(self):
         super().__post_init__()
-        # 旧存档中被取消勾选的文件没有 Step，按 files 补建
+        # files unchecked in an old archive have no Step; rebuild them from files
         if self.files:
             existing = {s.fileIndex for s in self.steps}
             for file in self.files:

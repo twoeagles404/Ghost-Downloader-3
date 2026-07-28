@@ -1,12 +1,12 @@
-"""LiveEditDialog 的 6 分支决策逻辑测试。
+"""6-branch decision logic tests for LiveEditDialog.
 
-Seam S8: LiveEditDialog.accept() 的分支覆盖
-  1. URL 不变 → taskService.edit(task, options) 直接调用
-  2. URL 变 + parse 成功 + canReuseProgress → edit 不丢数据
-  3. URL 变 + parse 成功 + 不可复用 + 无已下载数据 → 直接 edit
-  4. URL 变 + parse 成功 + 不可复用 + 有已下载数据 → 弹确认框
-  5. URL 变 + parse 失败 → 显示错误，task 不变
-  6. reject 时取消进行中的 parse
+Seam S8: branch coverage of LiveEditDialog.accept()
+  1. URL unchanged -> taskService.edit(task, options) called directly
+  2. URL changed + parse ok + canReuseProgress -> edit without data loss
+  3. URL changed + parse ok + not reusable + no downloaded data -> edit directly
+  4. URL changed + parse ok + not reusable + has downloaded data -> show confirm dialog
+  5. URL changed + parse failed -> show error, task unchanged
+  6. cancel in-progress parse on reject
 """
 from __future__ import annotations
 
@@ -231,7 +231,7 @@ class TestEditParseFail:
         dialog.accept()
 
         with patch("app.view.dialogs.edit_task.InfoBar") as MockInfoBar:
-            cr.failLast("解析失败")
+            cr.failLast("Parsing Failed")
 
         assert len(ts.editCalls) == 0
         assert dialog.yesButton.isEnabled()

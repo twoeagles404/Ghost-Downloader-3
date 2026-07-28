@@ -41,7 +41,7 @@ class StandaloneWrapper(FramelessDialog):
         self.titleBar.iconLabel.hide()
         self.titleBar.setDoubleClickEnabled(False)
         self.titleBar.setFixedHeight(30)
-        self.setWindowTitle(self._dialog.tr("添加任务"))
+        self.setWindowTitle(self._dialog.tr("Add Task"))
         FluentStyleSheet.DIALOG.apply(self)
 
     def _initLayout(self) -> None:
@@ -75,13 +75,13 @@ class TaskDraftDialog(MessageBoxBase):
         self._cardByUrl: dict[str, object] = {}
         self._failCount = 0
 
-        self.titleLabel = SubtitleLabel(self.tr("添加任务"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Add Task"), self)
         self.urlEdit = AutoSizingEdit(self)
         self.progressBar = IndeterminateProgressBar(self)
         self.draftGroup = DraftCardGroup(self)
         self.optionGroup = OptionCardGroup(self)
-        self.batchButton = PushButton(FluentIcon.COPY, self.tr("批量添加"), self)
-        self.importButton = PushButton(FluentIcon.FOLDER_ADD, self.tr("导入文件"), self)
+        self.batchButton = PushButton(FluentIcon.COPY, self.tr("Batch Add"), self)
+        self.importButton = PushButton(FluentIcon.FOLDER_ADD, self.tr("Import File(s)"), self)
         self.headerLayout = QHBoxLayout()
 
         self._initWidget()
@@ -95,7 +95,7 @@ class TaskDraftDialog(MessageBoxBase):
     def _initWidget(self) -> None:
         self.hide()
         self.widget.setFixedWidth(700)
-        self.urlEdit.setPlaceholderText(self.tr("添加多个下载链接时，请确保每行只有一个下载链接"))
+        self.urlEdit.setPlaceholderText(self.tr("When adding multiple download links, make sure each line contains only one link"))
         self.urlEdit.setWordWrapMode(QTextOption.WrapMode.NoWrap)
         self.progressBar.hide()
         self._fileTypes = self._featureService.fileTypes()
@@ -265,7 +265,7 @@ class TaskDraftDialog(MessageBoxBase):
         self._refreshStats()
         displayUrl = url if len(url) <= 48 else f"{url[:45]}..."
         InfoBar.error(
-            self.tr("链接解析失败"),
+            self.tr("Link Parsing Failed"),
             f"{displayUrl}\n{error}",
             duration=5000,
             position=InfoBarPosition.BOTTOM_RIGHT,
@@ -304,11 +304,11 @@ class TaskDraftDialog(MessageBoxBase):
 
     def _onImportClicked(self) -> None:
         globs = [f"*{ext}" for ft in self._fileTypes for ext in ft.extensions]
-        nameFilters = [self.tr("所有可导入文件 ({0})").format(" ".join(globs))]
+        nameFilters = [self.tr("All Supported Formats ({0})").format(" ".join(globs))]
         nameFilters += [
             f"{ft.displayName} ({' '.join(f'*{ext}' for ext in ft.extensions)})"
             for ft in self._fileTypes
         ]
-        paths, _ = QFileDialog.getOpenFileNames(self, self.tr("导入文件"), "", ";;".join(nameFilters))
+        paths, _ = QFileDialog.getOpenFileNames(self, self.tr("Import File(s)"), "", ";;".join(nameFilters))
         if paths:
             self.addUrls([Path(p).as_uri() for p in paths])

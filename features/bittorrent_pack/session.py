@@ -21,14 +21,14 @@ if TYPE_CHECKING:
     pass
 
 _STATE_TEXT = {
-    "checking_files": "校验已有文件",
-    "checking_resume_data": "检查续传状态",
-    "downloading_metadata": "获取元数据",
-    "downloading": "下载中",
-    "finished": "下载完成",
-    "seeding": "做种中",
-    "allocating": "分配文件中",
-    "queued_for_checking": "等待校验",
+    "checking_files": "Verify existing file",
+    "checking_resume_data": "Check resume status",
+    "downloading_metadata": "Fetch metadata",
+    "downloading": "Downloading",
+    "finished": "Download Complete",
+    "seeding": "Seeding",
+    "allocating": "Allocating file",
+    "queued_for_checking": "Waiting for verification",
 }
 
 _ERROR_ALERTS = (
@@ -162,9 +162,9 @@ class BTSession(QObject):
 
         hashes = params.info_hashes if params.ti is None else params.ti.info_hashes()
         if hashes.has_v1() and self._session.find_torrent(hashes.v1).is_valid():
-            raise TaskError("该种子已在下载中")
+            raise TaskError("This torrent is already downloading")
         if hashes.has_v2() and self._session.find_torrent(hashes.v2).is_valid():
-            raise TaskError("该种子已在下载中")
+            raise TaskError("This torrent is already downloading")
 
         handle = self._session.add_torrent(params)
         handle.force_reannounce(0, -1, lt.reannounce_flags_t.ignore_min_interval)
@@ -178,7 +178,7 @@ class BTSession(QObject):
             ti = await asyncio.wait_for(waiter, timeout=bittorrentConfig.metadataTimeout.value)
             return lt.bencode(lt.create_torrent(ti).generate())
         except asyncio.TimeoutError:
-            raise TimeoutError("等待 magnet 元数据超时")
+            raise TimeoutError("Timed out waiting for magnet metadata")
         finally:
             self._metadataWaiters.pop(id(handle), None)
             try:
@@ -266,7 +266,7 @@ class BTSession(QObject):
             try:
                 ltParams = lt.read_resume_data(params.resumeData)
             except Exception as e:
-                logger.opt(exception=e).warning("读取 BitTorrent resume 数据失败")
+                logger.opt(exception=e).warning("Failed to read BitTorrent resume data")
 
         if ltParams is None:
             ltParams = lt.add_torrent_params()
@@ -296,7 +296,7 @@ class BTSession(QObject):
         if stale is not None and stale.is_valid():
             for entry in self._active.values():
                 if entry.handle == stale:
-                    raise TaskError("该种子已在下载中")
+                    raise TaskError("This torrent is already downloading")
             self._session.remove_torrent(stale)
 
         handle = self._session.add_torrent(ltParams)
@@ -322,7 +322,7 @@ class BTSession(QObject):
         try:
             await asyncio.wait_for(entry.resumeWaiter, timeout=10)
         except asyncio.TimeoutError:
-            logger.warning("等待 BitTorrent resume 数据超时")
+            logger.warning("Timed out waiting for BitTorrent resume data")
         finally:
             entry.resumeWaiter = None
             try:
@@ -340,7 +340,7 @@ class BTSession(QObject):
                 for entry in list(self._active.values()):
                     self._updateEntry(entry)
             except Exception as e:
-                logger.opt(exception=e).error("BitTorrent poll 异常")
+                logger.opt(exception=e).error("BitTorrent poll exception")
             await asyncio.sleep(1)
 
     def _routeAlert(self, alert) -> None:
@@ -370,7 +370,7 @@ class BTSession(QObject):
             if isinstance(alert, _ERROR_ALERTS):
                 if not entry.done.done():
                     entry.done.set_exception(
-                        TaskError("BitTorrent 错误：{detail}", detail=alert.message())
+                        TaskError("BitTorrent error: {detail}", detail=alert.message())
                     )
                 return
 
@@ -428,7 +428,7 @@ class BTSession(QObject):
 
         if isSeeding and not entry.done.done():
             if self._isSeedingLimitReached(shareRatioPercent, seedingTimeSeconds):
-                logger.info("自动暂停做种: 分享率 {:.2f}%, 做种时间 {}s",
+                logger.info("Auto-pausing seeding: share ratio {:.2f}%, seeding time {}s",
                             shareRatioPercent, seedingTimeSeconds)
                 entry.done.set_result(None)
 

@@ -136,8 +136,8 @@ class LineEditSettingCard(SettingCard):
 class ProxySettingCard(CollapsibleSettingCard):
 
     def __init__(self, configItem: ConfigItem, featureService=None, parent=None):
-        super().__init__(FluentIcon.GLOBE, self.tr("代理"),
-                         self.tr("设置下载时希望使用的代理"), parent=parent)
+        super().__init__(FluentIcon.GLOBE, self.tr("Proxy"),
+                         self.tr("Configure proxy for downloads"), parent=parent)
         self._configItem = configItem
         self._featureService = featureService
 
@@ -146,25 +146,25 @@ class ProxySettingCard(CollapsibleSettingCard):
         self.radioLayout = QVBoxLayout(self.radioWidget)
 
         self.buttonGroup = QButtonGroup(self)
-        self.offRadio = RadioButton(self.tr("不使用代理"), self.radioWidget)
-        self.autoRadio = RadioButton(self.tr("自动检测系统代理"), self.radioWidget)
-        self.customRadio = RadioButton(self.tr("使用自定义代理"), self.radioWidget)
+        self.offRadio = RadioButton(self.tr("No Proxy"), self.radioWidget)
+        self.autoRadio = RadioButton(self.tr("Auto-detect System Proxy"), self.radioWidget)
+        self.customRadio = RadioButton(self.tr("Use Custom Proxy"), self.radioWidget)
 
         self.customWidget = QWidget(self.view)
         self.customLayout = QHBoxLayout(self.customWidget)
         self.protocolCombo = ComboBox(self.customWidget)
         self.protocolCombo.addItems(["socks4", "socks5", "socks5h", "http", "https"])
         self.ipEdit = ErrorVisibleLineEdit(self.customWidget)
-        self.ipEdit.setPlaceholderText(self.tr("代理 IP 地址"))
+        self.ipEdit.setPlaceholderText(self.tr("Proxy IP Address"))
         self.portEdit = ErrorVisibleLineEdit(self.customWidget)
-        self.portEdit.setPlaceholderText(self.tr("端口"))
+        self.portEdit.setPlaceholderText(self.tr("Port"))
 
         self.credWidget = QWidget(self.view)
         self.credLayout = QHBoxLayout(self.credWidget)
         self.userEdit = LineEdit(self.credWidget)
-        self.userEdit.setPlaceholderText(self.tr("用户名（可选）"))
+        self.userEdit.setPlaceholderText(self.tr("Username (optional)"))
         self.passEdit = LineEdit(self.credWidget)
-        self.passEdit.setPlaceholderText(self.tr("密码（可选）"))
+        self.passEdit.setPlaceholderText(self.tr("Password (optional)"))
         self.passEdit.setEchoMode(LineEdit.EchoMode.Password)
 
         self.compatBanner = WarningBanner(self.view)
@@ -201,7 +201,7 @@ class ProxySettingCard(CollapsibleSettingCard):
             self.radioLayout.addWidget(btn)
 
         self.customLayout.setContentsMargins(48, 5, 44, 10)
-        self.customLayout.addWidget(BodyLabel(self.tr("编辑代理服务器: "), self.customWidget))
+        self.customLayout.addWidget(BodyLabel(self.tr("Proxy Server:"), self.customWidget))
         self.customLayout.addSpacerItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         self.customLayout.addWidget(self.protocolCombo)
         self.customLayout.addWidget(BodyLabel("://", self.customWidget))
@@ -210,7 +210,7 @@ class ProxySettingCard(CollapsibleSettingCard):
         self.customLayout.addWidget(self.portEdit)
 
         self.credLayout.setContentsMargins(48, 5, 44, 18)
-        self.credLayout.addWidget(BodyLabel(self.tr("认证信息: "), self.credWidget))
+        self.credLayout.addWidget(BodyLabel(self.tr("Proxy Credentials: "), self.credWidget))
         self.credLayout.addSpacerItem(QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
         self.credLayout.addWidget(self.userEdit)
         self.credLayout.addWidget(BodyLabel(" : ", self.credWidget))
@@ -253,7 +253,7 @@ class ProxySettingCard(CollapsibleSettingCard):
         elif button is self.offRadio:
             cfg.set(self._configItem, "Off")
         elif button is self.customRadio:
-            if self.ipEdit.text() == self.tr("未检测到代理"):
+            if self.ipEdit.text() == self.tr("No Proxy Detected"):
                 self.ipEdit.clear()
             self._onProxyFieldChanged()
         self._refreshCompatBanner()
@@ -261,7 +261,7 @@ class ProxySettingCard(CollapsibleSettingCard):
     def _showProxyUrl(self, url: str | None) -> None:
         if not url:
             self.protocolCombo.setCurrentText("")
-            self.ipEdit.setText(self.tr("未检测到代理"))
+            self.ipEdit.setText(self.tr("No Proxy Detected"))
             self.portEdit.setText("")
             self.userEdit.setText("")
             self.passEdit.setText("")
@@ -292,7 +292,7 @@ class ProxySettingCard(CollapsibleSettingCard):
             if incompatible:
                 names = "、".join(incompatible)
                 self._compatLabel.setText(
-                    self.tr("{0} 不支持当前代理协议，建议使用 SOCKS5 以兼容全部下载方式").format(names)
+                    self.tr("{0} does not support this proxy protocol; it's recommended to use SOCKS5 for compatibility with all download methods.").format(names)
                 )
                 self.compatBanner.show()
             else:
@@ -346,9 +346,9 @@ class SelectFolderSettingCard(SettingCard):
 
         self.browseButton = ToolButton(FluentIcon.FOLDER, self)
         self.restoreButton = ToolButton(FluentIcon.CANCEL, self)
-        self.browseButton.setToolTip(self.tr("浏览文件夹"))
+        self.browseButton.setToolTip(self.tr("Browse Folder"))
         self.browseButton.installEventFilter(ToolTipFilter(self.browseButton))
-        self.restoreButton.setToolTip(self.tr("恢复默认路径"))
+        self.restoreButton.setToolTip(self.tr("Restore Default Path"))
         self.restoreButton.installEventFilter(ToolTipFilter(self.restoreButton))
 
         self.hBoxLayout.addWidget(self.browseButton, 0, Qt.AlignmentFlag.AlignRight)
@@ -360,7 +360,7 @@ class SelectFolderSettingCard(SettingCard):
         self.restoreButton.clicked.connect(lambda: self._setPath(self._defaultPath))
 
     def _onBrowseClicked(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self.window(), self.tr("选择文件夹"), self._configItem.value)
+        folder = QFileDialog.getExistingDirectory(self.window(), self.tr("Select Folder"), self._configItem.value)
         if folder:
             self._setPath(folder)
 
@@ -397,9 +397,9 @@ class PresetRowWidget(QWidget):
         self.switchButton.setChecked(preset.get("isEnabled", True))
         self.switchButton.setOnText("")
         self.switchButton.setOffText("")
-        self.editButton.setToolTip(self.tr("编辑"))
+        self.editButton.setToolTip(self.tr("Edit"))
         self.editButton.installEventFilter(ToolTipFilter(self.editButton))
-        self.removeButton.setToolTip(self.tr("删除"))
+        self.removeButton.setToolTip(self.tr("Delete"))
         self.removeButton.installEventFilter(ToolTipFilter(self.removeButton))
         self._refreshOpacity(preset.get("isEnabled", True))
 
@@ -466,8 +466,8 @@ class IdentitySettingCard(CollapsibleSettingCard):
         from qfluentwidgets import DropDownPushButton
         from app.view.components.option_cards import toProfileLabel
 
-        super().__init__(FluentIcon.ROBOT, self.tr("模拟身份"),
-                         self.tr("TLS 指纹与 User-Agent 预设"), parent=parent)
+        super().__init__(FluentIcon.ROBOT, self.tr("Client Profile"),
+                         self.tr("TLS Fingerprint & User-Agent Preset"), parent=parent)
         self._rowWidgets: list[PresetRowWidget] = []
 
         from qfluentwidgets import IconWidget
@@ -481,13 +481,13 @@ class IdentitySettingCard(CollapsibleSettingCard):
         self.profileLayout = QHBoxLayout(self.profileWidget)
         self.profileIcon = IconWidget(FluentIcon.ROBOT, self.profileWidget)
         self.profileIcon.setFixedSize(16, 16)
-        self.profileTitleLabel = BodyLabel(self.tr("全局默认"), self.profileWidget)
-        self.profileDescLabel = CaptionLabel(self.tr("未被预设匹配时使用"), self.profileWidget)
+        self.profileTitleLabel = BodyLabel(self.tr("Global Default"), self.profileWidget)
+        self.profileDescLabel = CaptionLabel(self.tr("Used when no preset matches"), self.profileWidget)
 
         self.buttonContainer = QWidget(self.view)
         self.buttonLayout = QHBoxLayout(self.buttonContainer)
         from qfluentwidgets import PrimaryPushButton
-        self.addButton = PrimaryPushButton(FluentIcon.ADD, self.tr("添加预设"), self.buttonContainer)
+        self.addButton = PrimaryPushButton(FluentIcon.ADD, self.tr("Add Preset"), self.buttonContainer)
 
         self._initWidget()
         self._initLayout()
@@ -593,10 +593,10 @@ class IdentitySettingCard(CollapsibleSettingCard):
         presets = list(cfg.identityPresets.value)
         if index < 0 or index >= len(presets):
             return
-        name = presets[index].get("name", self.tr("未命名预设"))
+        name = presets[index].get("name", self.tr("Unnamed Preset"))
         dialog = MessageBox(
-            self.tr("删除预设"),
-            self.tr("确定要删除 {0} 吗？").format(name),
+            self.tr("Delete Preset"),
+            self.tr("Are you sure you want to delete {0}?").format(name),
             self.window(),
         )
         if not dialog.exec():
@@ -624,7 +624,7 @@ class HeadersPresetRow(QWidget):
 
         self.radioButton = RadioButton(preset["name"], self)
         self.countLabel = CaptionLabel(
-            self.tr("{0} 条标头").format(len(preset["headers"])), self)
+            self.tr("{0} header(s)").format(len(preset["headers"])), self)
         self.editButton = PrimaryToolButton(FluentIcon.EDIT, self)
         self.removeButton = ToolButton(FluentIcon.DELETE, self)
 
@@ -634,9 +634,9 @@ class HeadersPresetRow(QWidget):
 
     def _initWidget(self, isCurrent: bool, canRemove: bool) -> None:
         self.radioButton.setChecked(isCurrent)
-        self.editButton.setToolTip(self.tr("编辑"))
+        self.editButton.setToolTip(self.tr("Edit"))
         self.editButton.installEventFilter(ToolTipFilter(self.editButton))
-        self.removeButton.setToolTip(self.tr("删除"))
+        self.removeButton.setToolTip(self.tr("Delete"))
         self.removeButton.installEventFilter(ToolTipFilter(self.removeButton))
         self.removeButton.setEnabled(canRemove)
 
@@ -659,15 +659,15 @@ class HeadersPresetRow(QWidget):
 class HeadersPresetSettingCard(CollapsibleSettingCard):
 
     def __init__(self, parent=None):
-        super().__init__(FluentIcon.DICTIONARY, self.tr("请求标头预设"),
-                         self.tr("新建任务的标头起点"), parent=parent)
+        super().__init__(FluentIcon.DICTIONARY, self.tr("Request Header Presets"),
+                         self.tr("Starting headers for new tasks"), parent=parent)
         self._rowWidgets: list[HeadersPresetRow] = []
 
         self.choiceLabel = BodyLabel(self)
         self.buttonContainer = QWidget(self.view)
         self.buttonLayout = QHBoxLayout(self.buttonContainer)
         self.addButton = PrimaryPushButton(
-            FluentIcon.ADD, self.tr("添加预设"), self.buttonContainer)
+            FluentIcon.ADD, self.tr("Add Preset"), self.buttonContainer)
 
         self._initLayout()
         self._bind()
@@ -734,10 +734,10 @@ class HeadersPresetSettingCard(CollapsibleSettingCard):
     def _onRemoveClicked(self, index: int) -> None:
         from qfluentwidgets import MessageBox
         presets = list(cfg.headersPresets.value)
-        name = presets[index].get("name", self.tr("未命名预设"))
+        name = presets[index].get("name", self.tr("Unnamed Preset"))
         dialog = MessageBox(
-            self.tr("删除预设"),
-            self.tr("确定要删除 {0} 吗？").format(name),
+            self.tr("Delete Preset"),
+            self.tr("Are you sure you want to delete {0}?").format(name),
             self.window(),
         )
         if not dialog.exec():
@@ -771,9 +771,9 @@ class SelectFileCard(SettingCard):
 
         self.chooseFileButton = ToolButton(FluentIcon.FOLDER, self)
         self.clearButton = ToolButton(FluentIcon.CANCEL, self)
-        self.chooseFileButton.setToolTip(self.tr("选择文件"))
+        self.chooseFileButton.setToolTip(self.tr("Select Files"))
         self.chooseFileButton.installEventFilter(ToolTipFilter(self.chooseFileButton))
-        self.clearButton.setToolTip(self.tr("清除路径"))
+        self.clearButton.setToolTip(self.tr("Clear Path"))
         self.clearButton.installEventFilter(ToolTipFilter(self.clearButton))
 
         self.hBoxLayout.addWidget(self.chooseFileButton, 0, Qt.AlignmentFlag.AlignRight)
@@ -785,7 +785,7 @@ class SelectFileCard(SettingCard):
         self.clearButton.clicked.connect(lambda: self._setPath(""))
 
     def _onChooseFile(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self.window(), self.tr("选择文件"))
+        path, _ = QFileDialog.getOpenFileName(self.window(), self.tr("Select Files"))
         if path:
             self._setPath(path)
 
@@ -805,9 +805,9 @@ class RuntimeCard(SettingCard):
         self._coroutineRunner = coroutineRunner
         self._taskService = taskService
         self._runtime: BinaryRuntime = runtime
-        super().__init__(FluentIcon.INFO, runtime.name, self.tr("正在检测运行时..."), parent)
+        super().__init__(FluentIcon.INFO, runtime.name, self.tr("Detecting runtime..."), parent)
 
-        self.installButton = PrimaryPushButton(self.tr("一键安装"), self)
+        self.installButton = PrimaryPushButton(self.tr("Install"), self)
         self.refreshButton = ToolButton(FluentIcon.SYNC, self)
         self.deleteButton = ToolButton(FluentIcon.DELETE, self)
 
@@ -820,9 +820,9 @@ class RuntimeCard(SettingCard):
         if not self._runtime.canInstall:
             self.installButton.hide()
         self.deleteButton.hide()
-        self.deleteButton.setToolTip(self.tr("卸载"))
+        self.deleteButton.setToolTip(self.tr("Uninstall"))
         self.deleteButton.installEventFilter(ToolTipFilter(self.deleteButton))
-        self.refreshButton.setToolTip(self.tr("刷新"))
+        self.refreshButton.setToolTip(self.tr("Refresh"))
         self.refreshButton.installEventFilter(ToolTipFilter(self.refreshButton))
 
     def _initLayout(self) -> None:
@@ -853,32 +853,32 @@ class RuntimeCard(SettingCard):
         )
 
         if status.isBusy:
-            self.setContent(self.tr("正在检测运行时..."))
+            self.setContent(self.tr("Detecting runtime..."))
             self.installButton.hide()
             self.deleteButton.hide()
             return
 
         if status.error:
-            self.setContent(self.tr("检测运行时失败"))
+            self.setContent(self.tr("Runtime detection failed"))
         elif isInstalled:
             if status.version and status.latestVersion:
-                line1 = self.tr("版本: {0}（最新: {1}）").format(status.version, status.latestVersion)
+                line1 = self.tr("Version: {0} (Latest: {1})").format(status.version, status.latestVersion)
             elif status.version:
-                line1 = self.tr("版本: {0}").format(status.version)
+                line1 = self.tr("Version: {0}").format(status.version)
             elif status.latestVersion:
-                line1 = self.tr("最新版本: {0}").format(status.latestVersion)
+                line1 = self.tr("Latest version: {0}").format(status.latestVersion)
             else:
                 line1 = ""
-            line2 = self.tr("路径: {0}").format(status.path)
+            line2 = self.tr("Path: {0}").format(status.path)
             self.setContent(f"{line1}\n{line2}" if line1 else line2)
         else:
-            self.setContent(self.tr("未检测到可用的 {0}").format(status.name))
+            self.setContent(self.tr("No available {0} detected").format(status.name))
 
         if isUpdateAvailable:
-            self.installButton.setText(self.tr("更新到 {0}").format(status.latestVersion))
+            self.installButton.setText(self.tr("Update to {0}").format(status.latestVersion))
             self.installButton.setVisible(True)
         elif not isInstalled or not isManaged:
-            self.installButton.setText(self.tr("一键安装"))
+            self.installButton.setText(self.tr("Install"))
             self.installButton.setVisible(self._runtime.canInstall)
         else:
             self.installButton.hide()
@@ -908,8 +908,8 @@ class RuntimeCard(SettingCard):
             if card is not None and isValid(card):
                 card.installButton.setEnabled(True)
                 InfoBar.success(
-                    card.tr("安装任务已创建"),
-                    card.tr("请前往任务页查看安装进度"),
+                    card.tr("Installation task created"),
+                    card.tr("Please go to Tasks page to check installation progress"),
                     duration=3000,
                     position=InfoBarPosition.TOP,
                     parent=card.window(),
@@ -927,7 +927,7 @@ class RuntimeCard(SettingCard):
     def _onInstallTaskFailed(self, error: str) -> None:
         self.installButton.setEnabled(True)
         InfoBar.error(
-            self.tr("安装失败"),
+            self.tr("Installation failed"),
             error,
             duration=-1,
             position=InfoBarPosition.TOP,
@@ -938,8 +938,8 @@ class RuntimeCard(SettingCard):
         from qfluentwidgets import MessageBox
 
         dialog = MessageBox(
-            self.tr("确认卸载"),
-            self.tr("确定要卸载 {0} 吗？").format(self._runtime.name),
+            self.tr("Confirm Uninstall"),
+            self.tr("Are you sure you want to uninstall {0}?").format(self._runtime.name),
             self.window(),
         )
         if not dialog.exec():
@@ -948,7 +948,7 @@ class RuntimeCard(SettingCard):
             self._runtime.delete()
         except Exception as e:
             InfoBar.error(
-                self.tr("卸载失败"), str(e),
+                self.tr("Uninstall Failed"), str(e),
                 duration=-1, position=InfoBarPosition.TOP, parent=self.window(),
             )
             return

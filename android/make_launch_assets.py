@@ -52,8 +52,8 @@ def saveBackgroundIcon() -> None:
     background.save(str(OUT / "icon_background.png"))
 
 def saveSplashLogo() -> None:
-    # 开屏(windowBackground)居中徽标。用 logo.png 而非裸幽灵: 裸幽灵是白的、浅色开屏底上隐形;
-    # logo.png 自带圆角渐变底深浅都可见, 圆角外透明处由 layer-list 底色层透出(随 values-night 切)。
+    # centered logo on the splash (windowBackground). Use logo.png rather than the bare ghost: the bare ghost is white and invisible on a light splash;
+    # logo.png has a rounded gradient background visible on both light and dark; the transparent area outside the rounded corners shows the layer-list base color (switched by values-night).
     logo = QImage(str(LOGO)).convertToFormat(QImage.Format.Format_ARGB32)
     scaled = logo.scaled(
         512, 512,
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     saveForegroundIcon()
     saveBackgroundIcon()
     saveSplashLogo()
-    print(f"已生成: {', '.join(p.name for p in sorted(OUT.glob('*')))}")
+    print(f"Generated: {', '.join(p.name for p in sorted(OUT.glob('*')))}")

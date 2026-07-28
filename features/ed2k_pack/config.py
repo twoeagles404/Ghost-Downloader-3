@@ -28,10 +28,10 @@ class ED2kConfig(PackConfig):
             LineEditSettingCard, SelectFolderSettingCard, SpinBoxSettingCard,
         )
 
-        group = CollapsibleSettingCardGroup(self.tr("eD2k 下载"), "ed2k", parent)
+        group = CollapsibleSettingCardGroup(self.tr("eD2k Download"), "ed2k", parent)
         installFolderCard = SelectFolderSettingCard(
             ed2kConfig.installFolder, f"{APP_DATA_DIR}/goed2kd",
-            self.tr("goed2kd 安装目录"),
+            self.tr("goed2kd Install Location"),
             group,
         )
         runtimeCard = self.createRuntimeCard(ed2kRuntime, group)
@@ -41,28 +41,28 @@ class ED2kConfig(PackConfig):
             installFolderCard,
             runtimeCard,
             LineEditSettingCard(
-                FluentIcon.GLOBE, self.tr("服务器列表源"),
-                self.tr("eD2k server.met 文件的 URL，留空则不引导"),
+                FluentIcon.GLOBE, self.tr("Server List Source"),
+                self.tr("URL of the eD2k server.met file; leave empty to skip bootstrapping"),
                 self.serverMetSource, group,
             ),
             LineEditSettingCard(
-                FluentIcon.GLOBE, self.tr("DHT 节点源"),
-                self.tr("KAD nodes.dat 文件的 URL，留空则不引导"),
+                FluentIcon.GLOBE, self.tr("DHT Node Source"),
+                self.tr("URL of the KAD nodes.dat file; leave empty to skip bootstrapping"),
                 self.nodesDatSource, group,
             ),
             SwitchSettingCard(
-                FluentIcon.WIFI, self.tr("启用 DHT"),
-                self.tr("通过分布式哈希表查找节点，关闭后仅使用 eD2k 服务器"),
+                FluentIcon.WIFI, self.tr("Enable DHT"),
+                self.tr("Discover peers via DHT network; when disabled, only eD2k servers are used"),
                 self.enableDht, group,
             ),
             SwitchSettingCard(
-                FluentIcon.GLOBE, self.tr("启用 UPnP"),
-                self.tr("自动配置路由器端口转发"),
+                FluentIcon.GLOBE, self.tr("Enable UPnP"),
+                self.tr("Automatically configure router port forwarding"),
                 self.enableUpnp, group,
             ),
             SpinBoxSettingCard(
-                FluentIcon.LINK, self.tr("监听端口"),
-                self.tr("0 表示交给系统自动分配可用端口"), "",
+                FluentIcon.LINK, self.tr("Port"),
+                self.tr("0 for system assigned port"), "",
                 self.listenPort, group, 1,
             ),
         ])
@@ -77,7 +77,7 @@ class ED2kRuntime(BinaryRuntime):
     name = "goed2kd"
     canInstall = True
     title = N("BinaryRuntime", "eD2k / eMule")
-    description = N("BinaryRuntime", "支持电驴协议，适合下载经典资源")
+    description = N("BinaryRuntime", "Supports the eD2k protocol, suitable for downloading classic resources")
     icon = FluentIcon.BOOK_SHELF
     isRecommended = False
 
@@ -117,7 +117,7 @@ class ED2kRuntime(BinaryRuntime):
         downloadStep.outputFile = binaryPath
 
         task = InstallTask(
-            name=f"goed2kd 安装 ({assetName})",
+            name=f"goed2kd installation ({assetName})",
             url=url,
             packId="ed2k",
             fileSize=download.fileSize,

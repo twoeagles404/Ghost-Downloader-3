@@ -25,7 +25,7 @@ class ED2kSession:
 
     def client(self) -> Client:
         if self._client is None:
-            raise RuntimeError("ED2kSession 未启动")
+            raise RuntimeError("ED2kSession not started")
         return self._client
 
     async def open(self) -> None:
@@ -33,7 +33,7 @@ class ED2kSession:
             return
         path = ed2kRuntime.path()
         if not path:
-            raise RuntimeError("未找到 goed2kd，请先在设置中安装")
+            raise RuntimeError("goed2kd not found, please install it in settings first")
         client = Client(Path(path), Path(APP_DATA_DIR) / "ed2k_data")
         try:
             await client.start(Settings(

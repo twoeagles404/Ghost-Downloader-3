@@ -63,7 +63,7 @@ class HuggingFaceParser(TaskParser):
     async def parse(self, options: TaskOptions) -> Task:
         info = parseHuggingFaceUrl(options.url)
         if info is None:
-            raise ValueError("无法解析 HuggingFace 链接")
+            raise ValueError("Cannot parse HuggingFace link")
 
         repoId = f"{info['org']}/{info['repo']}"
         repoType = info["repoType"]
@@ -122,7 +122,7 @@ class HuggingFaceParser(TaskParser):
             client.close()
 
         if not entries:
-            raise ValueError(f"仓库 {repoId} 为空或无法访问")
+            raise ValueError(f"Repository {repoId} is empty or inaccessible")
 
         files: list[HuggingFaceFile] = []
         for i, entry in enumerate(entries):
@@ -171,7 +171,7 @@ class HuggingFaceParser(TaskParser):
         while url:
             response = await client.get(url)
             if response.status.as_int() == 401:
-                raise PermissionError("该仓库需要授权，请在设置中配置 HuggingFace Access Token")
+                raise PermissionError("This repository requires authorization, please configure a HuggingFace Access Token in settings")
             response.raise_for_status()
             page = await response.json()
             if isinstance(page, list):

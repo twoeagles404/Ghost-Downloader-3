@@ -72,7 +72,7 @@ def toEmulation(profile: str, sourceUa: str = "") -> Emulation | None:
                 fam = FAMILY_BY_PREFIX.get(m.group(1)) if m else None
                 return Emulation(profile=pinned, platform=PLATFORM_BY_FAMILY.get(fam, host))
 
-    logger.warning("未知的模拟身份 {}, 退回默认", profile)
+    logger.warning("Unknown spoof identity {}, falling back to default", profile)
     return Emulation(profile=PROFILES_BY_FAMILY["chrome"][0][2], platform=host)
 
 

@@ -25,42 +25,42 @@ class PackManifest:
     def fromDir(cls, packDir: Path) -> PackManifest | None:
         manifestPath = packDir / "manifest.toml"
         if not manifestPath.exists():
-            logger.warning("FeaturePack 缺少 manifest.toml: {}", packDir)
+            logger.warning("FeaturePack is missing manifest.toml: {}", packDir)
             return None
 
         try:
             raw = tomllib.loads(manifestPath.read_text(encoding="utf-8"))
         except Exception as e:
-            logger.warning("无法读取 manifest {}: {}", manifestPath, repr(e))
+            logger.warning("Cannot read manifest {}: {}", manifestPath, repr(e))
             return None
 
         packSection = raw.get("pack")
         if not isinstance(packSection, dict):
-            logger.warning("manifest 缺少 [pack] 节: {}", manifestPath)
+            logger.warning("manifest missing [pack] section: {}", manifestPath)
             return None
 
         entry = packSection.get("entry", "pack.py")
         if not isinstance(entry, str) or not entry.strip():
-            logger.warning("manifest entry 无效: {}", manifestPath)
+            logger.warning("invalid manifest entry: {}", manifestPath)
             return None
 
         entryPath = packDir / entry
         if not entryPath.exists() and entry.endswith(".py"):
             entryPath = packDir / (entry[:-3] + ".pyc")
         if not entryPath.exists():
-            logger.warning("入口文件不存在: {}", packDir / entry)
+            logger.warning("Entry file does not exist: {}", packDir / entry)
             return None
 
         className = packSection.get("class")
         if not isinstance(className, str) or not className.strip():
-            logger.warning("manifest 缺少 class 字段: {}", manifestPath)
+            logger.warning("manifest missing class field: {}", manifestPath)
             return None
 
         deps = packSection.get("dependencies", [])
         if not isinstance(deps, list) or any(
             not isinstance(d, str) or not d for d in deps
         ):
-            logger.warning("manifest dependencies 无效: {}", manifestPath)
+            logger.warning("invalid manifest dependencies: {}", manifestPath)
             return None
 
         return cls(
@@ -74,7 +74,7 @@ class PackManifest:
 
 def loadPacks(featuresDir: Path, services=None) -> list[FeaturePack]:
     if not featuresDir.exists():
-        logger.warning("features 目录不存在: {}", featuresDir)
+        logger.warning("features directory does not exist: {}", featuresDir)
         return []
 
     manifests = [
@@ -97,15 +97,15 @@ def orderedByDependency(manifests: list[PackManifest]) -> list[PackManifest]:
         if name in visited:
             return
         if name in skipped:
-            raise ValueError(f"{name} 依赖的 FeaturePack 已被跳过")
+            raise ValueError(f"{name} depends on a FeaturePack that was skipped")
         if name in visiting:
             cycle = visiting[visiting.index(name):] + [name]
-            raise ValueError(f"循环依赖: {' -> '.join(cycle)}")
+            raise ValueError(f"Circular dependency: {' -> '.join(cycle)}")
 
         visiting.append(name)
         for dep in byName[name].dependencies:
             if dep not in byName:
-                raise ValueError(f"{name} 依赖未找到的 FeaturePack: {dep}")
+                raise ValueError(f"{name} depends on a FeaturePack that was not found: {dep}")
             visit(dep)
         visiting.pop()
         visited.add(name)
@@ -117,7 +117,7 @@ def orderedByDependency(manifests: list[PackManifest]) -> list[PackManifest]:
         except Exception as e:
             skipped.add(m.name)
             visiting.clear()
-            logger.opt(exception=e).error("跳过 FeaturePack {}", m.name)
+            logger.opt(exception=e).error("Skipping FeaturePack {}", m.name)
 
     return [m for m in ordered if m.name not in skipped]
 
@@ -131,7 +131,7 @@ def loadManifest(manifest: PackManifest, services=None) -> FeaturePack | None:
             submodule_search_locations=[str(manifest.folder)],
         )
         if spec is None or spec.loader is None:
-            logger.error("无法创建模块规格: {}", moduleName)
+            logger.error("Cannot create module spec: {}", moduleName)
             return None
 
         module = importlib.util.module_from_spec(spec)
@@ -144,14 +144,14 @@ def loadManifest(manifest: PackManifest, services=None) -> FeaturePack | None:
 
         PackClass = getattr(module, manifest.className, None)
         if PackClass is None:
-            logger.warning("未找到类 {}: {}", manifest.className, moduleName)
+            logger.warning("Class not found {}: {}", manifest.className, moduleName)
             return None
 
         pack = PackClass(services)
-        logger.success("加载 FeaturePack: {}", moduleName)
+        logger.success("Loading FeaturePack: {}", moduleName)
         return pack
 
     except Exception as e:
         sys.modules.pop(moduleName, None)
-        logger.opt(exception=e).error("加载 FeaturePack 失败: {}", moduleName)
+        logger.opt(exception=e).error("Failed to load FeaturePack: {}", moduleName)
         return None

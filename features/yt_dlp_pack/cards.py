@@ -40,13 +40,13 @@ def buildQualityTiers(mediaInfo: dict) -> list[tuple[str, str]]:
     result: list[tuple[str, str]] = []
     if tiers:
         bestH, bestFps = tiers[0]
-        result.append(("bv*+ba/b", f"最佳画质 ({bestH}p{'60' if bestFps else ''})"))
+        result.append(("bv*+ba/b", f"Best quality ({bestH}p{'60' if bestFps else ''})"))
 
     for height, fps in tiers:
         fpsLabel = "60" if fps else ""
         result.append((f"bv*[height<={height}]+ba/b", f"{height}p{fpsLabel}"))
 
-    result.append(("ba/b", "仅音频"))
+    result.append(("ba/b", "Audio only"))
     return result
 
 
@@ -62,17 +62,17 @@ def buildSubtitleChoices(mediaInfo: dict) -> list[tuple[str, str, bool]]:
     for lang in (mediaInfo.get("automatic_captions") or {}):
         if lang not in seen:
             seen.add(lang)
-            choices.append((lang, f"{lang} (自动)", True))
+            choices.append((lang, f"{lang} (auto)", True))
 
     return choices
 
 
 STEP_LABELS = {
-    1: "提取信息",
-    2: "下载视频",
-    3: "下载音频",
-    4: "合并",
-    5: "下载字幕",
+    1: "Extract info",
+    2: "Download video",
+    3: "Download audio",
+    4: "Merge",
+    5: "Download subtitles",
 }
 
 
@@ -82,7 +82,7 @@ def toYtDlpSizeText(task: YouTubeTask, speed: int, received: int) -> str | None:
             from PySide6.QtCore import QCoreApplication
             videoCount = len(task.steps) // STEPS_PER_VIDEO
             totalReceived = sum(s.receivedBytes for s in task.steps)
-            return QCoreApplication.translate("YtDlpTaskCard", "{0} 个视频 · {1}").format(
+            return QCoreApplication.translate("YtDlpTaskCard", "{0} Videos · {1}").format(
                 videoCount, toReadableSize(totalReceived))
         return toReadableSize(task.fileSize) if task.fileSize > 0 else None
     if task.fileSize > 0:
@@ -113,11 +113,11 @@ class SubtitleSelectDialog(MessageBoxBase):
         super().__init__(parent)
         self._choices = choices
 
-        self.titleLabel = SubtitleLabel(self.tr("选择字幕语言"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Select Subtitle Language"), self)
         self.summaryLabel = BodyLabel("", self)
 
-        self.selectAllButton = PrimaryPushButton(self.tr("全选"), self)
-        self.clearButton = PushButton(self.tr("全不选"), self)
+        self.selectAllButton = PrimaryPushButton(self.tr("Select All"), self)
+        self.clearButton = PushButton(self.tr("Select None"), self)
 
         self.treeView = AutoSizingTreeView(self, minimumVisibleRows=3, maximumVisibleRows=16)
         self.treeModel = QStandardItemModel(self.treeView)
@@ -129,8 +129,8 @@ class SubtitleSelectDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(400)
-        self.yesButton.setText(self.tr("确定"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         self.treeView.setRootIsDecorated(False)
         self.treeView.setUniformRowHeights(True)
@@ -179,7 +179,7 @@ class SubtitleSelectDialog(MessageBoxBase):
             1 for row in range(self.treeModel.rowCount())
             if self.treeModel.item(row, 0).checkState() == Qt.CheckState.Checked
         )
-        self.summaryLabel.setText(self.tr("{0}/{1} 种语言").format(count, self.treeModel.rowCount()))
+        self.summaryLabel.setText(self.tr("{0}/{1} Languages").format(count, self.treeModel.rowCount()))
 
     def selectedLanguages(self) -> tuple[str, bool]:
         langs: list[str] = []
@@ -199,12 +199,12 @@ class VideoSelectDialog(MessageBoxBase):
         super().__init__(parent)
         self._files = task.files or []
 
-        self.titleLabel = SubtitleLabel(self.tr("选择视频"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Select Video"), self)
         self.summaryLabel = BodyLabel("", self)
 
-        self.selectAllButton = PrimaryPushButton(self.tr("全选"), self)
-        self.clearButton = PushButton(self.tr("全不选"), self)
-        self.invertButton = PushButton(self.tr("反选"), self)
+        self.selectAllButton = PrimaryPushButton(self.tr("Select All"), self)
+        self.clearButton = PushButton(self.tr("Select None"), self)
+        self.invertButton = PushButton(self.tr("Invert Selection"), self)
 
         self.treeView = AutoSizingTreeView(self, minimumVisibleRows=3, maximumVisibleRows=16)
         self.treeModel = QStandardItemModel(self.treeView)
@@ -216,21 +216,21 @@ class VideoSelectDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(550)
-        self.yesButton.setText(self.tr("确定"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         self.treeView.setRootIsDecorated(False)
         self.treeView.setUniformRowHeights(True)
         self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
-        self.treeModel.setHorizontalHeaderLabels([self.tr("标题"), self.tr("时长")])
+        self.treeModel.setHorizontalHeaderLabels([self.tr("Title"), self.tr("Duration")])
         self.treeView.setModel(self.treeModel)
         self.treeView.header().setStretchLastSection(False)
         self.treeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.treeView.header().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
 
         for file in self._files:
-            title = file.relativePath.strip() or f"视频 {file.index + 1}"
+            title = file.relativePath.strip() or f"Video {file.index + 1}"
 
             nameItem = QStandardItem(f"{file.index + 1}. {title}")
             nameItem.setCheckable(True)
@@ -285,7 +285,7 @@ class VideoSelectDialog(MessageBoxBase):
             1 for row in range(self.treeModel.rowCount())
             if self.treeModel.item(row, 0).checkState() == Qt.CheckState.Checked
         )
-        self.summaryLabel.setText(self.tr("{0}/{1} 个视频").format(count, self.treeModel.rowCount()))
+        self.summaryLabel.setText(self.tr("{0}/{1} Videos").format(count, self.treeModel.rowCount()))
         self.yesButton.setEnabled(count > 0)
 
     def selectedIndexes(self) -> set[int]:
@@ -304,7 +304,7 @@ class YtDlpDraftCard(DraftCard):
         mediaInfo: dict = getattr(task, "_mediaInfo", {})
         hasMediaInfo = bool(mediaInfo.get("formats"))
 
-        self._qualityTiers = buildQualityTiers(mediaInfo) if hasMediaInfo else [("bv*+ba/b", self.tr("最佳画质"))]
+        self._qualityTiers = buildQualityTiers(mediaInfo) if hasMediaInfo else [("bv*+ba/b", self.tr("Best Quality"))]
         self._subtitleChoices = buildSubtitleChoices(mediaInfo) if hasMediaInfo else []
 
         self._mediaSpinner = IndeterminateProgressRing(self)
@@ -321,12 +321,12 @@ class YtDlpDraftCard(DraftCard):
 
         self._subtitleButton = TransparentToolButton(FluentIcon.LANGUAGE, self)
         self._subtitleButton.installEventFilter(ToolTipFilter(self._subtitleButton))
-        self._subtitleButton.setToolTip(self.tr("选择字幕"))
+        self._subtitleButton.setToolTip(self.tr("Select Subtitles"))
         self._subtitleButton.setEnabled(bool(self._subtitleChoices))
 
         self._videoSelectButton = TransparentToolButton(FluentIcon.LIBRARY, self)
         self._videoSelectButton.installEventFilter(ToolTipFilter(self._videoSelectButton))
-        self._videoSelectButton.setToolTip(self.tr("选择视频"))
+        self._videoSelectButton.setToolTip(self.tr("Select Video"))
         self._videoSelectButton.setVisible(task.isPlaylist)
 
         self._playlistSpinner = IndeterminateProgressRing(self)
@@ -427,12 +427,12 @@ class YtDlpDraftCard(DraftCard):
             self._onVideoSelectClicked()
         else:
             self._videoSelectButton.setEnabled(False)
-            self._videoSelectButton.setToolTip(self.tr("未找到播放列表"))
+            self._videoSelectButton.setToolTip(self.tr("Playlist not found"))
 
     def _onPlaylistFailed(self, error: str) -> None:
         self._playlistSpinner.hide()
         self._videoSelectButton.show()
-        self._videoSelectButton.setToolTip(self.tr("加载播放列表失败"))
+        self._videoSelectButton.setToolTip(self.tr("Failed to load playlist"))
 
 
 class YtDlpTaskCard(MultiFileTaskCard):

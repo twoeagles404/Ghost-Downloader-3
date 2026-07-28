@@ -1,9 +1,9 @@
-"""startFileDrag 平台分派与回退的逐分支测试。
+"""Branch-by-branch tests for startFileDrag platform dispatch and fallback.
 
-覆盖：
-  - Windows 原生路径成功时不触发 Qt 回退
-  - Windows 准备阶段失败时回退 Qt（原参数透传）
-  - 非 Windows 平台直通 Qt 路径
+Covers:
+  - Windows native path success does not trigger the Qt fallback
+  - Windows prep-phase failure falls back to Qt (original args passed through)
+  - Non-Windows platforms go straight through the Qt path
 """
 from __future__ import annotations
 

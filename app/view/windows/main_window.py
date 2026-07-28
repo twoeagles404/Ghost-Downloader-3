@@ -81,17 +81,17 @@ class MainWindow(MSFluentWindow):
         self.searchEdit.raise_()
 
     def _initLayout(self) -> None:
-        self._addPage(TaskPage, FluentIcon.DOWNLOAD, self.tr("下载任务"),
+        self._addPage(TaskPage, FluentIcon.DOWNLOAD, self.tr("Tasks"),
                       NavigationItemPosition.TOP)
         self.navigationInterface.addItem(
             routeKey="addTaskButton",
-            text=self.tr("新建任务"),
+            text=self.tr("New Task"),
             selectable=False,
             icon=FluentIcon.ADD,
             onClick=lambda: self.addUrls([]),
             position=NavigationItemPosition.TOP,
         )
-        self._addPage(SettingPage, FluentIcon.SETTING, self.tr("设置"),
+        self._addPage(SettingPage, FluentIcon.SETTING, self.tr("Settings"),
                       NavigationItemPosition.BOTTOM)
         self._showPage(TaskPage)
 
@@ -220,18 +220,18 @@ class MainWindow(MSFluentWindow):
         session = request["session"]
         requestId = request["requestId"]
         peerAddress = request.get("peerAddress", "")
-        extensionVersion = request.get("extensionVersion", self.tr("未知"))
-        clientKind = request.get("clientKind", self.tr("浏览器扩展"))
+        extensionVersion = request.get("extensionVersion", self.tr("Unknown"))
+        clientKind = request.get("clientKind", self.tr("Browser Extension"))
 
         content = self.tr(
-            "浏览器扩展正在请求连接到 Ghost Downloader。\n\n"
-            "来源: {0}\n客户端: {1}\n扩展版本: {2}\n\n"
-            "仅在你刚刚点击扩展里的\"自动配对\"时允许。"
+            "The browser extension is requesting a connection to Ghost Downloader.\n\n"
+            "Source: {0}\nClient: {1}\nExtension version: {2}\n\n"
+            'Only allowed when you just clicked "Auto pair" in the extension.'
         ).format(peerAddress, clientKind, extensionVersion)
 
-        dialog = MessageBox(self.tr("浏览器扩展配对请求"), content, self)
-        dialog.yesButton.setText(self.tr("允许配对"))
-        dialog.cancelButton.setText(self.tr("拒绝"))
+        dialog = MessageBox(self.tr("Browser Extension Pairing Request"), content, self)
+        dialog.yesButton.setText(self.tr("Allow"))
+        dialog.cancelButton.setText(self.tr("Decline"))
         dialog.contentLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
         if dialog.exec():
@@ -245,21 +245,21 @@ class MainWindow(MSFluentWindow):
 
         infoBar = InfoBar(
             icon=FluentIcon.CLOUD,
-            title=self.tr("检测到新版本"),
-            content=self.tr("最新版本: {0}").format(release.version),
+            title=self.tr("New Version Available"),
+            content=self.tr("Latest version: {0}").format(release.version),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             duration=-1,
             position=InfoBarPosition.BOTTOM_RIGHT,
             parent=self,
         )
-        downloadButton = PrimaryPushButton(FluentIcon.DOWNLOAD, self.tr("立即下载"))
+        downloadButton = PrimaryPushButton(FluentIcon.DOWNLOAD, self.tr("Download Now"))
         downloadButton.clicked.connect(lambda: addBestAssetTask(release, self))
         infoBar.addWidget(downloadButton)
-        detailButton = PushButton(FluentIcon.CHAT, self.tr("查看详情"))
+        detailButton = PushButton(FluentIcon.CHAT, self.tr("View Details"))
         detailButton.clicked.connect(lambda: showReleaseDialog(release, self))
         infoBar.addWidget(detailButton)
-        sponsorButton = PushButton(FluentIcon.HEART, self.tr("请作者喝咖啡"))
+        sponsorButton = PushButton(FluentIcon.HEART, self.tr("Buy Author A Coffee"))
         sponsorButton.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(AUTHOR_URL)))
         infoBar.addWidget(sponsorButton)
         infoBar.show()
@@ -268,12 +268,12 @@ class MainWindow(MSFluentWindow):
         from qfluentwidgets import TransparentToolButton, ToolTipFilter
 
         dialog = MessageBox(
-            self.tr("程序发生异常"),
-            self.tr("点击\"确定\"后将复制错误信息并打开反馈页面。\n\n{0}").format(message),
+            self.tr("An exception occurred"),
+            self.tr('After clicking "OK", the error info will be copied and the feedback page will open.\n\n{0}').format(message),
             self,
         )
         logButton = TransparentToolButton(FluentIcon.DOCUMENT, dialog)
-        logButton.setToolTip(self.tr("查看日志"))
+        logButton.setToolTip(self.tr("View Logs"))
         logButton.installEventFilter(ToolTipFilter(logButton))
         logButton.clicked.connect(self._openLogFolder)
 
@@ -317,13 +317,13 @@ class MainWindow(MSFluentWindow):
         if mode == CloseMode.ASK:
             from qfluentwidgets import CheckBox
             dialog = MessageBox(
-                self.tr("是否完全退出程序？"),
-                self.tr("后台运行时可通过系统托盘图标重新打开。"),
+                self.tr("Quit the program entirely?"),
+                self.tr("While running in background, you can reopen from the system tray icon."),
                 self,
             )
-            dialog.yesButton.setText(self.tr("退出程序"))
-            dialog.cancelButton.setText(self.tr("继续在后台运行"))
-            checkbox = CheckBox(self.tr("记住我的选择"), dialog)
+            dialog.yesButton.setText(self.tr("Exit"))
+            dialog.cancelButton.setText(self.tr("Continue running in background"))
+            checkbox = CheckBox(self.tr("Remember my choice"), dialog)
             dialog.textLayout.addWidget(checkbox)
             mode = CloseMode.QUIT if dialog.exec() else CloseMode.BACKGROUND
             if checkbox.isChecked():

@@ -14,13 +14,13 @@ class PlanTaskDialog(MessageBoxBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.titleLabel = SubtitleLabel(self.tr("设置计划任务"), self)
-        self.contentLabel = BodyLabel(self.tr("所有任务完成后执行以下操作："), self)
+        self.titleLabel = SubtitleLabel(self.tr("Schedule Task"), self)
+        self.contentLabel = BodyLabel(self.tr("Perform the following after all tasks are completed:"), self)
         self.radioGroup = QButtonGroup(self)
-        self.shutdownButton = RadioButton(self.tr("关机"), self)
-        self.restartButton = RadioButton(self.tr("重启"), self)
-        self.sleepButton = RadioButton(self.tr("睡眠"), self)
-        self.openFileButton = RadioButton(self.tr("打开文件"), self)
+        self.shutdownButton = RadioButton(self.tr("Shutdown"), self)
+        self.restartButton = RadioButton(self.tr("Restart"), self)
+        self.sleepButton = RadioButton(self.tr("Sleep"), self)
+        self.openFileButton = RadioButton(self.tr("Open File"), self)
         self.pathContainer = QWidget(self)
         self.pathLayout = QHBoxLayout(self.pathContainer)
         self.pathEdit = LineEdit(self.pathContainer)
@@ -32,8 +32,8 @@ class PlanTaskDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(420)
-        self.yesButton.setText(self.tr("确认"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Confirm"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         self.radioGroup.addButton(self.shutdownButton)
         self.radioGroup.addButton(self.restartButton)
@@ -42,9 +42,9 @@ class PlanTaskDialog(MessageBoxBase):
         self.radioGroup.setExclusive(True)
         self.shutdownButton.setChecked(True)
 
-        self.pathEdit.setPlaceholderText(self.tr("请选择要打开的文件"))
+        self.pathEdit.setPlaceholderText(self.tr("Please select the file to open"))
         self.pathEdit.setClearButtonEnabled(True)
-        self.browseButton.setToolTip(self.tr("选择文件"))
+        self.browseButton.setToolTip(self.tr("Select Files"))
         self.browseButton.installEventFilter(ToolTipFilter(self.browseButton))
 
         self.pathLayout.setContentsMargins(0, 0, 0, 0)
@@ -78,7 +78,7 @@ class PlanTaskDialog(MessageBoxBase):
         self.pathContainer.setVisible(self.openFileButton.isChecked())
 
     def _onBrowseClicked(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, self.tr("选择文件"))
+        path, _ = QFileDialog.getOpenFileName(self, self.tr("Select Files"))
         if path:
             self.pathEdit.setText(path)
 

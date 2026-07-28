@@ -116,7 +116,7 @@ class TokenLineEdit(QWidget):
         self.setCursor(Qt.CursorShape.IBeamCursor)
         self.setMinimumHeight(33)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        self.lineEdit.setPlaceholderText(self.tr("添加..."))
+        self.lineEdit.setPlaceholderText(self.tr("Add..."))
         self.lineEdit.installEventFilter(self)
         cs = CustomStyleSheet(self)
         cs.setCustomStyleSheet(

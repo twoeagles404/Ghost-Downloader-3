@@ -95,7 +95,7 @@ class BatchUrlDialog(MessageBoxBase):
         self._urls: list[str] = []
         self._expandTimer = QTimer(self, singleShot=True)
 
-        self.titleLabel = SubtitleLabel(self.tr("批量添加"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Batch Add"), self)
         self.helpButton = TransparentToolButton(FluentIcon.QUESTION, self)
         self.titleRow = QHBoxLayout()
         self.templateEdit = AutoSizingEdit(self, minimumVisibleLines=2, maximumVisibleLines=3)
@@ -113,7 +113,7 @@ class BatchUrlDialog(MessageBoxBase):
                      "http://example.com/{mp4,mkv}/video")
         )
         self.previewEdit.setReadOnly(True)
-        self.previewEdit.setPlaceholderText(self.tr("输入模板后在此预览"))
+        self.previewEdit.setPlaceholderText(self.tr("Preview Here After Entering Template"))
         self.countLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.countLabel.setTextColor("grey", "grey")
         self.countLabel.hide()
@@ -144,13 +144,13 @@ class BatchUrlDialog(MessageBoxBase):
     def _onHelpClicked(self) -> None:
         TeachingTip.create(
             self.helpButton,
-            self.tr("语法说明"),
+            self.tr("Syntax Help"),
             self.tr(
                 "[1-100] → 1, 2, 3, …, 100\n"
-                "[001-050] → 001, 002, …, 050 (自动补零)\n"
-                "[1-10:2] → 1, 3, 5, 7, 9 (步长)\n"
-                "[a-z] → a, b, …, z (字母范围)\n"
-                "{mp4,mkv,avi} → mp4, mkv, avi (枚举)"
+                "[001-050] -> 001, 002, ..., 050 (zero-padded)\n"
+                "[1-10:2] -> 1, 3, 5, 7, 9 (step)\n"
+                "[a-z] -> a, b, ..., z (letter range)\n"
+                "{mp4,mkv,avi} -> mp4, mkv, avi (enumeration)"
             ),
             tailPosition=TeachingTipTailPosition.BOTTOM,
             isClosable=True,
@@ -180,5 +180,5 @@ class BatchUrlDialog(MessageBoxBase):
                 lines.append("⋯")
                 lines.append(self._urls[-1])
             self.previewEdit.setPlainText("\n".join(lines))
-            self.countLabel.setText(self.tr("共 {} 个链接").format(count))
+            self.countLabel.setText(self.tr("{} links in total").format(count))
             self.countLabel.show()

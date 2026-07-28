@@ -24,12 +24,12 @@ def _mock_cfg(monkeypatch):
     """Provide a clean cfg with known defaults for every test."""
     from app.config.cfg import cfg
     monkeypatch.setattr(cfg.identityPresets, "value", [
-        {"name": "百度网盘客户端", "clientProfile": "raw", "userAgent": "pan.baidu.com",
+        {"name": "Baidu Netdisk client", "clientProfile": "raw", "userAgent": "pan.baidu.com",
          "hosts": ["*.pcs.baidu.com"], "isEnabled": True},
     ])
     monkeypatch.setattr(cfg.clientProfile, "value", "auto")
     monkeypatch.setattr(cfg.headersPresets, "value", [
-        {"name": "默认", "headers": {"accept-encoding": "deflate, br, gzip"}},
+        {"name": "Default", "headers": {"accept-encoding": "deflate, br, gzip"}},
     ])
     monkeypatch.setattr(cfg.currentHeadersPreset, "value", 0)
 
@@ -56,12 +56,12 @@ class TestMatchIdentityPreset:
     def test_b2_wildcard_subdomain_match(self):
         result = self._match("d.pcs.baidu.com")
         assert result is not None
-        assert result["name"] == "百度网盘客户端"
+        assert result["name"] == "Baidu Netdisk client"
 
     def test_b3_wildcard_root_domain_match(self):
         result = self._match("pcs.baidu.com")
         assert result is not None
-        assert result["name"] == "百度网盘客户端"
+        assert result["name"] == "Baidu Netdisk client"
 
     def test_b4_no_match(self):
         assert self._match("google.com") is None

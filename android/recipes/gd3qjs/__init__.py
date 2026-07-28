@@ -26,9 +26,9 @@ class Gd3qjsRecipe(Recipe):
         libs = [join(self.PREBUILT_DIR, b) for b in self.BINARIES]
         for lib in libs:
             if not exists(lib):
-                error(f"[gd3qjs] 预置二进制缺失: {lib}（检查 Dockerfile 编译步骤）")
+                error(f"[gd3qjs] prebuilt binary missing: {lib} (check the compile step in the Dockerfile)")
                 raise FileNotFoundError(lib)
-        info(f"[gd3qjs] install_libs 预编 qjs -> lib/{arch.arch}/")
+        info(f"[gd3qjs] install_libs prebuild qjs -> lib/{arch.arch}/")
         self.install_libs(arch, *libs)
 
 recipe = Gd3qjsRecipe()

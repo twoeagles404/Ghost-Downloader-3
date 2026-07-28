@@ -52,7 +52,7 @@ class TrackerService:
             normalized = sourceUrl.strip()
             parsed = urlsplit(normalized)
             if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-                raise ValueError("Web Tracker 源地址无效")
+                raise ValueError("Invalid Web Tracker source URL")
             client = buildClient()
             try:
                 response = await client.get(normalized)
@@ -65,7 +65,7 @@ class TrackerService:
                 if (p := urlsplit(t)).scheme.lower() in TRACKER_SCHEMES and p.netloc
             ]
             if not trackers:
-                raise ValueError("Web Tracker 源没有返回有效的 Tracker")
+                raise ValueError("Web Tracker source returned no valid trackers")
             return trackers
 
         results = await asyncio.gather(

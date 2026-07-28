@@ -10,7 +10,7 @@ LONG_PRESS_MS = 450
 
 
 class MobileTaskCardBase:
-    """窄屏触屏改造: 操作按钮收进 ⋮ 溢出菜单, 长按多选, 轻触打开。"""
+    """Narrow-screen touch redesign: action buttons collapse into the overflow menu, long-press to multi-select, tap to open."""
 
     def setupMobile(self) -> None:
         self.overflowButton = TransparentToolButton(FluentIcon.MORE, self)
@@ -31,21 +31,21 @@ class MobileTaskCardBase:
         menu = self.createContextMenu()
         menu.addSeparator()
 
-        openFileAction = Action(FluentIcon.LINK, self.tr("打开文件"), self)
+        openFileAction = Action(FluentIcon.LINK, self.tr("Open File"), self)
         openFileAction.triggered.connect(lambda: openFile(self.task.outputPath))
         menu.addAction(openFileAction)
 
-        openFolderAction = Action(FluentIcon.FOLDER, self.tr("打开文件夹"), self)
+        openFolderAction = Action(FluentIcon.FOLDER, self.tr("Open Folder"), self)
         openFolderAction.triggered.connect(lambda: openFolder(self.task.outputFolder))
         menu.addAction(openFolderAction)
 
         if self.task.status == TaskStatus.COMPLETED:
-            verifyAction = Action(FluentIcon.FINGERPRINT, self.tr("校验哈希"), self)
+            verifyAction = Action(FluentIcon.FINGERPRINT, self.tr("Verify Hash"), self)
             verifyAction.triggered.connect(self._onVerifyHashClicked)
             menu.addAction(verifyAction)
 
         menu.addSeparator()
-        deleteAction = Action(FluentIcon.DELETE, self.tr("删除"), self)
+        deleteAction = Action(FluentIcon.DELETE, self.tr("Delete"), self)
         deleteAction.triggered.connect(self._onDeleteClicked)
         menu.addAction(deleteAction)
 
@@ -58,7 +58,7 @@ class MobileTaskCardBase:
             self._longPressTimer.start()
 
     def mouseReleaseEvent(self, e) -> None:
-        CardWidget.mouseReleaseEvent(self, e)  # 跳过桌面卡的「松手即选中」, 改走下面触屏语义
+        CardWidget.mouseReleaseEvent(self, e)  # skip the desktop card's "select on release", use the touch semantics below instead
         self._longPressTimer.stop()
         if e.button() != Qt.MouseButton.LeftButton or self._hasLongPressed:
             return

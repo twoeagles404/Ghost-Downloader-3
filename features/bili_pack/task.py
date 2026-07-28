@@ -187,7 +187,7 @@ class BilibiliTask(Task):
                 ))
 
     def _pageSuffix(self, page: BiliPage) -> str:
-        # 后缀跟总分P数走，与选择解耦，保证文件名稳定
+        # the suffix follows the total part (P) count, decoupled from selection, to keep filenames stable
         if len(self.files or []) <= 1:
             return ""
         suffix = f" - P{page.pageNumber}"

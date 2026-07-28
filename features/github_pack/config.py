@@ -87,8 +87,8 @@ class GitHubProxySiteCard(SettingCard):
     def __init__(self, submit, parent=None):
         self.submit = submit
         super().__init__(
-            FluentIcon.GLOBE, self.tr("代理站"),
-            self.tr("选择 GitHub 反向代理站，延迟仅供参考"), parent,
+            FluentIcon.GLOBE, self.tr("Proxy Site"),
+            self.tr("Select GitHub reverse proxy site, latency is for reference only"), parent,
         )
         self._latencies: dict[str, int | None] = {s: None for s in GITHUB_PROXY_SITES}
         self._isRefreshing = False
@@ -105,12 +105,12 @@ class GitHubProxySiteCard(SettingCard):
         self.customSiteEdit.setPlaceholderText("https://example.com/")
         self.customSiteEdit.setClearButtonEnabled(True)
         self.customSiteEdit.setMinimumWidth(220)
-        self.refreshButton.setToolTip(self.tr("刷新延迟"))
+        self.refreshButton.setToolTip(self.tr("Re-test Latency"))
         self.refreshButton.installEventFilter(ToolTipFilter(self.refreshButton))
 
         for site in GITHUB_PROXY_SITES:
             self.comboBox.addItem(urlparse(site).netloc or site.rstrip("/"))
-        self.comboBox.addItem(self.tr("自定义"))
+        self.comboBox.addItem(self.tr("Custom"))
 
         currentSite = githubConfig.selectedSite.value
         if currentSite == CUSTOM_SITE_KEY:
@@ -139,9 +139,9 @@ class GitHubProxySiteCard(SettingCard):
         if latency is None:
             return ""
         if latency == PROBE_UNAVAILABLE:
-            return self.tr("不可用")
+            return self.tr("Unavailable")
         if latency == PROBE_TIMEOUT:
-            return self.tr("超时")
+            return self.tr("Timeout")
         return f"{latency} ms"
 
     def _refreshLatencyLabels(self):
@@ -154,7 +154,7 @@ class GitHubProxySiteCard(SettingCard):
         customSite = githubConfig.customSite.value
         customLatency = self._latencies.get(customSite) if customSite else None
         tag = self._latencyTag(customLatency)
-        customLabel = f"{self.tr('自定义')} ({tag})" if tag else self.tr("自定义")
+        customLabel = f"{self.tr("Custom")} ({tag})" if tag else self.tr("Custom")
         self.comboBox.setItemText(len(GITHUB_PROXY_SITES), customLabel)
 
     def _onCurrentIndexChanged(self, index: int):
@@ -204,10 +204,10 @@ class GitHubConfig(PackConfig):
         from qfluentwidgets import FluentIcon, SwitchSettingCard
         from app.view.components.setting_card_group import CollapsibleSettingCardGroup
 
-        githubGroup = CollapsibleSettingCardGroup(self.tr("GitHub 加速"), "github", parent)
+        githubGroup = CollapsibleSettingCardGroup(self.tr("GitHub Acceleration"), "github", parent)
         enableCard = SwitchSettingCard(
-            FluentIcon.LINK, self.tr("启用 GitHub 加速"),
-            self.tr("命中 GitHub 文件链接时，自动改写为所选反向代理站"),
+            FluentIcon.LINK, self.tr("Enable GitHub Acceleration"),
+            self.tr("Automatically change GitHub file links to download through selected proxy"),
             self.enabled, githubGroup,
         )
         proxySiteCard = GitHubProxySiteCard(self.submit, githubGroup)

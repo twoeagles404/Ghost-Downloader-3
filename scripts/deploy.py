@@ -13,9 +13,9 @@ sys.path.insert(0, str(REPO))
 from app.config.constants import VERSION, YEAR, AUTHOR, DESKTOP_ID
 
 MACOS_DOCUMENT_TYPES = [
-    {"name": "种子文件", "extensions": ["torrent"], "icon": "torrent"},
-    {"name": "M3U8 播放列表", "extensions": ["m3u8", "m3u"], "icon": "m3u8"},
-    {"name": "DASH 清单", "extensions": ["mpd"], "icon": "m3u8"},
+    {"name": "Torrent File", "extensions": ["torrent"], "icon": "torrent"},
+    {"name": "M3U8 Playlist", "extensions": ["m3u8", "m3u"], "icon": "m3u8"},
+    {"name": "DASH List", "extensions": ["mpd"], "icon": "m3u8"},
 ]
 
 EXCLUDED_PACKS = {"jack_yao"}

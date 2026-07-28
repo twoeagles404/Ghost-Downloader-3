@@ -119,7 +119,7 @@ if platform == "win32":
             )
         except OSError:
             from loguru import logger
-            logger.debug("文件系统不支持稀疏文件，使用常规预分配")
+            logger.debug("The filesystem does not support sparse files, using regular preallocation")
 
         newPos = c_longlong()
         SetFilePointerEx(handle, size, byref(newPos), FILE_BEGIN)

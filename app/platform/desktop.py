@@ -311,8 +311,8 @@ def _startFileDragWin32(paths: list[str], hwnd: int) -> None:
         )
         ctypes.WINFUNCTYPE(ctypes.c_ulong, ctypes.c_void_p)(vtable[2])(pUnknown)
 
-    # 拖拽图标与 DropDescription 靠 IDataObject::SetData 私有格式传递，
-    # 剪贴板数据对象不支持 SetData，必须从 shell item 构建数据对象
+    # the drag icon and DropDescription are passed via IDataObject::SetData private formats,
+    # the clipboard data object does not support SetData; it must be built from the shell item's data object
     pidls: list[ctypes.c_void_p] = []
     try:
         for p in paths:
@@ -342,8 +342,8 @@ def _startFileDragWin32(paths: list[str], hwnd: int) -> None:
             )
             try:
                 dwEffect = ctypes.c_ulong(0)
-                # 至此拖拽会话已托付给 Shell；失败不再上抛回退 Qt，
-                # 否则会在鼠标已松开后再启动一次幽灵拖拽
+                # by now the drag session is handed to the Shell; on failure it no longer bubbles back to the Qt fallback,
+                # otherwise it would start a ghost drag again after the mouse was already released
                 try:
                     shell32.SHDoDragDrop(hwnd, pDataObj, None, 7, ctypes.byref(dwEffect))
                 except OSError as e:

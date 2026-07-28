@@ -71,6 +71,6 @@ def pruneQt(libs, pyside, log):
 
     for plugin in UNUSED_PLUGINS:
         freed += removeDir(join(pyside, "Qt", "plugins", plugin))
-    log("[gd3-prune] 裁掉未用 Qt 模块/QML/translations，释放 ~{} MB（keep={} 个模块）".format(
+    log("[gd3-prune] Pruned unused Qt modules/QML/translations, freed ~{} MB (keep={} modules)".format(
         freed // 1024 // 1024, len(KEEP)))
     return freed

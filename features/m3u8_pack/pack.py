@@ -46,7 +46,7 @@ class M3U8Parser(TaskParser):
             url = str(localPath.resolve())
             body = await asyncio.to_thread(localPath.read_text, encoding="utf-8", errors="ignore")
             if "http://" not in body and "https://" not in body:
-                raise ValueError("该本地清单只含相对段路径, 缺少 base URL 无法下载, 请改用原始在线链接")
+                raise ValueError("This local playlist only contains relative segment paths and lacks a base URL, so it cannot be downloaded; please use the original online link")
             manifestUrl = url
             responseHeaders: dict[str, str] = {}
         else:
@@ -98,7 +98,7 @@ class M3U8Parser(TaskParser):
                             variantClient.close()
                         isLive = not m3u8.loads(variantBody, uri=variantUrl).is_endlist
                     except Exception as e:
-                        logger.warning("取变体清单判活失败, 按点播处理: {}", repr(e))
+                        logger.warning("Failed to check variant playlist liveness, treating as VOD: {}", repr(e))
                         isLive = False
                 else:
                     isLive = False
@@ -188,7 +188,7 @@ class M3U8Parser(TaskParser):
                 return self._mpdStreams(body)
             return self._hlsStreams(body)
         except Exception as e:
-            logger.warning("枚举可选视频流失败: {}", repr(e))
+            logger.warning("Failed to enumerate selectable video streams: {}", repr(e))
             return []
 
     def _hlsStreams(self, body: str) -> list[dict]:
@@ -307,13 +307,13 @@ class M3U8Pack(FeaturePack):
         return [
             FileType(
                 extensions=(".m3u8", ".m3u"),
-                displayName=self.tr("M3U8 播放列表"),
+                displayName=self.tr("M3U8 Playlist"),
                 mimeType="application/vnd.apple.mpegurl",
                 icon="m3u8",
             ),
             FileType(
                 extensions=(".mpd",),
-                displayName=self.tr("DASH 清单"),
+                displayName=self.tr("DASH List"),
                 mimeType="application/dash+xml",
                 icon="m3u8",
             ),

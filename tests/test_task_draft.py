@@ -1,6 +1,6 @@
-"""TaskDraft parse→review→confirm 流程的逐分支测试。
+"""Branch-by-branch tests for the TaskDraft parse->review->confirm flow.
 
-Seam S9: TaskDraft — 批量解析、确认、取消的生命周期。
+Seam S9: TaskDraft - lifecycle of bulk parsing, confirmation, cancellation.
 """
 from __future__ import annotations
 

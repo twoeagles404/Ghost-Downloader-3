@@ -25,9 +25,9 @@ class Gd3ffmpegRecipe(Recipe):
         libs = [join(self.PREBUILT_DIR, b) for b in self.BINARIES]
         for lib in libs:
             if not exists(lib):
-                error(f"[gd3ffmpeg] 预置二进制缺失: {lib}（检查 Dockerfile 下载步骤）")
+                error(f"[gd3ffmpeg] prebuilt binary missing: {lib} (check the download step in the Dockerfile)")
                 raise FileNotFoundError(lib)
-        info(f"[gd3ffmpeg] install_libs 预编 ffmpeg/ffprobe -> lib/{arch.arch}/")
+        info(f"[gd3ffmpeg] install_libs prebuild ffmpeg/ffprobe -> lib/{arch.arch}/")
         self.install_libs(arch, *libs)
 
 recipe = Gd3ffmpegRecipe()

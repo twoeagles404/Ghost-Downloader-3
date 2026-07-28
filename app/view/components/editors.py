@@ -70,7 +70,7 @@ class FolderPicker(QWidget):
     def _initWidget(self) -> None:
         self.comboBox.setMinimumWidth(200)
         self.browseButton.setFixedSize(28, 28)
-        self.browseButton.setToolTip(self.tr("浏览文件夹"))
+        self.browseButton.setToolTip(self.tr("Browse Folder"))
         self.browseButton.installEventFilter(ToolTipFilter(self.browseButton))
 
     def _initLayout(self) -> None:
@@ -117,7 +117,7 @@ class FolderPicker(QWidget):
     def _onBrowseClicked(self) -> None:
         from PySide6.QtWidgets import QFileDialog
         folder = QFileDialog.getExistingDirectory(
-            self.window(), self.tr("选择文件夹"), self.path()
+            self.window(), self.tr("Select Folder"), self.path()
         )
         if folder:
             self.comboBox.setCurrentText(folder)

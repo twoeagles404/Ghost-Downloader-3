@@ -48,11 +48,11 @@ class ScanLoginDialog(MessageBoxBase):
 
         self.widget.setFixedSize(430, 560)
         self.yesButton.hide()
-        self.cancelButton.setText(self.tr("关闭"))
+        self.cancelButton.setText(self.tr("Close"))
 
-        self.titleLabel = SubtitleLabel(self.tr("扫码登录"), self.widget)
+        self.titleLabel = SubtitleLabel(self.tr("QR Code Login"), self.widget)
         self.descriptionLabel = CaptionLabel(
-            self.tr("使用哔哩哔哩手机客户端扫描下方二维码，并在手机端确认登录"),
+            self.tr("Use the Bilibili mobile app to scan the QR code below and confirm login on your phone."),
             self.widget,
         )
         self.qrLabel = PixmapLabel(self.widget)
@@ -60,14 +60,14 @@ class ScanLoginDialog(MessageBoxBase):
         self.qrLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.qrLabel.setScaledContents(True)
 
-        self.statusLabel = BodyLabel(self.tr("正在获取二维码..."), self.widget)
+        self.statusLabel = BodyLabel(self.tr("Fetching QR code..."), self.widget)
         self.tipLabel = CaptionLabel(
-            self.tr('二维码有效期约 180 秒，失效后可点击"刷新二维码"重新生成'),
+            self.tr('Code is valid for 180 seconds; select "Refresh QR Code" to generate a new code'),
             self.widget,
         )
 
-        self.refreshButton = PrimaryPushButton(FluentIcon.SYNC, self.tr("刷新二维码"), self.widget)
-        self.openBrowserButton = PushButton(FluentIcon.LINK, self.tr("打开登录链接"), self.widget)
+        self.refreshButton = PrimaryPushButton(FluentIcon.SYNC, self.tr("Refresh QR Code"), self.widget)
+        self.openBrowserButton = PushButton(FluentIcon.LINK, self.tr("Open Login Link"), self.widget)
         self.openBrowserButton.setEnabled(False)
 
         self._initWidget()
@@ -106,7 +106,7 @@ class ScanLoginDialog(MessageBoxBase):
     def reloadQrCode(self):
         self.qrLabel.setPixmap(QPixmap())
         self.qrLabel.setFixedSize(240, 240)
-        self.statusLabel.setText(self.tr("正在获取二维码..."))
+        self.statusLabel.setText(self.tr("Fetching QR code..."))
         self.openBrowserButton.setEnabled(False)
         self._loginUrl = ""
         self._account.startQrLogin()
@@ -114,20 +114,20 @@ class ScanLoginDialog(MessageBoxBase):
     def _onQrState(self, statusCode: int, text: str):
         from .account import QR_EXPIRED, QR_LOGIN_SUCCESS, QR_UNSCANNED, QR_SCANNED
         if statusCode == QR_LOGIN_SUCCESS:
-            self.statusLabel.setText(self.tr("登录成功，正在导入 Cookie..."))
+            self.statusLabel.setText(self.tr("Login succeeded. Importing Cookie..."))
             self.accept()
         elif statusCode == 0:
             self._loginUrl = text
             self.qrLabel.setPixmap(_toQrPixmap(text))
             self.qrLabel.setFixedSize(240, 240)
-            self.statusLabel.setText(self.tr("请使用哔哩哔哩客户端扫码"))
+            self.statusLabel.setText(self.tr("Please use the Bilibili app to scan QR code"))
             self.openBrowserButton.setEnabled(True)
         elif statusCode == QR_UNSCANNED:
-            self.statusLabel.setText(self.tr("等待扫码"))
+            self.statusLabel.setText(self.tr("Waiting for scan"))
         elif statusCode == QR_SCANNED:
-            self.statusLabel.setText(self.tr("二维码已扫码，请在手机端确认登录"))
+            self.statusLabel.setText(self.tr("QR code scanned. Please confirm login on your phone."))
         elif statusCode == QR_EXPIRED:
-            self.statusLabel.setText(self.tr('二维码已失效，请点击"刷新二维码"重新生成'))
+            self.statusLabel.setText(self.tr('Code expired, select "Refresh QR Code" to generate a new code'))
         else:
             self.statusLabel.setText(text or str(statusCode))
 
@@ -145,15 +145,15 @@ class EditCookieDialog(MessageBoxBase):
         super().__init__(parent)
 
         self.widget.setFixedSize(420, 500)
-        self.yesButton.setText(self.tr("保存"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
-        self.titleLabel = SubtitleLabel(self.tr("手动导入 Cookie"), self.widget)
+        self.titleLabel = SubtitleLabel(self.tr("Import Cookie Manually"), self.widget)
         self.descriptionLabel = CaptionLabel(
-            self.tr("请粘贴浏览器导出的完整 Cookie，留空后保存可清空当前 Cookie"), self.widget,
+            self.tr("Paste the full Cookie exported from the browser. Save with it empty to clear the current Cookie."), self.widget,
         )
         self.cookieTextEdit = PlainTextEdit(self.widget)
-        self.cookieTextEdit.setPlaceholderText(self.tr("请在此输入用户 Cookie"))
+        self.cookieTextEdit.setPlaceholderText(self.tr("Enter user Cookie here"))
         self.cookieTextEdit.setPlainText(initialCookie or "")
 
         self.viewLayout.addWidget(self.titleLabel)
@@ -165,12 +165,12 @@ class BilibiliLoginSettingCard(SettingCard):
     def __init__(self, account, parent=None):
         self._account = account
         super().__init__(
-            FluentIcon.VIEW, self.tr("账号登录"),
-            self.tr("状态：未登录"), parent,
+            FluentIcon.VIEW, self.tr("Account Login"),
+            self.tr("Status: Not Logged In"), parent,
         )
-        self.scanButton = PrimaryPushButton(self.tr("扫码登录"), self)
-        self.editButton = PushButton(self.tr("导入 Cookie"), self)
-        self.logoutButton = PushButton(self.tr("退出登录"), self)
+        self.scanButton = PrimaryPushButton(self.tr("QR Code Login"), self)
+        self.editButton = PushButton(self.tr("Import Cookie"), self)
+        self.logoutButton = PushButton(self.tr("Logout"), self)
 
         self._initLayout()
         self._bind()
@@ -194,12 +194,12 @@ class BilibiliLoginSettingCard(SettingCard):
         if self._account.isLoggedIn:
             uname = self._account.username or "-"
             mid = self._account.mid or "-"
-            vip = self._account.vip or "未开通"
+            vip = self._account.vip or "Not activated"
             self.setContent(
-                self.tr("状态：已登录 用户名：{0} UID：{1} 会员状态：{2}").format(uname, mid, vip)
+                self.tr("Status: Logged In, User: {0}, UID: {1}, Membership: {2}").format(uname, mid, vip)
             )
         else:
-            self.setContent(self.tr("状态：未登录"))
+            self.setContent(self.tr("Status: Not Logged In"))
         self.scanButton.setEnabled(True)
         self.editButton.setEnabled(True)
         self.logoutButton.setEnabled(self._account.isLoggedIn)
@@ -228,7 +228,7 @@ class BilibiliLoginSettingCard(SettingCard):
         self.scanButton.setEnabled(False)
         self.editButton.setEnabled(False)
         self.logoutButton.setEnabled(False)
-        self.setContent(self.tr("正在退出登录..."))
+        self.setContent(self.tr("Logging out..."))
         self._account.logout()
 
 
@@ -249,24 +249,24 @@ class BilibiliConfig(PackConfig):
         from qfluentwidgets import ComboBoxSettingCard, FluentIcon, SwitchSettingCard
         from app.view.components.setting_card_group import CollapsibleSettingCardGroup
 
-        biliGroup = CollapsibleSettingCardGroup(self.tr("Bilibili 下载"), "bilibili", parent)
+        biliGroup = CollapsibleSettingCardGroup(self.tr("Bilibili Download"), "bilibili", parent)
         loginCard = BilibiliLoginSettingCard(self._account, biliGroup)
         biliGroup.addSettingCards([
             loginCard,
-            ComboBoxSettingCard(self.defaultQuality, FluentIcon.VIDEO, self.tr("默认画质"),
-                                self.tr("选择偏好的视频画质"),
+            ComboBoxSettingCard(self.defaultQuality, FluentIcon.VIDEO, self.tr("Default Quality"),
+                                self.tr("Select Preferred Video Quality"),
                                 texts=["240P", "360P", "480P", "720P", "720P60", "1080P",
-                                       "1080P+", "1080P60", "4K", "HDR", "杜比视界"],
+                                       "1080P+", "1080P60", "4K", "HDR", "Dolby Vision"],
                                 parent=biliGroup),
-            ComboBoxSettingCard(self.alternativeQuality, FluentIcon.SPEED_HIGH, self.tr("画质不可用时"),
-                                self.tr("当选择的画质不可用时的替代策略"),
-                                texts=[self.tr("选择最高画质"), self.tr("选择最低画质")],
+            ComboBoxSettingCard(self.alternativeQuality, FluentIcon.SPEED_HIGH, self.tr("When Quality Unavailable"),
+                                self.tr("Fallback strategy when selected quality is unavailable"),
+                                texts=[self.tr("Choose Highest Quality"), self.tr("Choose Lowest Quality")],
                                 parent=biliGroup),
             SwitchSettingCard(FluentIcon.PALETTE, self.tr("HDR"),
-                              self.tr("请求 HDR 视频流（需要大会员）"),
+                              self.tr("Request HDR video stream (Premium required)"),
                               self.shouldIncludeHdr, biliGroup),
-            SwitchSettingCard(FluentIcon.HEADPHONE, self.tr("杜比全景声/视界"),
-                              self.tr("请求杜比全景声和杜比视界（需要大会员）"),
+            SwitchSettingCard(FluentIcon.HEADPHONE, self.tr("Dolby Atmos/Vision"),
+                              self.tr("Request Dolby Atmos and Dolby Vision (Premium required)"),
                               self.shouldIncludeDolby, biliGroup),
         ])
         return [biliGroup]

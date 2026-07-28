@@ -27,7 +27,7 @@ class ReleaseInfoDialog(MessageBoxBase):
 
         self.versionLabel = SubtitleLabel(release.version, self)
         self.dateLabel = CaptionLabel(release.publishedAt[:10] if release.publishedAt else "", self)
-        self.prereleaseLabel = CaptionLabel(self.tr("⚠️ 预发布版本"), self)
+        self.prereleaseLabel = CaptionLabel(self.tr("⚠️ Prerelease"), self)
         self.detailButton = PrimaryToolButton(FluentIcon.LINK, self)
         self.sponsorButton = ToolButton(FluentIcon.HEART, self)
         self.descriptionEdit = MarkdownViewer(self, minimumVisibleLines=5, maximumVisibleLines=16)
@@ -41,15 +41,15 @@ class ReleaseInfoDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(min(580, self.width() - 48))
-        self.yesButton.setText(self.tr("下载"))
+        self.yesButton.setText(self.tr("Download"))
         self.versionLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.prereleaseLabel.setVisible(self._release.prerelease)
-        self.detailButton.setToolTip(self.tr("打开发布页"))
+        self.detailButton.setToolTip(self.tr("Open Release Page"))
         self.detailButton.installEventFilter(ToolTipFilter(self.detailButton))
-        self.sponsorButton.setToolTip(self.tr("赞助作者"))
+        self.sponsorButton.setToolTip(self.tr("Support the Developer"))
         self.sponsorButton.installEventFilter(ToolTipFilter(self.sponsorButton))
 
-        self.descriptionEdit.setMarkdown(self._release.body or self.tr("暂无更新说明"))
+        self.descriptionEdit.setMarkdown(self._release.body or self.tr("No release notes available"))
 
         self.assetView.setRootIsDecorated(False)
         self.assetView.setUniformRowHeights(True)
@@ -57,7 +57,7 @@ class ReleaseInfoDialog(MessageBoxBase):
         self.assetView.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.assetView.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-        self.assetModel.setHorizontalHeaderLabels([self.tr("文件名"), self.tr("大小"), self.tr("下载次数")])
+        self.assetModel.setHorizontalHeaderLabels([self.tr("File Name"), self.tr("Size"), self.tr("Download Counts")])
         self.assetView.setModel(self.assetModel)
         self.assetView.header().setStretchLastSection(True)
         self.assetView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)

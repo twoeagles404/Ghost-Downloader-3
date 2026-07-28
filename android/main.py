@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     setupEnvironment()
     app = SingletonApplication(sys.argv, "gd3")
-    # setupAndroid 须在 QApplication 之后: setupFont 的 QFontDatabase 需要 QGuiApplication
+    # setupAndroid must run after QApplication: setupFont's QFontDatabase needs QGuiApplication
     from app.view.mobile import setupAndroid
     setupAndroid()
     startApp(app)

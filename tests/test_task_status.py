@@ -1,7 +1,7 @@
-"""Task 状态推导与转换的逐分支测试。
+"""Branch-by-branch tests for Task status derivation and transitions.
 
-Seam S1: Task.updateStatus() — step 状态组合 → task 状态推导
-Seam S2: Task.setStatus()   — 批量状态转换行为
+Seam S1: Task.updateStatus() - step status combination -> task status derivation
+Seam S2: Task.setStatus()   - bulk status transition behavior
 """
 from __future__ import annotations
 
@@ -121,7 +121,7 @@ class TestSetStatus:
         assert task.steps[0].error is None
 
 
-# ── S5: 错误冒泡（Task.run 的异常处理）──
+# -- S5: error bubbling (exception handling in Task.run) --
 
 
 class TestErrorBubble:
@@ -134,7 +134,7 @@ class TestErrorBubble:
         class FailStep(TaskStep):
             stepIndex: int = 0
             async def run(self, reportSpeed, waitForSpeedLimit):
-                raise TaskError("下载失败")
+                raise TaskError("Download Failed")
 
         task = makeTask()
         task.steps = [FailStep(stepIndex=0)]

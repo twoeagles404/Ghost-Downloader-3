@@ -86,7 +86,7 @@ class TaskDraft(QObject):
                         item=item,
                     )
                 except Exception as e:
-                    logger.opt(exception=e).error("提交解析请求失败 {}", url)
+                    logger.opt(exception=e).error("Failed to submit parse request {}", url)
                     self.parseFailed.emit(url, str(e) or repr(e))
                     nextItems.append(item)
                     continue
@@ -182,7 +182,7 @@ class TaskDraft(QObject):
     def _onParseFailed(self, error: str, item: DraftItem) -> None:
         if item.confirmedOptions is not None:
             item.confirmedOptions = None
-            logger.warning("后台确认任务解析失败: {}", error)
+            logger.warning("Background confirmation task parsing failed: {}", error)
             return
 
         if not item.parseId:
@@ -190,5 +190,5 @@ class TaskDraft(QObject):
 
         item.parseId = ""
         self.parseFailed.emit(item.url, error)
-        logger.warning("解析任务失败 {}: {}", item.url, error)
+        logger.warning("Failed to parse task {}: {}", item.url, error)
         self.parsingBusyChanged.emit(self._isParsing())

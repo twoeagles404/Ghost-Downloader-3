@@ -1,7 +1,7 @@
-"""M3U8TaskStep._parseOutputLine 的输出格式解析测试。
+"""Output-format parsing tests for M3U8TaskStep._parseOutputLine.
 
-Seam: _parseOutputLine — 输入一行 N_m3u8DL-RE stdout 文本，
-观察 progress / speed / receivedBytes / task.fileSize 的更新。
+Seam: _parseOutputLine - given one line of N_m3u8DL-RE stdout text,
+observe updates to progress / speed / receivedBytes / task.fileSize.
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ def makeStep() -> M3U8TaskStep:
 
 
 class TestVodProgressV06:
-    """N_m3u8DL-RE v0.6.0 的 VOD 进度格式——无空格分隔。"""
+    """VOD progress format of N_m3u8DL-RE v0.6.0 - no space separator."""
 
     def test_with_sizes_no_spaces(self):
         step = makeStep()
@@ -66,7 +66,7 @@ class TestVodProgressV06:
 
 
 class TestVodProgressLegacy:
-    """旧版 N_m3u8DL-RE 的格式——字段间有空格。"""
+    """Format of legacy N_m3u8DL-RE - fields separated by spaces."""
 
     def test_legacy_format(self):
         step = makeStep()
@@ -80,7 +80,7 @@ class TestVodProgressLegacy:
 
 
 class TestConcatenatedBuffer:
-    """NonAnsiWriter 剥掉换行符后，多条进度拼成一串——取最后一条。"""
+    """After NonAnsiWriter strips newlines, multiple progress lines are concatenated - take the last one."""
 
     def test_takes_last_vod_match(self):
         step = makeStep()
@@ -103,7 +103,7 @@ class TestConcatenatedBuffer:
 
 
 class TestLiveProgress:
-    """SimpleLiveRecordManager2 的直播进度格式。"""
+    """Live progress format for SimpleLiveRecordManager2."""
 
     def test_basic(self):
         step = makeStep()
@@ -136,7 +136,7 @@ class TestLiveProgress:
 
 
 class TestLiveRecordProgress:
-    """HTTPLiveRecordManager 的直播录制格式——无百分比。"""
+    """Live recording format for HTTPLiveRecordManager - no percentage."""
 
     def test_basic(self):
         step = makeStep()

@@ -27,15 +27,15 @@ class FileSelectDialog(MessageBoxBase):
         self._categoryService = categoryService
         self._fileItems: dict[int, QStandardItem] = {}
 
-        self.titleLabel = SubtitleLabel(self.tr("选择下载文件"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Select Download Files"), self)
         self.summaryLabel = BodyLabel("", self)
         self.treeView = AutoSizingTreeView(self, minimumVisibleRows=3, maximumVisibleRows=16)
         self.treeModel = QStandardItemModel(self.treeView)
 
-        self.selectAllButton = PrimaryPushButton(self.tr("全选"), self)
-        self.clearButton = PushButton(self.tr("全不选"), self)
-        self.invertButton = PushButton(self.tr("反选"), self)
-        self.selectByTypeButton = DropDownPushButton(self.tr("按类型选择"), self)
+        self.selectAllButton = PrimaryPushButton(self.tr("Select All"), self)
+        self.clearButton = PushButton(self.tr("Select None"), self)
+        self.invertButton = PushButton(self.tr("Invert Selection"), self)
+        self.selectByTypeButton = DropDownPushButton(self.tr("Select by Type"), self)
         self.selectByTypeMenu = RoundMenu(parent=self)
 
         self._initWidget()
@@ -50,10 +50,10 @@ class FileSelectDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(720)
-        self.yesButton.setText(self.tr("应用"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Application"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
-        self.treeModel.setHorizontalHeaderLabels([self.tr("文件"), self.tr("大小")])
+        self.treeModel.setHorizontalHeaderLabels([self.tr("File"), self.tr("Size")])
         self.treeView.setModel(self.treeModel)
         self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.treeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
@@ -138,7 +138,7 @@ class FileSelectDialog(MessageBoxBase):
                 continue
             action = Action(
                 category.toIcon(),
-                self.tr("仅选{0} ({1})").format(category.name, count),
+                self.tr("Only {0} ({1})").format(category.name, count),
                 self,
             )
             action.triggered.connect(lambda _, cid=categoryId: self._selectCategory(cid))
@@ -151,7 +151,7 @@ class FileSelectDialog(MessageBoxBase):
         if uncategorized > 0:
             action = Action(
                 FluentIcon.HELP,
-                self.tr("仅选{0} ({1})").format(self.tr("其他"), uncategorized),
+                self.tr("Only {0} ({1})").format(self.tr("Other"), uncategorized),
                 self,
             )
             action.triggered.connect(lambda _: self._selectCategory(""))
@@ -234,7 +234,7 @@ class FileSelectDialog(MessageBoxBase):
         total = len(self._fileItems)
         size = sum(f.size for f in (self._task.files or []) if f.index in selected)
         self.summaryLabel.setText(
-            self.tr("已选择 {0}/{1} 个文件，共 {2}").format(len(selected), total, toReadableSize(size))
+            self.tr("Selected {0}/{1} files, totaling {2} in size").format(len(selected), total, toReadableSize(size))
         )
 
     def selectedIndexes(self) -> set[int]:
@@ -244,8 +244,8 @@ class FileSelectDialog(MessageBoxBase):
         if self.selectedIndexes():
             return True
         InfoBar.warning(
-            self.tr("至少选择一个文件"),
-            self.tr("当前没有任何文件被勾选"),
+            self.tr("At least one file must be selected"),
+            self.tr("No files are currently selected"),
             parent=self,
         )
         return False

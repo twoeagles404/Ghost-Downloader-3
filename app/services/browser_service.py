@@ -189,7 +189,7 @@ class BrowserService(QObject):
             "requestId": requestId,
             "ok": True,
             "token": self.token,
-            "message": "配对成功",
+            "message": "Pairing successful",
         })
 
     def rejectPair(self, session: BrowserClientSession, requestId: str) -> None:
@@ -197,7 +197,7 @@ class BrowserService(QObject):
             "type": MessageType.PAIR_RESULT,
             "requestId": requestId,
             "ok": False,
-            "message": "已拒绝配对请求",
+            "message": "Pairing request declined",
         })
 
     def _toResourceTaskOptions(self, resource: dict) -> ResourceTaskOptions:
@@ -368,18 +368,18 @@ class BrowserService(QObject):
         try:
             data = json.loads(message)
         except Exception:
-            self._sendError(session, "无效的消息格式")
+            self._sendError(session, "Invalid message format")
             return
 
         if not isinstance(data, dict):
-            self._sendError(session, "无效的消息结构")
+            self._sendError(session, "Invalid message type")
             return
 
         rawType = toStr(data, "type")
         try:
             msgType = MessageType(rawType)
         except ValueError:
-            self._sendError(session, "未知的消息类型")
+            self._sendError(session, "Unknown message type")
             return
 
         if msgType == MessageType.PAIR_REQUEST:
@@ -398,7 +398,7 @@ class BrowserService(QObject):
             return
 
         if not session.isAuthenticated:
-            self._sendError(session, "请先完成握手认证", code=ErrorCode.UNAUTHORIZED)
+            self._sendError(session, "Authentication required", code=ErrorCode.UNAUTHORIZED)
             session.socket.close()
             return
 
@@ -415,13 +415,13 @@ class BrowserService(QObject):
         requestId = toStr(data, "requestId") or None
 
         if toInt(data, "protocolVersion", 0) != PROTOCOL_VERSION:
-            self._sendError(session, "协议版本不匹配", requestId=requestId, code=ErrorCode.PROTOCOL_MISMATCH)
+            self._sendError(session, "Protocol version mismatch", requestId=requestId, code=ErrorCode.PROTOCOL_MISMATCH)
             session.socket.close()
             self.protocolMismatched.emit()
             return
 
         if toStr(data, "token") != self.token:
-            self._sendError(session, "配对令牌无效", requestId=requestId, code=ErrorCode.UNAUTHORIZED)
+            self._sendError(session, "Invalid pairing token", requestId=requestId, code=ErrorCode.UNAUTHORIZED)
             session.socket.close()
             return
 
@@ -471,13 +471,13 @@ class BrowserService(QObject):
         draft = data.get("draft")  # None = not present (auto-intercept / old extension)
 
         if not requestId or not isinstance(payload, dict):
-            self._sendError(session, "无效的请求")
+            self._sendError(session, "Invalid request")
             return
 
         try:
             source = TaskSource(rawSource)
         except ValueError:
-            self._sendError(session, "未知的任务来源")
+            self._sendError(session, "Unknown task source")
             return
 
         try:
@@ -524,18 +524,18 @@ class BrowserService(QObject):
         rawAction = toStr(data, "action")
 
         if not requestId:
-            self._sendError(session, "缺少 requestId")
+            self._sendError(session, "Missing requestId")
             return
 
         try:
             action = TaskAction(rawAction)
         except ValueError:
-            self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId, ok=False, message="不支持的操作")
+            self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId, ok=False, message="Unsupported operation")
             return
 
         task = self._taskService.taskById(taskId)
         if task is None:
-            self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId, ok=False, message="任务不存在")
+            self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId, ok=False, message="Specified task does not exist")
             return
 
         try:
@@ -543,12 +543,12 @@ class BrowserService(QObject):
                 if task.status == TaskStatus.RUNNING:
                     if not task.canPause:
                         self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId,
-                                         ok=False, message="当前任务不支持暂停")
+                                         ok=False, message="Specified task does not support pausing")
                         return
                     self._taskService.pause(task)
                 elif task.status == TaskStatus.COMPLETED:
                     self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId,
-                                     ok=False, message="任务已完成")
+                                     ok=False, message="Task completed")
                     return
                 else:
                     self._taskService.start(task)
@@ -566,7 +566,7 @@ class BrowserService(QObject):
                 path = Path(task.outputPath)
                 if not path.exists():
                     self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId,
-                                     ok=False, message="文件尚未生成")
+                                     ok=False, message="File not created")
                     return
                 openFile(path)
 
@@ -574,7 +574,7 @@ class BrowserService(QObject):
                 path = Path(task.outputPath)
                 if not path.parent.exists():
                     self._sendResult(session, MessageType.TASK_ACTION_RESULT, requestId,
-                                     ok=False, message="目录不存在")
+                                     ok=False, message="Specified directory does not exist")
                     return
                 revealInFolder(path)
 

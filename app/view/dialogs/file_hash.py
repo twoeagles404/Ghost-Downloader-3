@@ -43,14 +43,14 @@ class FileHashDialog(MessageBoxBase):
         self._filePath = filePath
         self._worker: FileHashWorker | None = None
 
-        self.titleLabel = SubtitleLabel(self.tr("校验下载文件"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Verify Downloaded File"), self)
         self.algorithmCombo = ComboBox(self)
-        self.statusLabel = BodyLabel(self.tr("等待开始"), self)
+        self.statusLabel = BodyLabel(self.tr("Waiting to Start"), self)
         self.progressBar = ProgressBar(self)
 
         self.widget.setMinimumWidth(420)
-        self.yesButton.setText(self.tr("开始校验"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Start Verification"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         algorithms = sorted(hashlib.algorithms_available)
         self.algorithmCombo.addItems(algorithms)
@@ -59,7 +59,7 @@ class FileHashDialog(MessageBoxBase):
 
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.addSpacing(8)
-        self.viewLayout.addWidget(BodyLabel(self.tr("选择校验算法"), self))
+        self.viewLayout.addWidget(BodyLabel(self.tr("Select Verification Algorithm"), self))
         self.viewLayout.addWidget(self.algorithmCombo)
         self.viewLayout.addSpacing(8)
         self.viewLayout.addWidget(self.statusLabel)
@@ -79,7 +79,7 @@ class FileHashDialog(MessageBoxBase):
         self.yesButton.setEnabled(False)
         self.cancelButton.setEnabled(False)
         self.progressBar.setValue(0)
-        self.statusLabel.setText(self.tr("正在校验..."))
+        self.statusLabel.setText(self.tr("Verifying..."))
 
         self._worker = FileHashWorker(self._filePath, algorithm, self)
         self._worker.progressChanged.connect(self.progressBar.setValue)
@@ -93,13 +93,13 @@ class FileHashDialog(MessageBoxBase):
         super().reject()
 
     def _onSucceeded(self, digest: str) -> None:
-        self.statusLabel.setText(self.tr("校验完成"))
+        self.statusLabel.setText(self.tr("Verification Complete"))
         self.hashReady.emit(self.selectedAlgorithm(), digest)
         self._cleanup()
         super().accept()
 
     def _onFailed(self, error: str) -> None:
-        self.statusLabel.setText(self.tr("校验失败：{0}").format(error))
+        self.statusLabel.setText(self.tr("Verification Failed: {0}").format(error))
         self.progressBar.error()
         self._cleanup()
 

@@ -79,10 +79,10 @@ class MacStatusItem:
         menu.setAutoenablesItems_(False)
         menu.setDelegate_(self._target)
         for title, selector, key, symbol in (
-            (tr("仪表盘"), "showDashboard:", "", "gauge.open.with.lines.needle.33percent"),
-            (tr("全部开始"), "startAll:", "", "play.fill"),
-            (tr("全部暂停"), "pauseAll:", "", "pause.fill"),
-            (tr("退出程序"), "quitApp:", "q", "power"),
+            (tr("Dashboard"), "showDashboard:", "", "gauge.open.with.lines.needle.33percent"),
+            (tr("Start All"), "startAll:", "", "play.fill"),
+            (tr("Pause All"), "pauseAll:", "", "pause.fill"),
+            (tr("Exit"), "quitApp:", "q", "power"),
         ):
             item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(title, selector, key)
             item.setTarget_(self._target)

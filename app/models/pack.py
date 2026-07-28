@@ -90,7 +90,7 @@ class BinaryRuntime:
     parse: Callable[[TaskOptions], Awaitable[Task]] | None = None
     name: str = ""
     canInstall: bool = False
-    # 自描述展示信息（title 用 QT_TRANSLATE_NOOP 声明原文，展示端 translate）
+    # self-describing display info (title declares the original via QT_TRANSLATE_NOOP, the display side translates)
     title: str = ""
     description: str = ""
     icon: FluentIcon | None = None

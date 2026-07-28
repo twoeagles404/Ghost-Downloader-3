@@ -73,28 +73,28 @@ SPEED_FIELD = FieldSpec("speed", FluentIcon.SPEED_HIGH, {
 ETA_FIELD = FieldSpec("eta", FluentIcon.STOP_WATCH, {TaskStatus.RUNNING: toEtaText})
 SIZE_FIELD = FieldSpec("size", FluentIcon.LIBRARY, {None: toSizeText})
 
-TOGGLE_BUTTON = ButtonSpec("toggle", FluentIcon.PLAY, "暂停/继续", PrimaryToolButton, states={
+TOGGLE_BUTTON = ButtonSpec("toggle", FluentIcon.PLAY, "Pause/Resume", PrimaryToolButton, states={
     TaskStatus.RUNNING: lambda t: ButtonState(icon=FluentIcon.PAUSE, enabled=t.canPause),
     TaskStatus.COMPLETED: lambda t: ButtonState(enabled=False),
 })
 
-SELECT_FILES_BUTTON = ButtonSpec("selectFiles", FluentIcon.LIBRARY, "选择文件",
+SELECT_FILES_BUTTON = ButtonSpec("selectFiles", FluentIcon.LIBRARY, "Select Files",
     states={None: lambda t: ButtonState(visible=bool(t.files) and len(t.files) > 1)})
 
-VERIFY_HASH_BUTTON = ButtonSpec("verifyHash", FluentIcon.FINGERPRINT, "校验文件哈希",
+VERIFY_HASH_BUTTON = ButtonSpec("verifyHash", FluentIcon.FINGERPRINT, "Verify File Hash",
     default=BUTTON_HIDDEN,
     states={
         TaskStatus.COMPLETED: lambda t: ButtonState(
             enabled=t.hasOutputFile and Path(t.outputPath).exists()),
     })
 
-OPEN_FILE_BUTTON = ButtonSpec("openFile", FluentIcon.LINK, "打开文件", states={
+OPEN_FILE_BUTTON = ButtonSpec("openFile", FluentIcon.LINK, "Open File", states={
     TaskStatus.COMPLETED: lambda t: ButtonState(
         enabled=not t.hasOutputFile or Path(t.outputPath).exists()),
 })
 
-OPEN_FOLDER_BUTTON = ButtonSpec("openFolder", FluentIcon.FOLDER, "打开文件夹")
-DELETE_BUTTON = ButtonSpec("delete", FluentIcon.CLOSE, "删除", TransparentToolButton)
+OPEN_FOLDER_BUTTON = ButtonSpec("openFolder", FluentIcon.FOLDER, "Open Folder")
+DELETE_BUTTON = ButtonSpec("delete", FluentIcon.CLOSE, "Delete", TransparentToolButton)
 
 
 class TaskCard(CardWidget):
@@ -252,13 +252,13 @@ class TaskCard(CardWidget):
             self.progressBar.hide()
             self._isFileMissing = task.hasOutputFile and not Path(task.outputPath).exists()
             if self._isFileMissing:
-                self._setStatus(self.tr("文件不存在"))
+                self._setStatus(self.tr("File does not exist"))
                 self.statusLabel.setTextColor(QColor(200, 160, 80), QColor(200, 170, 100))
             elif task.completedAt:
-                self._setStatus(self.tr("完成于 {}").format(
+                self._setStatus(self.tr("Completed at {}").format(
                     datetime.fromtimestamp(task.completedAt).strftime("%Y-%m-%d %H:%M:%S")))
             else:
-                self._setStatus(self.tr("任务已经完成"))
+                self._setStatus(self.tr("Task Completed"))
             self.nameLabel.setText(task.name)
             self._refreshIcon()
 
@@ -269,15 +269,15 @@ class TaskCard(CardWidget):
                 text = QCoreApplication.translate("TaskErrors", error.message)
                 self._setStatus(text.format_map(error.params) if error.params else text)
             else:
-                self._setStatus(self.tr("下载过程中发生错误，请稍后重试"))
+                self._setStatus(self.tr("An error occurred during download, please try again later"))
 
         else:
             self.progressBar.setError(False)
             self.progressBar.pause()
             if task.status == TaskStatus.PAUSED:
-                self._setStatus(self.tr("任务已经暂停"))
+                self._setStatus(self.tr("Task Paused"))
             elif task.status == TaskStatus.WAITING:
-                self._setStatus(self.tr("任务正在等待"))
+                self._setStatus(self.tr("Task Pending"))
 
     def _setStatus(self, text: str) -> None:
         self.statusLabel.setTextColor()
@@ -323,8 +323,8 @@ class TaskCard(CardWidget):
 
     def _onDeleteClicked(self) -> None:
         from qfluentwidgets import MessageBox
-        dialog = MessageBox(self.tr("删除任务"), self.tr("确定要删除这个下载任务吗？"), self.window())
-        deleteFiles = CheckBox(self.tr("同时删除已下载的文件"))
+        dialog = MessageBox(self.tr("Delete Task"), self.tr("Are you sure you want to delete this download task?"), self.window())
+        deleteFiles = CheckBox(self.tr("Also delete downloaded files"))
         deleteFiles.setChecked(cfg.shouldDeleteFilesOnRemove.value)
         dialog.textLayout.addWidget(deleteFiles)
         if dialog.exec():
@@ -333,7 +333,7 @@ class TaskCard(CardWidget):
 
     def _onVerifyHashClicked(self) -> None:
         if not Path(self._task.outputPath).is_file():
-            self._setStatus(self.tr("文件不存在，无法校验"))
+            self._setStatus(self.tr("Cannot verify nonexistent file"))
             return
         from app.view.dialogs.file_hash import FileHashDialog
         dialog = FileHashDialog(self._task.outputPath, self.window())
@@ -367,28 +367,28 @@ class TaskCard(CardWidget):
     def createContextMenu(self) -> RoundMenu:
         menu = RoundMenu(parent=self)
 
-        copyUrl = Action(FluentIcon.COPY, self.tr("复制下载链接"), self)
+        copyUrl = Action(FluentIcon.COPY, self.tr("Copy Download Link"), self)
         copyUrl.triggered.connect(lambda: QApplication.clipboard().setText(self._task.url))
         menu.addAction(copyUrl)
 
         if self._hashDigest:
-            copyHash = Action(FluentIcon.FINGERPRINT, self.tr("复制校验值"), self)
+            copyHash = Action(FluentIcon.FINGERPRINT, self.tr("Copy Checksum"), self)
             copyHash.triggered.connect(lambda: QApplication.clipboard().setText(self._hashDigest))
             menu.addAction(copyHash)
 
         if self._task.canEdit and self._task.status != TaskStatus.COMPLETED:
-            edit = Action(FluentIcon.EDIT, self.tr("编辑任务参数..."), self)
+            edit = Action(FluentIcon.EDIT, self.tr("Edit Task Options..."), self)
             edit.triggered.connect(self._onEditClicked)
             menu.addAction(edit)
 
-        redownload = Action(FluentIcon.UPDATE, self.tr("重新下载"), self)
+        redownload = Action(FluentIcon.UPDATE, self.tr("Redownload"), self)
         redownload.triggered.connect(lambda: self._taskService.redownload(self._task))
         menu.addAction(redownload)
 
         if cfg.isCategoryEnabled.value:
-            moveMenu = RoundMenu(self.tr("移动到分类"), self)
+            moveMenu = RoundMenu(self.tr("Assign Category"), self)
             moveMenu.setIcon(FluentIcon.TAG)
-            uncategorized = Action(FluentIcon.MORE, self.tr("未分类"), self)
+            uncategorized = Action(FluentIcon.MORE, self.tr("Uncategorized"), self)
             uncategorized.triggered.connect(lambda: self._taskService.setCategory(self._task, ""))
             moveMenu.addAction(uncategorized)
             moveMenu.addSeparator()
@@ -476,5 +476,5 @@ class MultiFileTaskCard(TaskCard):
                 and task.status in {TaskStatus.WAITING, TaskStatus.COMPLETED}):
             selected = sum(1 for f in task.files if f.selected)
             self.statusLabel.setText(
-                self.tr("{0}/{1} 个文件").format(selected, len(task.files))
+                self.tr("{0}/{1} Files").format(selected, len(task.files))
             )

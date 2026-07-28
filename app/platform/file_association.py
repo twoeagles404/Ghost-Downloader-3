@@ -26,7 +26,7 @@ def register(fileTypes: list[FileType]) -> None:
         elif sys.platform == "linux":
             _registerLinux(fileTypes)
     except Exception as e:
-        logger.opt(exception=e).error("文件关联注册失败")
+        logger.opt(exception=e).error("File association registration failed")
 
 
 def _registerWindows(fileTypes: list[FileType]) -> None:
@@ -95,11 +95,11 @@ def _registerLinux(fileTypes: list[FileType]) -> None:
     try:
         subprocess.run(["update-desktop-database", str(desktopDir)], check=False, capture_output=True)
     except FileNotFoundError:
-        logger.warning("缺少 update-desktop-database, 跳过")
+        logger.warning("Missing update-desktop-database, skipping")
 
     for mime in mimes:
         try:
             subprocess.run(["xdg-mime", "default", f"{DESKTOP_ID}.desktop", mime], check=False, capture_output=True)
         except FileNotFoundError:
-            logger.warning("缺少 xdg-mime, 跳过文件关联")
+            logger.warning("Missing xdg-mime, skipping file association")
             break

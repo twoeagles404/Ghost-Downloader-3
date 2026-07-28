@@ -129,14 +129,14 @@ class CategoryService(QObject):
 
     def _buildDefaults(self) -> list[Category]:
         names = {
-            "cat_video": self.tr("视频"),
-            "cat_audio": self.tr("音频"),
-            "cat_image": self.tr("图片"),
-            "cat_subtitle": self.tr("字幕"),
-            "cat_document": self.tr("文档"),
-            "cat_archive": self.tr("压缩包"),
-            "cat_program": self.tr("程序"),
-            "cat_other": self.tr("其他"),
+            "cat_video": self.tr("Video"),
+            "cat_audio": self.tr("Audio"),
+            "cat_image": self.tr("Images"),
+            "cat_subtitle": self.tr("Subtitles"),
+            "cat_document": self.tr("Documents"),
+            "cat_archive": self.tr("Archives"),
+            "cat_program": self.tr("Programs"),
+            "cat_other": self.tr("Other"),
         }
         return [
             Category.fromDict({**p, "name": names[p["categoryId"]]})

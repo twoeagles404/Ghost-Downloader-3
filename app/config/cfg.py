@@ -47,13 +47,13 @@ class Language(Enum):
     AUTO = QLocale()
 
 
-# 语言的展示标签，AUTO 由视图层翻译
+# the display label of the language; AUTO is translated by the view layer
 LANGUAGE_TEXTS = {
-    Language.CHINESE_SIMPLIFIED: "简体中文 (中国大陆)",
-    Language.CHINESE_TRADITIONAL: "正體中文 (台灣)",
-    Language.CANTONESE: "粤语 (香港)",
+    Language.CHINESE_SIMPLIFIED: "Simplified Chinese (China)",
+    Language.CHINESE_TRADITIONAL: "Traditional Chinese (Taiwan)",
+    Language.CANTONESE: "Cantonese (Hong Kong)",
     Language.ENGLISH_UNITED_STATES: "English (US)",
-    Language.JAPANESE: "日本語 (日本)",
+    Language.JAPANESE: "Japanese (Japan)",
     Language.RUSSIAN: "Русский (Россия)",
     Language.PORTUGUESE_BRAZIL: "Português (Brasil)",
 }
@@ -211,18 +211,18 @@ class HeadersPresetListValidator(ConfigValidator):
 
     def correct(self, value) -> list:
         presets = [i for i in value if self._isValid(i)] if isinstance(value, list) else []
-        return presets or [{"name": "默认", "headers": dict(BASE_HEADERS)}]
+        return presets or [{"name": "Default", "headers": dict(BASE_HEADERS)}]
 
 
 class Config(QConfig):
 
-    # 覆盖 QConfig.themeMode，让 QConfig.load() 自动用正确的 key 和 default
+    # override QConfig.themeMode so QConfig.load() automatically uses the correct key and default
     themeMode = OptionsConfigItem(
         "Personalization", "ThemeMode", Theme.AUTO,
         OptionsValidator(Theme), ThemeSerializer(),
     )
 
-    # 下载
+    # Download
     downloadFolder = ConfigItem(
         "GeneralDownload", "DownloadFolder",
         "/storage/emulated/0/Download" if IS_ANDROID
@@ -247,14 +247,14 @@ class Config(QConfig):
         "GeneralDownload", "MaxReassignSize", 512, RangeValidator(64, 102400)
     )
 
-    # 分类
+    # Category
     isCategoryEnabled = ConfigItem("Category", "EnableCategory", False, BoolValidator())
     categoryRules = ConfigItem(
         "Category", "CategoryRules", [],
         CategoryListValidator(), JsonConfigSerializer(list, list),
     )
 
-    # 浏览器扩展
+    # Browser extension
     isBrowserExtensionEnabled = ConfigItem("Browser", "EnableBrowserExtension", True, BoolValidator())
     browserExtensionPairToken = ConfigItem("Browser", "BrowserExtensionPairToken", "")
     browserExtensionPort = RangeConfigItem("Browser", "Port", 14370, RangeValidator(1024, 65535))
@@ -263,13 +263,13 @@ class Config(QConfig):
     )
     isUrlSchemeRegistered = ConfigItem("Browser", "UrlSchemeRegistered", False, BoolValidator())
 
-    # Aria2 RPC 兼容
+    # Aria2 RPC compatibility
     isAria2RpcEnabled = ConfigItem("Aria2Rpc", "Enabled", False, BoolValidator())
     aria2RpcPort = RangeConfigItem("Aria2Rpc", "Port", 16800, RangeValidator(1024, 65535))
     aria2RpcToken = ConfigItem("Aria2Rpc", "Token", "")
     aria2RpcEmulateFingerprint = ConfigItem("Aria2Rpc", "EmulateFingerprint", False, BoolValidator())
 
-    # 个性化
+    # Personalization
     if sys.platform == "win32":
         from app.platform.windows import isWin10
         backgroundEffect = OptionsConfigItem(
@@ -287,7 +287,7 @@ class Config(QConfig):
         OptionsValidator(Language), LanguageSerializer(), restart=True,
     )
 
-    # 软件
+    # Software
     shouldCheckUpdateAtStartup = ConfigItem("Software", "CheckUpdateAtStartUp", True, BoolValidator())
     shouldRunAtLogin = ConfigItem("Software", "AutoRun", False, BoolValidator())
     closeMode = OptionsConfigItem(
@@ -302,11 +302,11 @@ class Config(QConfig):
     # OOBE
     hasCompletedOobe = ConfigItem("Software", "HasCompletedOobe", False, BoolValidator())
 
-    # UI 状态
+    # UI state
     expandedSettingGroups = ConfigItem("UI", "ExpandedSettingGroups", [], StringListValidator())
     settingGroupOrder = ConfigItem("UI", "SettingGroupOrder", [], StringListValidator())
 
-    # 网络
+    # Network
     clientProfile = ConfigItem("Network", "ClientProfile", "auto", ClientProfileValidator())
     headersPresets = ConfigItem(
         "Network", "HeadersPresets", [],
@@ -317,7 +317,7 @@ class Config(QConfig):
     )
     identityPresets = ConfigItem(
         "Network", "IdentityPresets",
-        [{"name": "百度网盘客户端", "clientProfile": "raw",
+        [{"name": "Baidu Netdisk client", "clientProfile": "raw",
           "userAgent": "pan.baidu.com", "hosts": ["*.pcs.baidu.com"],
           "isEnabled": True}],
         IdentityPresetListValidator(), JsonConfigSerializer(list, list),

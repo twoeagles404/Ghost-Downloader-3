@@ -27,14 +27,14 @@ class MobileTaskPage(TaskPage):
 
     def _initWidget(self) -> None:
         super()._initWidget()
-        # 桌面的文字按钮在窄屏太宽, 换图标按钮; 选择改长按触发, 收起 selectButton
+        # desktop text buttons are too wide on narrow screens, switch to icon buttons; change selection to long-press, hide selectButton
         for old in (self.startAllButton, self.pauseAllButton):
             old.hide()
             old.deleteLater()
         self.startAllButton = PrimaryToolButton(FluentIcon.PLAY, self.toolBar)
         self.pauseAllButton = ToolButton(FluentIcon.PAUSE, self.toolBar)
-        self.startAllButton.setToolTip(self.tr("全部开始"))
-        self.pauseAllButton.setToolTip(self.tr("全部暂停"))
+        self.startAllButton.setToolTip(self.tr("Start All"))
+        self.pauseAllButton.setToolTip(self.tr("Pause All"))
         self.selectButton.hide()
 
         self.filterToolBar = QWidget(self)
@@ -67,14 +67,14 @@ class MobileTaskPage(TaskPage):
 
     def _createCard(self, task: Task) -> TaskCard | None:
         card = super()._createCard(task)
-        if card is None:  # 该任务所属 pack 未打包(如 Android 排除的 ed2k)
+        if card is None:  # the pack this task belongs to is not bundled (e.g. ed2k excluded on Android)
             return None
         baseType = type(card)
         mobileType = self._mobileCardTypes.get(baseType)
         if mobileType is None:
             mobileType = type(f"Mobile{baseType.__name__}", (MobileTaskCardBase, baseType), {})
             self._mobileCardTypes[baseType] = mobileType
-        card.__class__ = mobileType  # 套上移动 mixin: 同一 C++ 类型, 仅改 Python MRO
+        card.__class__ = mobileType  # apply the movable mixin: same C++ type, only changes the Python MRO
         card.setupMobile()
         return card
 
@@ -83,7 +83,7 @@ class MobileTaskPage(TaskPage):
         super().resizeEvent(event)
 
     def _fitCommandView(self) -> None:
-        # 窄屏放不下整条命令栏, 收窄它好让溢出动作折进「更多」按钮
+        # a narrow screen cannot fit the whole command bar, so narrow it to fold the overflow actions into the "More" button
         bar = self.commandView.bar
         margin = 12
         widthLimit = max(self.width() - 24 - margin, bar.moreButton.width())

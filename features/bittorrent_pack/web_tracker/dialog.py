@@ -48,9 +48,9 @@ class WebTrackerSourceCard(QWidget):
 
     def setCachedCount(self, count: int | None):
         if count is None:
-            self.statusLabel.setText(self.tr("未拉取"))
+            self.statusLabel.setText(self.tr("Waiting for Refresh"))
         else:
-            self.statusLabel.setText(self.tr("{0} 条").format(count))
+            self.statusLabel.setText(self.tr("{0} items").format(count))
 
     def _initWidget(self, url: str, cachedCount: int | None):
         self.urlEdit.setText(url)
@@ -71,10 +71,10 @@ class WebTrackerSourceCard(QWidget):
 class WebTrackerDialog(MessageBoxBase):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.sourceHeaderLabel = SubtitleLabel(self.tr("Tracker 源"), self.widget)
-        self.addSourceButton = PrimaryPushButton(FluentIcon.ADD, self.tr("添加"), self.widget)
+        self.sourceHeaderLabel = SubtitleLabel(self.tr("Tracker Sources"), self.widget)
+        self.addSourceButton = PrimaryPushButton(FluentIcon.ADD, self.tr("Add"), self.widget)
         self.sourceContainer = QWidget(self.widget)
-        self.customLabel = SubtitleLabel(self.tr("自定义 Tracker"), self.widget)
+        self.customLabel = SubtitleLabel(self.tr("Extra Trackers"), self.widget)
         self.customEdit = AutoSizingEdit(self.widget)
         self.sourceHeaderLayout = QHBoxLayout()
         self.sourceLayout = QVBoxLayout(self.sourceContainer)
@@ -86,14 +86,14 @@ class WebTrackerDialog(MessageBoxBase):
 
     def _initWidget(self):
         self.widget.setMinimumWidth(720)
-        self.yesButton.setText(self.tr("保存并刷新"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Save & Refresh"))
+        self.cancelButton.setText(self.tr("Cancel"))
         customText = bittorrentConfig.webTrackerCustomList.value
         customTrackers = [
             t for t in customText.split()
             if urlsplit(t).scheme.lower() in TRACKER_SCHEMES and urlsplit(t).netloc
         ]
-        self.customEdit.setPlaceholderText(self.tr("每行一个 tracker URL，不会被源刷新覆盖"))
+        self.customEdit.setPlaceholderText(self.tr("One tracker URL per line, will not be overwritten by source refresh"))
         self.customEdit.setPlainText("\n".join(customTrackers))
         for url in list(bittorrentConfig.webTrackerSources.value):
             self._addSourceCard(url)
@@ -122,8 +122,8 @@ class WebTrackerDialog(MessageBoxBase):
             normalized = card.url
             if not normalized:
                 InfoBar.error(
-                    self.tr("源地址无效"),
-                    self.tr("请输入有效的 HTTP/HTTPS 地址"),
+                    self.tr("Invalid Source URL"),
+                    self.tr("Please enter a valid HTTP/HTTPS URL"),
                     parent=self,
                 )
                 card.urlEdit.setFocus()

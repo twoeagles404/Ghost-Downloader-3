@@ -74,14 +74,14 @@ class MobileSettingPage(SettingPage):
         controlRow = QHBoxLayout()
         controlRow.setContentsMargins(32, 0, 0, 0)
         controlRow.setSpacing(8)
-        # 桌面控件(滑块 268 / 下拉 200 / 选择框 180 / 商店按钮 等)自带硬最小宽, 窄屏会把整页撑出屏外。
-        # 让行内最宽的主控件填满并可收缩到 0, 辅助控件(数值标签 / 图标按钮)保持原宽, 整页便不再被撑宽。
+        # desktop widgets (slider 268 / dropdown 200 / select box 180 / store button, etc.) have a hard minimum width; on narrow screens they push the whole page off-screen.
+        # let the widest main control in the row fill and shrink to 0, while auxiliary controls (value label / icon button) keep their width, so the page is no longer stretched wide.
         primary = max(controls, key=lambda w: w.sizeHint().width())
         for widget in controls:
             widget.setMinimumWidth(0)
             if widget is primary:
                 policy = widget.sizePolicy()
-                policy.setHorizontalPolicy(QSizePolicy.Policy.Ignored)  # 仅放开水平轴, 使其填满行宽并可收缩
+                policy.setHorizontalPolicy(QSizePolicy.Policy.Ignored)  # only free the horizontal axis so it fills the row width and can shrink
                 widget.setSizePolicy(policy)
                 controlRow.addWidget(widget, 1)
             else:

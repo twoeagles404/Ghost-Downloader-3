@@ -1,6 +1,6 @@
-"""TaskPage _runningIds 刷新机制测试。
+"""TaskPage _runningIds refresh mechanism test.
 
-Seam S11: taskStarted/Stopped → 精确刷新 running cards。
+Seam S11: taskStarted/Stopped -> precisely refresh running cards.
 """
 from __future__ import annotations
 

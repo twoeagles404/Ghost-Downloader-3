@@ -86,8 +86,8 @@ class HuggingFaceProxySiteCard(SettingCard):
     def __init__(self, submit, parent=None):
         self.submit = submit
         super().__init__(
-            FluentIcon.GLOBE, self.tr("镜像站"),
-            self.tr("选择 HuggingFace 镜像站，延迟仅供参考"), parent,
+            FluentIcon.GLOBE, self.tr("Mirror Site"),
+            self.tr("Select HuggingFace mirror site, latency is for reference only"), parent,
         )
         self._latencies: dict[str, int | None] = {s: None for s in HF_PROXY_SITES}
         self._isRefreshing = False
@@ -104,12 +104,12 @@ class HuggingFaceProxySiteCard(SettingCard):
         self.customSiteEdit.setPlaceholderText("https://example.com/")
         self.customSiteEdit.setClearButtonEnabled(True)
         self.customSiteEdit.setMinimumWidth(220)
-        self.refreshButton.setToolTip(self.tr("刷新延迟"))
+        self.refreshButton.setToolTip(self.tr("Re-test Latency"))
         self.refreshButton.installEventFilter(ToolTipFilter(self.refreshButton))
 
         for site in HF_PROXY_SITES:
             self.comboBox.addItem(urlparse(site).netloc or site.rstrip("/"))
-        self.comboBox.addItem(self.tr("自定义"))
+        self.comboBox.addItem(self.tr("Custom"))
 
         currentSite = huggingFaceConfig.selectedSite.value
         if currentSite == CUSTOM_SITE_KEY:
@@ -141,7 +141,7 @@ class HuggingFaceProxySiteCard(SettingCard):
             if latency is None:
                 label = displayName
             elif latency < 0:
-                label = f"{displayName} ({self.tr('超时')})"
+                label = f"{displayName} ({self.tr("Timeout")})"
             else:
                 label = f"{displayName} ({latency} ms)"
             self.comboBox.setItemText(i, label)
@@ -149,11 +149,11 @@ class HuggingFaceProxySiteCard(SettingCard):
         customSite = huggingFaceConfig.customSite.value
         customLatency = self._latencies.get(customSite) if customSite else None
         if customLatency is None:
-            customLabel = self.tr("自定义")
+            customLabel = self.tr("Custom")
         elif customLatency < 0:
-            customLabel = f"{self.tr('自定义')} ({self.tr('超时')})"
+            customLabel = f"{self.tr("Custom")} ({self.tr("Timeout")})"
         else:
-            customLabel = f"{self.tr('自定义')} ({customLatency} ms)"
+            customLabel = f"{self.tr("Custom")} ({customLatency} ms)"
         self.comboBox.setItemText(len(HF_PROXY_SITES), customLabel)
 
     def _onCurrentIndexChanged(self, index: int) -> None:
@@ -198,14 +198,14 @@ class HuggingFaceTokenCard(SettingCard):
     def __init__(self, parent=None):
         super().__init__(
             FluentIcon.FINGERPRINT, self.tr("Access Token"),
-            self.tr("用于下载需要授权的模型（如 Llama、Mistral）"), parent,
+            self.tr("Used to download gated models (e.g., Llama, Mistral)"), parent,
         )
         self.tokenEdit = PasswordLineEdit(self)
         self.tokenEdit.setPlaceholderText("hf_xxxxxxxxxxxx")
         self.tokenEdit.setMinimumWidth(240)
         self.tokenEdit.setText(huggingFaceConfig.accessToken.value)
         self.openTokenPageButton = HyperlinkButton(self)
-        self.openTokenPageButton.setText(self.tr("获取 Token"))
+        self.openTokenPageButton.setText(self.tr("Get Token"))
         self.openTokenPageButton.setUrl(TOKEN_URL)
 
         self.hBoxLayout.addWidget(self.tokenEdit)
@@ -233,8 +233,8 @@ class HuggingFaceConfig(PackConfig):
         group = CollapsibleSettingCardGroup(self.tr("HuggingFace"), "huggingface", parent)
         group.addSettingCards([
             SwitchSettingCard(
-                FluentIcon.CONNECT, self.tr("启用 HuggingFace 加速"),
-                self.tr("命中 HuggingFace 链接时，自动改写为所选镜像站"),
+                FluentIcon.CONNECT, self.tr("Enable HuggingFace Acceleration"),
+                self.tr("Automatically rewrite HuggingFace links to use selected mirror site"),
                 self.isEnabled, group,
             ),
             HuggingFaceProxySiteCard(self.submit, group),

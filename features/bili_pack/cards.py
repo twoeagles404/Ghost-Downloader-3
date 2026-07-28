@@ -15,7 +15,7 @@ from app.view.cards.task_cards import MultiFileTaskCard
 from app.view.components.tree_view import AutoSizingTreeView
 from .task import BilibiliTask, DownloadMode
 
-MODE_LABELS = ("视频", "音频", "封面")
+MODE_LABELS = ("Video", "Audio", "Cover")
 
 
 class SubtitleSelectDialog(MessageBoxBase):
@@ -24,11 +24,11 @@ class SubtitleSelectDialog(MessageBoxBase):
         super().__init__(parent)
         self._choices = choices
 
-        self.titleLabel = SubtitleLabel(self.tr("选择字幕语言"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Select Subtitle Language"), self)
         self.summaryLabel = BodyLabel("", self)
 
-        self.selectAllButton = PrimaryPushButton(self.tr("全选"), self)
-        self.clearButton = PushButton(self.tr("全不选"), self)
+        self.selectAllButton = PrimaryPushButton(self.tr("Select All"), self)
+        self.clearButton = PushButton(self.tr("Select None"), self)
 
         self.treeView = AutoSizingTreeView(self, minimumVisibleRows=3, maximumVisibleRows=16)
         self.treeModel = QStandardItemModel(self.treeView)
@@ -40,8 +40,8 @@ class SubtitleSelectDialog(MessageBoxBase):
 
     def _initWidget(self, selected: set[str]) -> None:
         self.widget.setMinimumWidth(400)
-        self.yesButton.setText(self.tr("确定"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         self.treeView.setRootIsDecorated(False)
         self.treeView.setUniformRowHeights(True)
@@ -86,7 +86,7 @@ class SubtitleSelectDialog(MessageBoxBase):
             1 for row in range(self.treeModel.rowCount())
             if self.treeModel.item(row, 0).checkState() == Qt.CheckState.Checked
         )
-        self.summaryLabel.setText(self.tr("{0}/{1} 种语言").format(count, self.treeModel.rowCount()))
+        self.summaryLabel.setText(self.tr("{0}/{1} Languages").format(count, self.treeModel.rowCount()))
 
     def selectedLanguages(self) -> list[str]:
         return [
@@ -102,12 +102,12 @@ class PageSelectDialog(MessageBoxBase):
         super().__init__(parent)
         self._pages = task.files or []
 
-        self.titleLabel = SubtitleLabel(self.tr("选择分P"), self)
+        self.titleLabel = SubtitleLabel(self.tr("Select Parts"), self)
         self.summaryLabel = BodyLabel("", self)
 
-        self.selectAllButton = PrimaryPushButton(self.tr("全选"), self)
-        self.clearButton = PushButton(self.tr("全不选"), self)
-        self.invertButton = PushButton(self.tr("反选"), self)
+        self.selectAllButton = PrimaryPushButton(self.tr("Select All"), self)
+        self.clearButton = PushButton(self.tr("Select None"), self)
+        self.invertButton = PushButton(self.tr("Invert Selection"), self)
 
         self.treeView = AutoSizingTreeView(self, minimumVisibleRows=3, maximumVisibleRows=16)
         self.treeModel = QStandardItemModel(self.treeView)
@@ -119,14 +119,14 @@ class PageSelectDialog(MessageBoxBase):
 
     def _initWidget(self) -> None:
         self.widget.setMinimumWidth(500)
-        self.yesButton.setText(self.tr("确定"))
-        self.cancelButton.setText(self.tr("取消"))
+        self.yesButton.setText(self.tr("Save"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         self.treeView.setRootIsDecorated(False)
         self.treeView.setUniformRowHeights(True)
         self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
-        self.treeModel.setHorizontalHeaderLabels([self.tr("分P"), self.tr("大小")])
+        self.treeModel.setHorizontalHeaderLabels([self.tr("Part"), self.tr("Size")])
         self.treeView.setModel(self.treeModel)
         self.treeView.header().setStretchLastSection(False)
         self.treeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
@@ -190,7 +190,7 @@ class PageSelectDialog(MessageBoxBase):
             1 for row in range(self.treeModel.rowCount())
             if self.treeModel.item(row, 0).checkState() == Qt.CheckState.Checked
         )
-        self.summaryLabel.setText(self.tr("{0}/{1} 个分P").format(count, self.treeModel.rowCount()))
+        self.summaryLabel.setText(self.tr("{0}/{1} Parts").format(count, self.treeModel.rowCount()))
         self.yesButton.setEnabled(count > 0)
 
     def selectedPageNumbers(self) -> set[int]:
@@ -218,11 +218,11 @@ class BilibiliDraftCard(MultiFileDraftCard):
 
         self._subtitleButton = TransparentToolButton(FluentIcon.LANGUAGE, self)
         self._subtitleButton.installEventFilter(ToolTipFilter(self._subtitleButton))
-        self._subtitleButton.setToolTip(self.tr("选择字幕"))
+        self._subtitleButton.setToolTip(self.tr("Select Subtitles"))
         self._subtitleButton.setEnabled(bool(self._subtitleChoices))
 
         if self._selectFilesButton is not None:
-            self._selectFilesButton.setToolTip(self.tr("选择分P"))
+            self._selectFilesButton.setToolTip(self.tr("Select Parts"))
         self._refreshButtonVisibility()
 
     def _initLayout(self) -> None:
@@ -270,7 +270,7 @@ class BilibiliDraftCard(MultiFileDraftCard):
                     seen.add(lan)
                     label = sub.get("lan_doc", lan)
                     if sub.get("isAi"):
-                        label += "（自动生成）"
+                        label += "(auto-generated)"
                     choices.append((lan, label))
         return choices
 
@@ -291,5 +291,5 @@ class BilibiliTaskCard(MultiFileTaskCard):
         task: BilibiliTask = self._task
         if task.mode == DownloadMode.COVER:
             self.selectFilesButton.hide()
-        self.selectFilesButton.setToolTip(self.tr("选择分P"))
+        self.selectFilesButton.setToolTip(self.tr("Select Parts"))
         self.selectFilesButton.installEventFilter(ToolTipFilter(self.selectFilesButton))

@@ -1,7 +1,7 @@
-"""BTSession 集成测试。
+"""BTSession integration tests.
 
 Seam: BTSession.run / duplicate rejection / updatePriorities / close
-使用合成本地种子，不依赖网络。
+Uses a synthetic local torrent, no network dependency.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from features.bittorrent_pack.config import bittorrentConfig
 
 @pytest.fixture
 def torrent_env():
-    """创建一个包含两个小文件的本地种子和对应目录。"""
+    """Create a local torrent containing two small files and the matching directory."""
     with tempfile.TemporaryDirectory() as srcDir:
         root = os.path.join(srcDir, "test_torrent")
         os.makedirs(root)
@@ -115,7 +115,7 @@ async def test_duplicate_info_hash_rejected(session, torrent_env):
     task1 = asyncio.create_task(session.run("dup-1", params))
     await asyncio.sleep(1)
 
-    with pytest.raises(Exception, match="已在下载中"):
+    with pytest.raises(Exception, match="Already downloading"):
         await session.run("dup-2", params)
 
     task1.cancel()

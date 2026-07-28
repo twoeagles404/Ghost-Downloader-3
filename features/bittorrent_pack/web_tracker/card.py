@@ -15,7 +15,7 @@ class WebTrackerCard(SettingCard):
     def __init__(self, submit, parent=None):
         super().__init__(FluentIcon.GLOBE, self.tr("Web Tracker"), "", parent)
         self._submit = submit
-        self.manageButton = PrimaryPushButton(self.tr("管理"), self)
+        self.manageButton = PrimaryPushButton(self.tr("Manage"), self)
         self.refreshButton = ToolButton(FluentIcon.SYNC, self)
         self._stateToolTip: StateToolTip | None = None
 
@@ -24,7 +24,7 @@ class WebTrackerCard(SettingCard):
         self._bind()
 
     def _initWidget(self):
-        self.refreshButton.setToolTip(self.tr("刷新缓存"))
+        self.refreshButton.setToolTip(self.tr("Refresh Cache"))
         self.refreshButton.installEventFilter(ToolTipFilter(self.refreshButton))
         self.refreshContent()
 
@@ -41,7 +41,7 @@ class WebTrackerCard(SettingCard):
     def refreshContent(self):
         sourceCount = len(list(bittorrentConfig.webTrackerSources.value))
         cachedTotal = len(trackerService.mergedTrackers())
-        self.setContent(self.tr("{0} 个源 · 共 {1} 条缓存").format(sourceCount, cachedTotal))
+        self.setContent(self.tr("{0} source(s), {1} trackers cached").format(sourceCount, cachedTotal))
 
     def _onManageClicked(self):
         from .dialog import WebTrackerDialog
@@ -58,8 +58,8 @@ class WebTrackerCard(SettingCard):
             return
         self.refreshButton.setEnabled(False)
         self._stateToolTip = StateToolTip(
-            self.tr("正在刷新 Web Tracker"),
-            self.tr("正在拉取 {0} 个源...").format(len(urls)),
+            self.tr("Refreshing Trackers"),
+            self.tr("Downloading from {0} source(s)").format(len(urls)),
             self.window(),
         )
         self._stateToolTip.move(self._stateToolTip.getSuitablePos())
@@ -78,7 +78,7 @@ class WebTrackerCard(SettingCard):
         success, total = result
         cachedTotal = len(trackerService.mergedTrackers())
         self._stateToolTip.setContent(
-            self.tr("已刷新 {0}/{1} 个源，共 {2} 条 Tracker").format(success, total, cachedTotal)
+            self.tr("Refreshed {0}/{1} sources, {2} trackers total").format(success, total, cachedTotal)
         )
         self._stateToolTip.setState(True)
         self._stateToolTip = None
@@ -88,6 +88,6 @@ class WebTrackerCard(SettingCard):
         self.refreshButton.setEnabled(True)
         if self._stateToolTip is None:
             return
-        self._stateToolTip.setContent(self.tr("刷新失败: {0}").format(str(error)))
+        self._stateToolTip.setContent(self.tr("Refresh Failed: {0}").format(str(error)))
         self._stateToolTip.setState(True)
         self._stateToolTip = None

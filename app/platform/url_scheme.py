@@ -15,7 +15,7 @@ def registerUrlScheme() -> None:
         elif sys.platform == "linux":
             _registerLinux()
     except Exception as e:
-        logger.opt(exception=e).error("URL scheme 注册失败")
+        logger.opt(exception=e).error("URL scheme registration failed")
 
 
 def unregisterUrlScheme() -> None:
@@ -25,7 +25,7 @@ def unregisterUrlScheme() -> None:
         elif sys.platform == "linux":
             _unregisterLinux()
     except Exception as e:
-        logger.opt(exception=e).error("URL scheme 注销失败")
+        logger.opt(exception=e).error("URL scheme deregistration failed")
 
 
 def isLaunchUri(uri: str) -> bool:

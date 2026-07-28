@@ -17,37 +17,35 @@ MODEL = "deepseek-v4-pro"
 
 LOCALES = {
     "en_US": "English (United States)",
-    "ja_JP": "日本語 (Japanese)",
+    "ja_JP": "Japanese",
     "ru_RU": "Русский (Russian)",
-    "zh_HK": "繁體中文 (Hong Kong)",
-    "zh_TW": "繁體中文 (Taiwan)",
+    "zh_HK": "Traditional Chinese (Hong Kong)",
+    "zh_TW": "Traditional Chinese (Taiwan)",
     "pt_BR": "Português (Brasil)",
 }
 
-SYSTEM_PROMPT_DESKTOP = """\
-你是专业软件本地化译员。将下载管理器 "Ghost Downloader 3" 的 UI 文本从简体中文译为 {locale_name}。
+SYSTEM_PROMPT_DESKTOP = """You are a professional software localization translator. Translate the UI text of the download manager "Ghost Downloader 3" from Simplified Chinese to {locale_name}.
 
-规则:
-1. 占位符 {{0}} {{1}} {{2}} 等必须原样保留，位置和数量不变
-2. HTML 标签原样保留
-3. \\n 表示换行，保留在译文相同位置
-4. 参考「已有翻译」的术语和语气
-5. 严格保持 === Context === 分组 + "源文 = 译文" 格式输出
-6. 只输出待翻译部分的结果
-7. 不要输出解释、注释、markdown 标记"""
+Rules:
+1. Placeholders such as {{0}} {{1}} {{2}} must be kept verbatim, with the same position and count
+2. Keep HTML tags verbatim
+3. Line-break markers must stay at the same position in the translation
+4. Reference the terminology and tone of "Existing translations"
+5. Strictly keep the === Context === grouping plus the "source = translation" output format
+6. Only output the results for the to-translate part
+7. Do not output explanations, comments, or markdown markup"""
 
-SYSTEM_PROMPT_BROWSER = """\
-你是专业软件本地化译员。将 "Ghost Downloader" 浏览器扩展的 UI 文本从简体中文译为 {locale_name}。
+SYSTEM_PROMPT_BROWSER = """You are a professional software localization translator. Translate the UI text of the "Ghost Downloader" browser extension from Simplified Chinese to {locale_name}.
 
-「已有翻译」格式: key = 源文 → 译文（用于参考术语和语气）
-「待翻译」格式: key = 源文（行尾 # 注释是上下文提示，不要翻译）
+"Existing translations" format: key = source -> translation (for reference of terminology and tone)
+"To translate" format: key = source (a trailing # comment is a context hint, do not translate)
 
-规则:
-1. 占位符 $1 $2 $NAME$ 等必须原样保留，位置和数量不变
-2. 参考「已有翻译」的术语和语气
-3. 严格保持 "key = 译文" 格式输出，每行一条
-4. 只输出待翻译部分的结果
-5. 不要输出解释、注释、markdown 标记"""
+Rules:
+1. Placeholders such as $1 $2 $NAME$ must be kept verbatim, with the same position and count
+2. Reference the terminology and tone of "Existing translations"
+3. Strictly keep the "key = translation" output format, one entry per line
+4. Only output the results for the to-translate part
+5. Do not output explanations, comments, or markdown markup"""
 
 
 def escapeNewlines(s: str) -> str:
@@ -82,7 +80,7 @@ def buildPrompt(finished, unfinished) -> str:
     lines = []
 
     if finished:
-        lines.append("## 已有翻译")
+        lines.append("## Existing translations")
         currentContext = None
         for ctx, src, trans in finished:
             if ctx != currentContext:
@@ -91,7 +89,7 @@ def buildPrompt(finished, unfinished) -> str:
             lines.append(f"{escapeNewlines(src)} = {escapeNewlines(trans)}")
         lines.append("")
 
-    lines.append("## 待翻译")
+    lines.append("## To translate")
     currentContext = None
     for ctx, src, existing in unfinished:
         if ctx != currentContext:
@@ -231,13 +229,13 @@ def buildBrowserPrompt(
     lines = []
 
     if existing:
-        lines.append("## 已有翻译")
+        lines.append("## Existing translations")
         for key, entry in existing.items():
             src = source.get(key, {}).get("message", "")
             lines.append(f"{key} = {src} → {entry['message']}")
         lines.append("")
 
-    lines.append("## 待翻译")
+    lines.append("## To translate")
     for key, entry in untranslated.items():
         desc = entry.get("description")
         hint = f"  # {desc}" if desc else ""

@@ -42,16 +42,16 @@ class SettingPage(ScrollArea):
         self.vBoxLayout = QVBoxLayout(self.container)
         self.vBoxLayout.addStretch(1)
 
-        self.generalGroup = CollapsibleSettingCardGroup(self.tr("综合下载设置"), "general", self.container)
-        self.categoryGroup = CollapsibleSettingCardGroup(self.tr("下载分类"), "category", self.container)
-        self.browserGroup = CollapsibleSettingCardGroup(self.tr("浏览器扩展"), "browser", self.container)
-        self.aria2RpcGroup = CollapsibleSettingCardGroup(self.tr("Aria2 RPC 兼容"), "aria2rpc", self.container)
-        self.personalGroup = CollapsibleSettingCardGroup(self.tr("个性化"), "personalization", self.container)
-        self.softwareGroup = CollapsibleSettingCardGroup(self.tr("应用"), "software", self.container)
-        self.aboutGroup = CollapsibleSettingCardGroup(self.tr("关于"), "about", self.container)
+        self.generalGroup = CollapsibleSettingCardGroup(self.tr("General Download Settings"), "general", self.container)
+        self.categoryGroup = CollapsibleSettingCardGroup(self.tr("Download Categorization"), "category", self.container)
+        self.browserGroup = CollapsibleSettingCardGroup(self.tr("Browser Extension"), "browser", self.container)
+        self.aria2RpcGroup = CollapsibleSettingCardGroup(self.tr("Aria2 RPC Compatibility"), "aria2rpc", self.container)
+        self.personalGroup = CollapsibleSettingCardGroup(self.tr("Personalization"), "personalization", self.container)
+        self.softwareGroup = CollapsibleSettingCardGroup(self.tr("Application"), "software", self.container)
+        self.aboutGroup = CollapsibleSettingCardGroup(self.tr("About"), "about", self.container)
 
         from app.view.pages.task_page import EmptyStatusWidget
-        self.emptyStatusWidget = EmptyStatusWidget(FluentIcon.SEARCH_MIRROR, self.tr("未找到匹配的设置项"), self)
+        self.emptyStatusWidget = EmptyStatusWidget(FluentIcon.SEARCH_MIRROR, self.tr("No matching settings found"), self)
         self.emptyStatusWidget.hide()
 
         self._initWidget()
@@ -72,16 +72,16 @@ class SettingPage(ScrollArea):
 
     def _initCards(self) -> None:
         self.speedLimitationCard = SpinBoxSettingCard(
-            FluentIcon.SPEED_OFF, self.tr("下载限速"),
-            self.tr("当下载任务界面限速开关开启时，所有任务将根据此值进行限速"),
+            FluentIcon.SPEED_OFF, self.tr("Download Speed Limit"),
+            self.tr("If the speed limit switch is enabled on the download tasks page, all tasks will be limited according to this value"),
             suffix=" KB/s", configItem=cfg.speedLimitation,
             singleStep=512, division=1 / 1024,
         )
         from qfluentwidgets import SettingCard
-        self.downloadFolderCard = SettingCard(FluentIcon.FOLDER, self.tr("下载路径"), self.tr("文件默认保存位置"))
+        self.downloadFolderCard = SettingCard(FluentIcon.FOLDER, self.tr("Download Path"), self.tr("Default file save location"))
         self.downloadFolderPicker = FolderPicker(self.downloadFolderCard)
         self.downloadRestoreButton = ToolButton(FluentIcon.CANCEL, self.downloadFolderCard)
-        self.downloadRestoreButton.setToolTip(self.tr("恢复默认路径"))
+        self.downloadRestoreButton.setToolTip(self.tr("Restore Default Path"))
         self.downloadRestoreButton.installEventFilter(ToolTipFilter(self.downloadRestoreButton))
         self.downloadFolderPicker.refreshHistory()
         self.downloadFolderPicker.setPath(cfg.downloadFolder.value)
@@ -92,22 +92,22 @@ class SettingPage(ScrollArea):
         self.clientProfileCard = IdentitySettingCard()
 
         self.generalGroup.addSettingCards([
-            RangeSettingCard(cfg.maxTaskNum, FluentIcon.TRAIN, self.tr("最大任务数"),
-                             self.tr("最多能同时进行的任务数量")),
-            RangeSettingCard(cfg.preBlockNum, FluentIcon.CLOUD, self.tr("预分配线程数"),
-                             self.tr("线程越多，下载越快。线程数大于 64 时，有触发反爬导致文件损坏的风险")),
-            SwitchSettingCard(FluentIcon.SPEED_HIGH, self.tr("自动提速"),
-                              self.tr("AI 实时检测各线程效率并自动增加线程数以提高下载速度"),
+            RangeSettingCard(cfg.maxTaskNum, FluentIcon.TRAIN, self.tr("Maximum Concurrent Tasks"),
+                             self.tr("Maximum number of simultaneous transfers")),
+            RangeSettingCard(cfg.preBlockNum, FluentIcon.CLOUD, self.tr("Pre-allocated Threads"),
+                             self.tr("More threads speed up downloads. Over 64 threads may trigger anti-scraping and corrupt files")),
+            SwitchSettingCard(FluentIcon.SPEED_HIGH, self.tr("Auto Boost"),
+                              self.tr("Monitor thread efficiencies with AI and auto-increase number of threads to boost download speed"),
                               cfg.autoSpeedUp),
-            SpinBoxSettingCard(FluentIcon.LIBRARY, self.tr("最小再分配大小"),
-                              self.tr("每线程剩余量大于此值时, 有线程完成或自动提速条件满足会触发重新分配"),
+            SpinBoxSettingCard(FluentIcon.LIBRARY, self.tr("Minimum Redistribution Size"),
+                              self.tr("If threads' workload surpasses this value, redistribution will trigger when a thread completes or Auto Boost is enabled"),
                               " KB", cfg.maxReassignSize, singleStep=64),
             self.speedLimitationCard,
-            SwitchSettingCard(FluentIcon.HISTORY, self.tr("保留文件修改时间"),
-                              self.tr("下载完成后将文件的修改时间设为服务器提供的 Last-Modified 值"),
+            SwitchSettingCard(FluentIcon.HISTORY, self.tr("Preserve file modification time"),
+                              self.tr("Set file modification time to server's Last-Modified value after download"),
                               cfg.shouldPreserveLastModified),
-            SwitchSettingCard(FluentIcon.DEVELOPER_TOOLS, self.tr("下载时验证 SSL 证书"),
-                              self.tr("文件无法下载时，可尝试关闭该选项"),
+            SwitchSettingCard(FluentIcon.DEVELOPER_TOOLS, self.tr("Verify SSL Certificates"),
+                              self.tr("Try disabling if files fail to download"),
                               cfg.shouldVerifySsl),
             self.downloadFolderCard,
             ProxySettingCard(cfg.proxyServer, featureService=self._featureService),
@@ -117,18 +117,18 @@ class SettingPage(ScrollArea):
 
         self.categoryRulesCard = CategoryRulesCard(self._categoryService)
         self.categoryGroup.addSettingCards([
-            SwitchSettingCard(FluentIcon.TAG, self.tr("启用下载分类"),
-                              self.tr("根据扩展名将下载任务归类，便于筛选与分发到指定文件夹"),
+            SwitchSettingCard(FluentIcon.TAG, self.tr("Enable Categorization"),
+                              self.tr("Categorize downloads by file extensions for easier filtering and management"),
                               cfg.isCategoryEnabled),
             self.categoryRulesCard,
         ])
 
         self.browserPairTokenCard = PrimaryPushSettingCard(
-            self.tr("复制令牌"), FluentIcon.COPY, self.tr("配对令牌"),
+            self.tr("Copy"), FluentIcon.COPY, self.tr("Pairing Token"),
             cfg.browserExtensionPairToken.value,
         )
         self.regenerateTokenButton = ToolButton(FluentIcon.SYNC, self.browserPairTokenCard)
-        self.regenerateTokenButton.setToolTip(self.tr("重新生成令牌"))
+        self.regenerateTokenButton.setToolTip(self.tr("Regenerate"))
         self.regenerateTokenButton.installEventFilter(ToolTipFilter(self.regenerateTokenButton))
         self.browserPairTokenCard.hBoxLayout.insertSpacing(6, 8)
         self.browserPairTokenCard.hBoxLayout.insertWidget(
@@ -136,12 +136,12 @@ class SettingPage(ScrollArea):
         )
 
         self.storeInstallCard = HyperlinkCard(
-            FIREFOX_ADDONS_URL, self.tr("Firefox 商店"), FluentIcon.GLOBE,
-            self.tr("从商店安装扩展"),
-            self.tr("商店版扩展需等待审核后才能获得更新"),
+            FIREFOX_ADDONS_URL, self.tr("Firefox Store"), FluentIcon.GLOBE,
+            self.tr("Install extension from store"),
+            self.tr("Store version requires review before receiving updates"),
         )
         edgeBtn = HyperlinkButton(self.storeInstallCard)
-        edgeBtn.setText(self.tr("Edge 商店"))
+        edgeBtn.setText(self.tr("Edge Store"))
         edgeBtn.setUrl(EDGE_ADDONS_URL)
         self.storeInstallCard.hBoxLayout.insertWidget(
             5, edgeBtn, 0, Qt.AlignmentFlag.AlignRight,
@@ -149,7 +149,7 @@ class SettingPage(ScrollArea):
         self.storeInstallCard.hBoxLayout.insertSpacing(6, 16)
 
         chromeBtn = HyperlinkButton(self.storeInstallCard)
-        chromeBtn.setText(self.tr("Chrome 商店"))
+        chromeBtn.setText(self.tr("Chrome Store"))
         chromeBtn.setUrl(CHROME_WEBSTORE_URL)
         self.storeInstallCard.hBoxLayout.insertWidget(
             5, chromeBtn, 0, Qt.AlignmentFlag.AlignRight,
@@ -157,39 +157,39 @@ class SettingPage(ScrollArea):
         self.storeInstallCard.hBoxLayout.insertSpacing(6, 16)
 
         self.chromiumInstallCard = PrimaryPushSettingCard(
-            self.tr("一键安装"), FluentIcon.DOWNLOAD,
-            self.tr("安装到 Chromium 浏览器"),
-            self.tr("自动解包扩展并引导加载（Chrome / Brave 等），扩展随桌面端更新自动升级"),
+            self.tr("Install"), FluentIcon.DOWNLOAD,
+            self.tr("Install to Chromium Browser"),
+            self.tr("Auto-unpack extension and guide loading (Chrome/Brave etc.), extension auto-updates with the desktop client"),
         )
         self.exportExtensionButton = HyperlinkButton(self.chromiumInstallCard)
-        self.exportExtensionButton.setText(self.tr("导出 CRX"))
+        self.exportExtensionButton.setText(self.tr("Export CRX"))
         self.chromiumInstallCard.hBoxLayout.insertWidget(
             5, self.exportExtensionButton, 0, Qt.AlignmentFlag.AlignRight,
         )
         self.chromiumInstallCard.hBoxLayout.insertSpacing(6, 16)
 
         self.browserPortCard = SpinBoxSettingCard(
-            FluentIcon.COMMAND_PROMPT, self.tr("服务端口"),
-            self.tr("浏览器扩展连接使用的端口"),
+            FluentIcon.COMMAND_PROMPT, self.tr("Service Port"),
+            self.tr("Port used for browser extension connection"),
             configItem=cfg.browserExtensionPort, singleStep=1, division=1,
         )
 
         self.browserEnableCard = SwitchSettingCard(
-            FluentIcon.CONNECT, self.tr("启用浏览器扩展"),
-            self.tr("接收来自浏览器的下载信息，请安装浏览器扩展后使用"),
+            FluentIcon.CONNECT, self.tr("Enable Browser Extension"),
+            self.tr("Receive downloads from browser - extension installation required"),
             cfg.isBrowserExtensionEnabled,
         )
 
         self.urlSchemeCard = SwitchSettingCard(
-            FluentIcon.LINK, self.tr("注册 URL 协议"),
-            self.tr("注册 ghostdownloader:// 协议，允许浏览器扩展启动桌面端"),
+            FluentIcon.LINK, self.tr("Register URL Protocol"),
+            self.tr("Register ghostdownloader:// protocol to allow browser extension to launch desktop client"),
             cfg.isUrlSchemeRegistered,
         ) if sys.platform != "darwin" else None
 
         browserCards = [
             self.browserEnableCard,
-            SwitchSettingCard(FluentIcon.CHAT, self.tr("接管下载时进入草稿模式"),
-                              self.tr("自动接管浏览器下载时先进入草稿，方便您调整下载路径和文件名"),
+            SwitchSettingCard(FluentIcon.CHAT, self.tr("Enter draft mode when intercepting downloads"),
+                              self.tr("Enter draft mode when automatically intercepting browser downloads to adjust download path and file name"),
                               cfg.shouldDraftTakenDownload),
             self.browserPairTokenCard,
             self.storeInstallCard,
@@ -203,97 +203,97 @@ class SettingPage(ScrollArea):
 
         self.aria2RpcGroup.addSettingCards([
             SwitchSettingCard(
-                FluentIcon.LINK, self.tr("启用 Aria2 RPC 兼容"),
-                self.tr("兼容 Aria2 JSON-RPC 协议，可接收外部工具发送的下载链接"),
+                FluentIcon.LINK, self.tr("Enable Aria2 RPC Compatibility"),
+                self.tr("Compatible with Aria2 JSON-RPC protocol, able to receive download links from external tools"),
                 cfg.isAria2RpcEnabled,
             ),
             SpinBoxSettingCard(
-                FluentIcon.GLOBE, self.tr("监听端口"),
-                self.tr("Aria2 RPC 默认端口为 16800"),
+                FluentIcon.GLOBE, self.tr("Port"),
+                self.tr("Default Aria2 RPC port is 16800"),
                 configItem=cfg.aria2RpcPort, singleStep=1, division=1,
             ),
             LineEditSettingCard(
-                FluentIcon.FINGERPRINT, self.tr("令牌"),
-                self.tr("若设置，客户端需传入 token 才可创建任务"),
+                FluentIcon.FINGERPRINT, self.tr("Token"),
+                self.tr("If set, client must provide token to create tasks"),
                 configItem=cfg.aria2RpcToken,
-                placeholder=self.tr("可选"),
+                placeholder=self.tr("Optional"),
                 isPassword=True,
             ),
             SwitchSettingCard(
-                FluentIcon.VPN, self.tr("模拟浏览器指纹"),
-                self.tr("为通过 Aria2 RPC 接收的任务附加浏览器 TLS 指纹与请求头"),
+                FluentIcon.VPN, self.tr("Spoof Browser Fingerprint"),
+                self.tr("Attach Browser TLS Fingerprint and Request Headers to tasks received via Aria2 RPC"),
                 cfg.aria2RpcEmulateFingerprint,
             ),
         ])
 
         self.zoomCard = PercentSpinBoxSettingCard(
-            FluentIcon.ZOOM, self.tr("界面缩放"),
-            self.tr("改变应用程序界面的缩放比例, 0% 为自动"),
+            FluentIcon.ZOOM, self.tr("UI Scaling"),
+            self.tr("Adjust UI scaling (0% for auto)"),
             configItem=cfg.dpiScale,
         )
 
         personalCards = [
-            ComboBoxSettingCard(cfg.themeMode, FluentIcon.BRUSH, self.tr("应用主题"),
-                                self.tr("更改应用程序的外观"),
-                                texts=[self.tr("浅色"), self.tr("深色"), self.tr("跟随系统设置")]),
+            ComboBoxSettingCard(cfg.themeMode, FluentIcon.BRUSH, self.tr("Application Theme"),
+                                self.tr("Change application appearance"),
+                                texts=[self.tr("Light"), self.tr("Dark"), self.tr("Follow System Settings")]),
         ]
         if sys.platform == "win32":
             personalCards.append(
                 ComboBoxSettingCard(cfg.backgroundEffect, FluentIcon.TRANSPARENT,
-                                    self.tr("窗口背景透明材质"),
-                                    self.tr("设置窗口背景透明效果和透明材质"),
+                                    self.tr("Window Transparency"),
+                                    self.tr("Set window transparency effect"),
                                     texts=["Acrylic", "Mica", "MicaAlt", "Aero", "None"]),
             )
         personalCards.append(self.zoomCard)
         if sys.platform == "darwin":
             self.showDockIconCard = SwitchSettingCard(
-                FluentIcon.APPLICATION, self.tr("在 Dock 栏中显示程序"),
-                self.tr("关闭后可通过菜单栏图标继续使用程序"),
+                FluentIcon.APPLICATION, self.tr("Show App Icon in Dock"),
+                self.tr("If disabled, use the menu bar item to open this window"),
                 cfg.shouldShowDockIcon,
             )
             self.showDockSpeedCard = SwitchSettingCard(
-                FluentIcon.SPEED_HIGH, self.tr("在 Dock 图标上显示实时速度"),
-                self.tr("下载时在程序坞图标上叠加当前速度"),
+                FluentIcon.SPEED_HIGH, self.tr("Show real-time speed on Dock icon"),
+                self.tr("Overlay current download speed on Dock icon"),
                 cfg.shouldShowDockSpeed,
             )
             self.showDockSpeedCard.setEnabled(cfg.shouldShowDockIcon.value)
             personalCards.extend([
                 self.showDockIconCard,
                 self.showDockSpeedCard,
-                SwitchSettingCard(FluentIcon.SPEED_HIGH, self.tr("在菜单栏显示实时速度"),
-                                  self.tr("下载时在菜单栏图标旁显示当前速度"),
+                SwitchSettingCard(FluentIcon.SPEED_HIGH, self.tr("Show real-time speed in menu bar"),
+                                  self.tr("Show current download speed next to menu bar icon"),
                                   cfg.shouldShowMenuBarSpeed),
             ])
         personalCards.append(
-            ComboBoxSettingCard(cfg.language, FluentIcon.LANGUAGE, self.tr("语言"),
-                                self.tr("设置界面的首选语言"),
-                                texts=[LANGUAGE_TEXTS.get(lang, self.tr("使用系统设置"))
+            ComboBoxSettingCard(cfg.language, FluentIcon.LANGUAGE, self.tr("Language"),
+                                self.tr("Set the preferred language for the interface"),
+                                texts=[LANGUAGE_TEXTS.get(lang, self.tr("Use System Settings"))
                                        for lang in cfg.language.options]),
         )
         self.personalGroup.addSettingCards(personalCards)
 
         self.autoRunCard = SwitchSettingCard(
-            FluentIcon.VPN, self.tr("开机启动"),
-            self.tr("在系统启动时静默运行 Ghost Downloader"),
+            FluentIcon.VPN, self.tr("Start on Boot"),
+            self.tr("Run Ghost Downloader silently at system startup"),
             cfg.shouldRunAtLogin,
         )
         from app.config.paths import APP_DATA_DIR, isPortable
         if isPortable():
             self.migrateCard = PushSettingCard(
-                self.tr("切换到用户模式"), FluentIcon.SYNC,
-                self.tr("数据存储模式"),
-                self.tr("当前为 Portable 模式，数据保存在程序旁: {0}").format(APP_DATA_DIR),
+                self.tr("Switch to User Mode"), FluentIcon.SYNC,
+                self.tr("Data Storage Mode"),
+                self.tr("Currently in Portable mode, data stored next to app: {0}").format(APP_DATA_DIR),
             )
         else:
             self.migrateCard = PushSettingCard(
-                self.tr("切换到 Portable 模式"), FluentIcon.SYNC,
-                self.tr("数据存储模式"),
-                self.tr("当前为用户模式，数据保存在: {0}").format(APP_DATA_DIR),
+                self.tr("Switch to Portable Mode"), FluentIcon.SYNC,
+                self.tr("Data Storage Mode"),
+                self.tr("Currently in User mode, data stored at: {0}").format(APP_DATA_DIR),
             )
 
         softwareCards = [
-            SwitchSettingCard(FluentIcon.UPDATE, self.tr("在应用程序启动时检查更新"),
-                              self.tr("新版本将更稳定，并具有更多功能"),
+            SwitchSettingCard(FluentIcon.UPDATE, self.tr("Check for updates on startup"),
+                              self.tr("Get more features and improved stability with new versions"),
                               cfg.shouldCheckUpdateAtStartup),
             self.autoRunCard,
         ]
@@ -301,14 +301,14 @@ class SettingPage(ScrollArea):
             softwareCards.append(
                 ComboBoxSettingCard(
                     cfg.closeMode, FluentIcon.POWER_BUTTON,
-                    self.tr("关闭主窗口时"),
-                    self.tr("设置关闭主窗口后程序继续在后台运行还是退出"),
-                    texts=[self.tr("关闭时询问"), self.tr("继续在后台运行"), self.tr("退出程序")],
+                    self.tr("When closing the main window"),
+                    self.tr("Choose whether to continue running in background or exit when closing the main window"),
+                    texts=[self.tr("Ask when closing"), self.tr("Continue running in background"), self.tr("Exit")],
                 ),
             )
         softwareCards.append(
-            SwitchSettingCard(FluentIcon.PASTE, self.tr("剪贴板监听"),
-                              self.tr("剪贴板监听器将自动检测剪贴板中的链接并添加下载任务"),
+            SwitchSettingCard(FluentIcon.PASTE, self.tr("Monitor Clipboard"),
+                              self.tr("Automatically detect links in clipboard and add download tasks"),
                               cfg.isClipboardListenerEnabled),
         )
         if not IS_ANDROID:
@@ -316,24 +316,24 @@ class SettingPage(ScrollArea):
         self.softwareGroup.addSettingCards(softwareCards)
 
         self.feedbackCard = PrimaryPushSettingCard(
-            self.tr("提供反馈"), FluentIcon.FEEDBACK,
-            self.tr("提供反馈"),
-            self.tr("通过提供反馈来帮助我们改进 Ghost Downloader，也可查看日志排查问题"),
+            self.tr("Provide Feedback"), FluentIcon.FEEDBACK,
+            self.tr("Provide Feedback"),
+            self.tr("Help improve Ghost Downloader by providing feedback, or view logs to troubleshoot issues"),
         )
-        self.openLogButton = PushButton(self.tr("查看日志"), self.feedbackCard)
+        self.openLogButton = PushButton(self.tr("View Logs"), self.feedbackCard)
         self.feedbackCard.hBoxLayout.insertSpacing(6, 8)
         self.feedbackCard.hBoxLayout.insertWidget(
             7, self.openLogButton, 0, Qt.AlignmentFlag.AlignRight,
         )
 
         self.aboutCard = PrimaryPushSettingCard(
-            self.tr("检查更新"), FluentIcon.INFO, self.tr("关于"),
+            self.tr("Check for Updates"), FluentIcon.INFO, self.tr("About"),
             f"© Copyright {YEAR}, {AUTHOR}. Version {VERSION}",
         )
 
         self.aboutGroup.addSettingCards([
-            HyperlinkCard(AUTHOR_URL, self.tr("打开作者的个人空间"), FluentIcon.PROJECTOR,
-                          self.tr("了解作者"), self.tr("发现更多 {} 的作品").format(AUTHOR)),
+            HyperlinkCard(AUTHOR_URL, self.tr("Open Author's Profile"), FluentIcon.PROJECTOR,
+                          self.tr("About the Author"), self.tr("Discover more works by {}").format(AUTHOR)),
             self.feedbackCard,
             self.aboutCard,
         ])
@@ -380,7 +380,7 @@ class SettingPage(ScrollArea):
         self.downloadFolderPicker.saveHistory(path)
 
     def _showRestartTooltip(self) -> None:
-        InfoBar.success(self.tr("已配置"), self.tr("重启软件后生效"), duration=1500, parent=self)
+        InfoBar.success(self.tr("Configuration Saved"), self.tr("Restart required to take effect"), duration=1500, parent=self)
 
     def _refreshPairTokenCard(self) -> None:
         self.browserPairTokenCard.setContent(self._browserService.token)
@@ -390,13 +390,13 @@ class SettingPage(ScrollArea):
         if not token:
             return
         QApplication.clipboard().setText(token)
-        InfoBar.success(self.tr("已复制配对令牌"), token,
+        InfoBar.success(self.tr("Token Copied"), token,
                         duration=2000, position=InfoBarPosition.BOTTOM_RIGHT, parent=self.window())
 
     def _onRegenerateTokenClicked(self) -> None:
         token = self._browserService.regenerateToken()
         QApplication.clipboard().setText(token)
-        InfoBar.success(self.tr("已重新生成配对令牌"), self.tr("新令牌已复制到剪贴板"),
+        InfoBar.success(self.tr("Token Regenerated"), self.tr("Copied new token to clipboard"),
                         duration=2000, position=InfoBarPosition.BOTTOM_RIGHT, parent=self.window())
 
     def _onChromiumInstallClicked(self) -> None:
@@ -413,24 +413,24 @@ class SettingPage(ScrollArea):
         ExtensionInstallDialog(path, self.window()).exec()
 
     def _onExtensionExtractFailed(self, error: str) -> None:
-        InfoBar.error(self.tr("解包失败"), error,
+        InfoBar.error(self.tr("Unpack failed"), error,
                       duration=3000, position=InfoBarPosition.BOTTOM_RIGHT, parent=self.window())
 
     def _refreshBrowserStatus(self) -> None:
         installType, version = self._browserService.connectionSummary
         port = self._browserService.boundPort
         if not installType:
-            text = self.tr("未连接")
+            text = self.tr("Not Connected")
         elif installType == "development":
-            text = self.tr("已连接 v{} (桌面端自管理)").format(version)
+            text = self.tr("Connected v{} (Desktop-managed)").format(version)
         else:
-            text = self.tr("已连接 v{} (商店安装)").format(version)
+            text = self.tr("Connected v{} (Store-installed)").format(version)
         self.browserEnableCard.setContent(text)
 
     def _onExportExtensionClicked(self) -> None:
         from PySide6.QtCore import QFile, QIODevice, QResource
         from PySide6.QtWidgets import QFileDialog
-        path, _ = QFileDialog.getSaveFileName(self, self.tr("选择导出路径"),
+        path, _ = QFileDialog.getSaveFileName(self, self.tr("Select Export Path"),
                                               "./Extension.crx", "Chromium Extension(*.crx)")
         if path:
             f = QFile(path)
@@ -453,10 +453,10 @@ class SettingPage(ScrollArea):
         from app.config.paths import isPortable, migrate, PORTABLE_PATH, USER_PATH
 
         target = USER_PATH if isPortable() else PORTABLE_PATH
-        mode = self.tr("用户模式") if isPortable() else self.tr("Portable 模式")
+        mode = self.tr("User Mode") if isPortable() else self.tr("Portable Mode")
         dialog = MessageBox(
-            self.tr("切换数据存储模式"),
-            self.tr("确定要切换到{0}吗？\n\n数据将被复制到新位置，程序随后退出。请手动重新打开。").format(mode),
+            self.tr("Switch Data Storage Mode"),
+            self.tr("Are you sure you want to switch to {0}?\n\nData will be copied to the new location, then the program will exit. Please reopen it manually.").format(mode),
             self.window(),
         )
         if not dialog.exec():
@@ -468,7 +468,7 @@ class SettingPage(ScrollArea):
     def _onAboutCardClicked(self) -> None:
         from app.update import fetchRelease
 
-        InfoBar.info(self.tr("检查更新"), self.tr("正在检查更新..."),
+        InfoBar.info(self.tr("Check for Updates"), self.tr("Checking for updates..."),
                      duration=1500, position=InfoBarPosition.BOTTOM_RIGHT, parent=self.window())
         self._coroutineRunner.submit(
             fetchRelease(),
@@ -481,8 +481,8 @@ class SettingPage(ScrollArea):
         from app.update import isOutdated
 
         if not isOutdated(release):
-            InfoBar.success(self.tr("当前已是最新版本"),
-                            self.tr("当前版本 {0}，最新版本 {1}").format(VERSION, release.version),
+            InfoBar.success(self.tr("You're running the latest version"),
+                            self.tr("Current version {0}, latest version {1}").format(VERSION, release.version),
                             duration=3000, position=InfoBarPosition.BOTTOM_RIGHT, parent=self.window())
             return
 
@@ -490,7 +490,7 @@ class SettingPage(ScrollArea):
         showReleaseDialog(release, self.window())
 
     def _onUpdateCheckFailed(self, error: str) -> None:
-        InfoBar.error(self.tr("检查更新失败"), self.tr("无法获取最新版本信息"),
+        InfoBar.error(self.tr("Failed to check update"), self.tr("Unable to get the latest version information"),
                       duration=3000, position=InfoBarPosition.BOTTOM_RIGHT, parent=self.window())
 
     def _onOpenLogClicked(self) -> None:
@@ -500,7 +500,7 @@ class SettingPage(ScrollArea):
 
     @property
     def searchPlaceholder(self) -> str:
-        return self.tr("搜索设置")
+        return self.tr("Search settings")
 
     def setSearchText(self, text: str) -> None:
         text = text.strip().lower()

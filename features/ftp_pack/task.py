@@ -85,11 +85,11 @@ class FtpConnectionInfo:
                 lastError = e
                 if index < len(attempts) - 1:
                     logger.info(
-                        "{}://{}:{} 使用 {} TLS 连接失败，尝试下一种模式: {}",
+                        "{}://{}:{} failed to connect with {} TLS, trying next mode: {}",
                         scheme, self.host, port, mode, repr(e),
                     )
 
-        raise TaskError("无法建立 FTP 连接") from lastError
+        raise TaskError("Cannot establish FTP connection") from lastError
 
 
 @dataclass
@@ -173,7 +173,7 @@ class FtpStep(TaskStep):
                     index += 1
             return subworkers
         except Exception as e:
-            logger.opt(exception=e).error("恢复 FTP 下载分片失败 {}", self.outputPath)
+            logger.opt(exception=e).error("Failed to resume FTP download segment {}", self.outputPath)
             return []
 
     def _buildSubworkers(self) -> list[FtpSubworker]:
@@ -203,7 +203,7 @@ class FtpStep(TaskStep):
             if target.is_file() or target.is_symlink():
                 target.unlink()
         except Exception as e:
-            logger.opt(exception=e).error("删除进度文件失败 {}", target)
+            logger.opt(exception=e).error("Failed to delete progress file {}", target)
 
     def _reassignSubworker(self) -> None:
         if self._stopping or self.task.status != TaskStatus.RUNNING or self.fileSize <= 0:
@@ -261,11 +261,11 @@ class FtpStep(TaskStep):
 
             if speedRatio < 0.8 * workerRatio:
                 self.isAccelerated = True
-                logger.info("自动加速已禁用，subworker 增加比: {:.2%}, 速度提升比: {:.2%}",
+                logger.info("Auto speed-up disabled, subworker increase ratio: {:.2%}, speed gain ratio: {:.2%}",
                             workerRatio, speedRatio)
             else:
                 self._accelCheckTime = 0
-                logger.info("继续自动加速，subworker 增加比: {:.2%}, 速度提升比: {:.2%}",
+                logger.info("Continuing auto speed-up, subworker increase ratio: {:.2%}, speed gain ratio: {:.2%}",
                             workerRatio, speedRatio)
 
     async def _supervise(self) -> None:
@@ -332,7 +332,7 @@ class FtpStep(TaskStep):
                 except Exception as e:
                     if self._stopping or self.task.status != TaskStatus.RUNNING:
                         raise CancelledError
-                    logger.opt(exception=e).error("{} 的未知大小分片连接中断，5 秒后重试", self.outputPath)
+                    logger.opt(exception=e).error("{}'s unknown-size segment connection dropped, retrying in 5 seconds", self.outputPath)
                     await asyncio.sleep(FTP_RETRY_DELAY)
                 finally:
                     self._closeTransfer(client, stream)
@@ -358,7 +358,7 @@ class FtpStep(TaskStep):
                 except Exception as e:
                     if self._stopping or self.task.status != TaskStatus.RUNNING:
                         raise CancelledError
-                    logger.opt(exception=e).error("{} 不支持断点续传，已从头开始重试", self.outputPath)
+                    logger.opt(exception=e).error("{} does not support resuming, restarted from the beginning", self.outputPath)
                     await asyncio.sleep(FTP_RETRY_DELAY)
                 finally:
                     self._closeTransfer(client, stream)
@@ -377,7 +377,7 @@ class FtpStep(TaskStep):
                     while remaining > 0:
                         chunk = await stream.read(min(65536, remaining))
                         if not chunk:
-                            raise RuntimeError("FTP 数据流提前结束")
+                            raise RuntimeError("FTP data stream ended prematurely")
                         pwrite(fd, chunk, subworker.position)
                         chunkSize = len(chunk)
                         subworker.receivedBytes += chunkSize
@@ -388,7 +388,7 @@ class FtpStep(TaskStep):
                 except Exception as e:
                     if self._stopping or self.task.status != TaskStatus.RUNNING:
                         raise CancelledError
-                    logger.opt(exception=e).error("{} 的分片连接中断，5 秒后重试", self.outputPath)
+                    logger.opt(exception=e).error("{}'s segment connection dropped, retrying in 5 seconds", self.outputPath)
                     await asyncio.sleep(FTP_RETRY_DELAY)
                 finally:
                     self._closeTransfer(client, stream)
@@ -451,7 +451,7 @@ class FtpStep(TaskStep):
             try:
                 ftruncate(self._fd, self.fileSize)
             except Exception as e:
-                logger.opt(exception=e).error("{} 预分配文件大小失败", self.outputPath)
+                logger.opt(exception=e).error("{} failed to preallocate file size", self.outputPath)
 
         supervisor = asyncio.create_task(self._supervise())
 
@@ -501,7 +501,7 @@ class FtpTask(Task):
         if isinstance(self.connectionInfo, dict):
             self.connectionInfo = FtpConnectionInfo(**self.connectionInfo)
         super().__post_init__()
-        # 旧存档中被取消勾选的文件没有 Step，按 files 补建
+        # files unchecked in an old archive have no Step; rebuild them from files
         if self.files:
             existing = {s.fileIndex for s in self.steps}
             for file in self.files:

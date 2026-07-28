@@ -174,8 +174,8 @@ def addBestAssetTask(release: Release, parent: QWidget, coroutineRunner, feature
     asset = bestAsset(release)
     if asset is None:
         InfoBar.warning(
-            parent.tr("未找到适配的安装包"),
-            parent.tr("请在版本详情中手动选择"),
+            parent.tr("No compatible installer package found"),
+            parent.tr("Please select manually in version details"),
             duration=3000, position=InfoBarPosition.BOTTOM_RIGHT, parent=parent,
         )
         showReleaseDialog(release, parent, coroutineRunner, featureService, taskService)
@@ -190,7 +190,7 @@ def addAssetTask(asset: ReleaseAsset, parent: QWidget, coroutineRunner, featureS
         featureService.parse(TaskOptions(url=asset.downloadUrl)),
         done=taskService.add,
         failed=lambda e: InfoBar.error(
-            parent.tr("创建下载任务失败"), str(e),
+            parent.tr("Failed to create download task"), str(e),
             duration=3000, position=InfoBarPosition.BOTTOM_RIGHT, parent=parent,
         ),
         owner=parent,

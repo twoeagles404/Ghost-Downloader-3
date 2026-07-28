@@ -38,9 +38,9 @@ def notify(channelId: str, channelName: str, notificationId: int,
 
 
 def notifyTaskCompleted(task: Task) -> None:
-    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "下载"),
+    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "Download"),
            hash(task.taskId) & 0x7FFFFFFF,
-           QCoreApplication.translate("Notifications", "下载完成"), task.name,
+           QCoreApplication.translate("Notifications", "Download Complete"), task.name,
            ongoing=False, lowImportance=False)
 
 
@@ -49,10 +49,10 @@ DISK_SPACE_NOTIFICATION_ID = 0x6764_0003
 
 def notifyDiskSpaceInsufficient(free: int, needed: int) -> None:
     from app.format import toReadableSize
-    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "下载"),
+    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "Download"),
            DISK_SPACE_NOTIFICATION_ID,
-           QCoreApplication.translate("Notifications", "磁盘空间不足"),
-           QCoreApplication.translate("Notifications", "剩余 {0}，需要 {1}，任务未自动开始").format(
+           QCoreApplication.translate("Notifications", "Insufficient disk space"),
+           QCoreApplication.translate("Notifications", "{0} free, {1} required, task did not auto-start").format(
                toReadableSize(free), toReadableSize(needed)),
            ongoing=False, lowImportance=False)
 
@@ -65,20 +65,20 @@ def notifyBrowserTaskAdded(tasks: list[Task]) -> None:
     if not tasks:
         return
     count = len(tasks)
-    title = QCoreApplication.translate("Notifications", "浏览器推送") if count == 1 \
-        else QCoreApplication.translate("Notifications", "浏览器推送（{count}）").format(count=count)
+    title = QCoreApplication.translate("Notifications", "Browser Push") if count == 1 \
+        else QCoreApplication.translate("Notifications", "Browser Push ({count})").format(count=count)
     text = tasks[0].name if count == 1 else "、".join(t.name for t in tasks[:3])
     if count > 3:
-        text += QCoreApplication.translate("Notifications", "等 {count} 个").format(count=count)
-    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "下载"),
+        text += QCoreApplication.translate("Notifications", "and {count} others").format(count=count)
+    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "Download"),
            BROWSER_PUSH_NOTIFICATION_ID,
            title, text, ongoing=False, lowImportance=False)
 
 
 def notifyBrowserPaired(peerAddress: str) -> None:
-    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "下载"),
+    notify(DOWNLOAD_CHANNEL, QCoreApplication.translate("Notifications", "Download"),
            BROWSER_PAIR_NOTIFICATION_ID,
-           QCoreApplication.translate("Notifications", "浏览器扩展已连接"), peerAddress,
+           QCoreApplication.translate("Notifications", "Browser Extension Connected"), peerAddress,
            ongoing=False, lowImportance=True)
 
 

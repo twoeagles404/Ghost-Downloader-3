@@ -54,7 +54,7 @@ class DraftCard(QWidget):
         self.categoryButton.setFixedSize(28, 28)
         self.categoryButton.installEventFilter(ToolTipFilter(self.categoryButton))
         self.editButton.setFixedSize(28, 28)
-        self.editButton.setToolTip(self.tr("编辑任务参数"))
+        self.editButton.setToolTip(self.tr("Edit Task Options"))
         self.editButton.installEventFilter(ToolTipFilter(self.editButton))
         self.editButton.setVisible(self._task.canEdit)
         self._refreshCategoryButton()
@@ -105,12 +105,12 @@ class DraftCard(QWidget):
             self.categoryButton.setToolTip(category.name)
         else:
             self.categoryButton.setIcon(FluentIcon.TAG)
-            self.categoryButton.setToolTip(self.tr("未分类"))
+            self.categoryButton.setToolTip(self.tr("Uncategorized"))
         self.categoryButton.show()
 
     def _showCategoryMenu(self) -> None:
         menu = RoundMenu(parent=self)
-        uncategorized = Action(FluentIcon.TAG, self.tr("未分类"), self)
+        uncategorized = Action(FluentIcon.TAG, self.tr("Uncategorized"), self)
         uncategorized.triggered.connect(lambda: self._onCategoryPicked(""))
         menu.addAction(uncategorized)
         menu.addSeparator()
@@ -144,7 +144,7 @@ class MultiFileDraftCard(DraftCard):
         if self._task.files and len(self._task.files) > 1:
             self._selectFilesButton = TransparentToolButton(FluentIcon.LIBRARY, self)
             self._selectFilesButton.setFixedSize(28, 28)
-            self._selectFilesButton.setToolTip(self.tr("选择文件"))
+            self._selectFilesButton.setToolTip(self.tr("Select Files"))
             self._selectFilesButton.installEventFilter(ToolTipFilter(self._selectFilesButton))
         self._refreshSummary()
 
@@ -167,7 +167,7 @@ class MultiFileDraftCard(DraftCard):
             return
         selected = sum(1 for f in self._task.files if f.selected)
         self.sizeLabel.setText(
-            self.tr("{0}/{1} 个文件 · {2}").format(
+            self.tr("{0}/{1} Files · {2}").format(
                 selected, len(self._task.files), toReadableSize(self._task.fileSize)
             )
         )

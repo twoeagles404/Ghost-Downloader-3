@@ -36,13 +36,13 @@ def setupFont() -> None:
     from PySide6.QtGui import QFontDatabase
     from qfluentwidgets import qconfig
 
-    # Android 的 Qt 平台字体库启动时已注册全部系统字体, 按名取用即可。
-    # 绝不对系统字体 addApplicationFont: 既多余, 又会在 MIUI 的 MiSans 可变字体上让 Qt 段错误。
+    # Android's Qt platform font library registers all system fonts at startup, so just use them by name.
+    # never addApplicationFont a system font: it's redundant and segfaults Qt on MIUI's MiSans variable font.
     known = set(QFontDatabase.families())
     preferred = ("MiSans VF", "MiSans", "OPPO Sans", "OplusSans", "HarmonyOS Sans SC", "vivo Sans")
     picked = next((name for name in preferred if name in known), None)
 
-    logger.info("系统字体: {}", picked or "sans-serif(回退)")
+    logger.info("System font: {}", picked or "sans-serif (fallback)")
     qconfig.set(qconfig.fontFamilies, [picked, "sans-serif"] if picked else ["sans-serif"], save=False)
 
 

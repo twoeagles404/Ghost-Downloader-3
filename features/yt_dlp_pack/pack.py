@@ -32,7 +32,7 @@ class YouTubeParser(TaskParser):
             saveCookiesIfBetter(cookieHeader)
 
         title = await self._fetchTitle(url)
-        name = toSafeFilename(title) if title else "YouTube 视频"
+        name = toSafeFilename(title) if title else "YouTube video"
 
         task = YouTubeTask(
             name=f"{name}.mp4",

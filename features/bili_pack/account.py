@@ -126,13 +126,13 @@ class BilibiliAccount(QObject):
             response.raise_for_status()
             payload = await response.json()
             if payload.get("code") not in {None, 0}:
-                raise ValueError(payload.get("message") or "获取二维码失败")
+                raise ValueError(payload.get("message") or "Failed to get QR code")
 
             data = payload.get("data") or {}
             loginUrl = str(data.get("url") or "").strip()
             qrCodeKey = str(data.get("qrcode_key") or "").strip()
             if not loginUrl or not qrCodeKey:
-                raise ValueError("二维码接口返回了不完整的数据")
+                raise ValueError("The QR-code API returned incomplete data")
 
             self._coroutineRunner.post(self.qrStateChanged.emit, 0, loginUrl)
 
@@ -250,7 +250,7 @@ class BilibiliAccount(QObject):
             if payload.get("code") == 0 and payload.get("status") is True:
                 return True
 
-            raise ValueError(payload.get("message") or "退出登录失败")
+            raise ValueError(payload.get("message") or "Failed to log out")
         finally:
             client.close()
 
@@ -270,12 +270,12 @@ class BilibiliAccount(QObject):
                 return {"isLoggedIn": False, "uname": ""}
 
             if payload.get("code") not in {None, 0}:
-                raise ValueError(payload.get("message") or "获取登录信息失败")
+                raise ValueError(payload.get("message") or "Failed to get login info")
 
             vipPayload = data.get("vip") or {}
             vipStatus = int(data.get("vipStatus") or vipPayload.get("status") or 0)
             if vipStatus != 1:
-                vipText = "未开通"
+                vipText = "Not activated"
             else:
                 vipLabel = ((vipPayload.get("label") or {}).get("text")
                             or (data.get("vip_label") or {}).get("text") or "").strip()
@@ -283,7 +283,7 @@ class BilibiliAccount(QObject):
                     vipText = vipLabel
                 else:
                     vipType = int(data.get("vipType") or vipPayload.get("type") or 0)
-                    vipText = {1: "月度大会员", 2: "年度大会员"}.get(vipType, "大会员")
+                    vipText = {1: "Monthly premium membership", 2: "Annual premium membership"}.get(vipType, "Premium membership")
 
             return {
                 "isLoggedIn": True,

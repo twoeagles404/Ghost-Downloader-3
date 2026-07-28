@@ -15,18 +15,18 @@ class WreqRecipe(RustCompiledComponentsRecipe):
         llvm = self.ctx.ndk.llvm_prebuilt_dir
         clang_include = glob(join(llvm, "lib", "clang", "*", "include"))[0]
 
-        # maturin 隔离子进程不继承镜像 ENV, 显式喂 rustup 并强制 toolchain(绕开"无默认")
+        # maturin's isolated subprocess does not inherit the image ENV, so explicitly feed rustup and force the toolchain (works around "no default")
         env["RUSTUP_HOME"] = os.environ.get("RUSTUP_HOME", "/opt/rustup")
         env["RUSTUP_TOOLCHAIN"] = "stable"
-        # 镜像的 /opt/cargo 是 root 只读, builder 下载 crate 写不进; 用可写的 home cargo
+        # the image's /opt/cargo is root read-only; the builder can't write downloaded crates there, so use the writable home cargo
         env["CARGO_HOME"] = join(os.path.expanduser("~"), ".cargo")
-        # android 目标过不了 auditwheel(非 manylinux), 跳过(同上游 CI)
+        # the android target can't pass auditwheel (non-manylinux), skip (same as upstream CI)
         env["MATURIN_PEP517_ARGS"] = "--skip-auditwheel"
-        # btls-sys 0.5.6 编 BoringSSL 走 NDK 的 cmake toolchain, 需要这个指路
+        # btls-sys 0.5.6 builds BoringSSL via the NDK cmake toolchain and needs this pointer
         env["ANDROID_NDK_HOME"] = self.ctx.ndk_dir
-        # 镜像自带 cmake 3.25 在 NDK toolchain 下 FindThreads 会失败, 用隔离的 cmake>=4
+        # the image's built-in cmake 3.25 fails FindThreads under the NDK toolchain, use an isolated cmake>=4
         env["CMAKE"] = "/opt/cmake4/bin/cmake"
-        # bindgen 给 BoringSSL 生成绑定, libclang 在 NDK 的 musl/lib 下
+        # bindgen generates bindings for BoringSSL; libclang lives under the NDK's musl/lib
         env["LIBCLANG_PATH"] = join(llvm, "musl", "lib")
         env["BINDGEN_EXTRA_CLANG_ARGS"] = (
             f"--target=aarch64-linux-android{self.ctx.ndk_api} "

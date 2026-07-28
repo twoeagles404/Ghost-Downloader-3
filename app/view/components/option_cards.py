@@ -22,11 +22,11 @@ PROFILE_FAMILY_LABELS = {
 
 def toProfileLabel(value: str) -> str:
     if value in {"", "auto"}:
-        return QCoreApplication.translate("ClientProfileCard", "自动（匹配来源）")
+        return QCoreApplication.translate("ClientProfileCard", "Auto (Match Source)")
     if value == "raw":
-        return QCoreApplication.translate("ClientProfileCard", "不模拟（原样发送）")
+        return QCoreApplication.translate("ClientProfileCard", "No Emulation (Send As-Is)")
     if value in PROFILE_FAMILY_LABELS:
-        return QCoreApplication.translate("ClientProfileCard", "{0}（最新）").format(
+        return QCoreApplication.translate("ClientProfileCard", "{0} (Latest)").format(
             PROFILE_FAMILY_LABELS[value]
         )
     head = value.rstrip("0123456789_")
@@ -91,7 +91,7 @@ class OutputFolderCard(OptionCard):
         self.setFixedHeight(50)
         self.iconWidget = IconWidget(FluentIcon.DOWNLOAD, self)
         self.iconWidget.setFixedSize(16, 16)
-        self.titleLabel = BodyLabel(self.tr("选择下载路径"), self)
+        self.titleLabel = BodyLabel(self.tr("Choose Download Path"), self)
         self.folderPicker = FolderPicker(self)
         self.folderPicker.setPath(str(initial) if initial else cfg.downloadFolder.value)
 
@@ -128,7 +128,7 @@ class SubworkerCountCard(OptionCard):
         self.setFixedHeight(50)
         self.iconWidget = IconWidget(FluentIcon.CLOUD, self)
         self.iconWidget.setFixedSize(16, 16)
-        self.titleLabel = BodyLabel(self.tr("预分配线程数"), self)
+        self.titleLabel = BodyLabel(self.tr("Pre-allocated Threads"), self)
         self.slider = Slider(Qt.Orientation.Horizontal, self)
         self.valueLabel = BodyLabel(self)
 
@@ -174,7 +174,7 @@ class ClientProfileCard(OptionCard):
         self._userAgent = initialUserAgent
         self.iconWidget = IconWidget(FluentIcon.ROBOT, self)
         self.iconWidget.setFixedSize(16, 16)
-        self.titleLabel = BodyLabel(self.tr("模拟身份"), self)
+        self.titleLabel = BodyLabel(self.tr("Client Profile"), self)
 
         label = self._presetLabelFor(initial, initialUserAgent) or toProfileLabel(initial)
         self.button = DropDownPushButton(label, self)
@@ -240,7 +240,7 @@ class UrlEditCard(OptionCard):
         self._initial = initial
         self.iconWidget = IconWidget(FluentIcon.LINK, self)
         self.iconWidget.setFixedSize(16, 16)
-        self.titleLabel = BodyLabel(self.tr("下载链接"), self)
+        self.titleLabel = BodyLabel(self.tr("Download Link"), self)
         self.urlEdit = LineEdit(self)
         self.urlEdit.setText(initial)
 
@@ -267,7 +267,7 @@ class HeadersEditCard(OptionCard):
         super().__init__(parent)
         self.iconWidget = IconWidget(FluentIcon.GLOBE, self)
         self.iconWidget.setFixedSize(16, 16)
-        self.titleLabel = BodyLabel(self.tr("请求标头"), self)
+        self.titleLabel = BodyLabel(self.tr("Request Headers"), self)
         self.headersEditor = HeadersEditor(self, defaults=currentHeaders())
 
         self.vBoxLayout = QVBoxLayout(self)

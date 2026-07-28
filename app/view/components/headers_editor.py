@@ -33,7 +33,7 @@ def toLogicalLines(text: str) -> list[str]:
 def parseHeaderLine(line: str) -> tuple[str, str] | None:
     name, separator, value = line.partition(":")
     name = name.strip()
-    # 名称为空是 HTTP/2 伪头，含空白是请求行——两者都不是标头，原样发出去会破坏请求
+    # an empty name is an HTTP/2 pseudo-header, whitespace is the request line - neither is a header, and sending as-is would break the request
     if not separator or not name or any(char.isspace() for char in name):
         return None
     return name, value.strip()
@@ -49,7 +49,7 @@ def parseCurl(line: str) -> list[tuple[str, str]]:
     index = 1
     while index < len(tokens) - 1:
         token = tokens[index]
-        # Windows 的「复制全部为 cURL」把多条命令用 & 连在同一行，到此为止
+        # Windows' "Copy all as cURL" joins multiple commands with & on one line; stop here
         if token in COMMAND_SEPARATORS:
             break
         if token in CURL_HEADER_FLAGS:
@@ -66,13 +66,13 @@ def parseCurl(line: str) -> list[tuple[str, str]]:
 
 
 def parseHeaders(text: str) -> list[tuple[str, str]]:
-    # 逐行分派而非整段二选一，否则 cURL 后面手加的裸行会被静默吞掉
+    # dispatch line by line rather than an all-or-nothing block, otherwise a bare line added after cURL would be silently swallowed
     rows: list[tuple[str, str]] = []
     hasCurl = False
     for line in toLogicalLines(text):
         if line[:5].lower() == "curl ":
-            # 一份标头属于一个请求。「复制全部为 cURL」是多个请求，
-            # 混在一起产出的标头集不对应任何一个真实请求，所以只认第一条。
+            # One set of headers belongs to one request. "Copy all as cURL" is multiple requests,
+            # the header set produced by mixing them corresponds to no real request, so only the first is accepted.
             if hasCurl:
                 continue
             hasCurl = True
@@ -89,7 +89,7 @@ def toHeadersText(rows: list[tuple[str, str]]) -> str:
 
 
 def toHeaderRows(text: str) -> list[tuple[str, str]]:
-    # 字面切分、零丢弃——视图切换必须无损，清洗只发生在粘贴时
+    # literal splitting, zero discard - view switching must be lossless; cleaning only happens on paste
     rows: list[tuple[str, str]] = []
     for line in text.splitlines():
         if not line.strip():
@@ -101,7 +101,7 @@ def toHeaderRows(text: str) -> list[tuple[str, str]]:
 
 class HeaderNameValidator(QValidator):
 
-    # 冒号会让「Key 含冒号」的行在视图往返时裂成两半，空白则是非法标头名
+    # a colon splits a row whose "Key contains a colon" into two on view round-trips; whitespace is an illegal header name
     def validate(self, text: str, pos: int):
         if ":" in text or any(char.isspace() for char in text):
             return QValidator.State.Invalid, text, pos
@@ -115,7 +115,7 @@ class HeaderCellEdit(LineEdit):
         self.isName = isName
         self._onPaste = onPaste
 
-    # QLineEdit 的 Ctrl+V 不走 paste()，右键菜单走——两条路都收敛到这里
+    # QLineEdit's Ctrl+V does not go through paste(); the right-click menu does - both paths converge here
     def paste(self) -> None:
         if self._onPaste(self, QApplication.clipboard().text()):
             return
@@ -158,10 +158,10 @@ class HeaderRow(QWidget):
         completer.setFilterMode(Qt.MatchFlag.MatchContains)
         self.nameEdit.setCompleter(completer)
         self.nameEdit.setValidator(HeaderNameValidator(self.nameEdit))
-        self.nameEdit.setPlaceholderText(self.tr("名称"))
+        self.nameEdit.setPlaceholderText(self.tr("Name"))
         self.nameEdit.setText(self._name)
 
-        self.valueEdit.setPlaceholderText(self.tr("值"))
+        self.valueEdit.setPlaceholderText(self.tr("Value"))
         self.valueEdit.setText(self._value)
 
         self.removeButton.setFixedSize(24, 24)
@@ -175,11 +175,11 @@ class HeaderRow(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(8)
-        layout.addWidget(self.nameEdit, 2)  # 名称列窄、值列宽
+        layout.addWidget(self.nameEdit, 2)  # narrow name column, wide value column
         layout.addWidget(self.valueEdit, 3)
         layout.addWidget(self.removeButton)
 
-    # 文本在 _initWidget 里填完才接信号，批量填充与粘贴因此不会级联触发
+    # the text is filled in _initWidget before connecting signals, so bulk filling and pasting won't cascade-trigger
     def _bind(self) -> None:
         self.nameEdit.textChanged.connect(self._onTextChanged)
         self.valueEdit.textChanged.connect(self._onTextChanged)
@@ -192,7 +192,7 @@ class HeaderRow(QWidget):
         self.nameEdit.setError(isDuplicate)
 
     def _onTextChanged(self) -> None:
-        # 一旦非空就露出删除按钮，之后不再收回——清空内容后仍要能删掉这一行
+        # once non-empty, reveal the delete button and never retract it - after clearing content this row must still be deletable
         if any(text.strip() for text in self.header()):
             self.removeButton.show()
         self._onEdited(self)
@@ -235,10 +235,10 @@ class HeadersEditor(QWidget):
         self.textEdit.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.textEdit.hide()
         self.textEdit.setPlaceholderText(
-            self.tr("每行一个 名称: 值，或直接粘贴 cURL 命令"))
-        self.helpButton.setToolTip(self.tr("使用帮助"))
-        self.modeButton.setToolTip(self.tr("切换到文本视图"))
-        self.resetButton.setToolTip(self.tr("恢复默认请求标头"))
+            self.tr("One Name: Value pair per line, or paste a cURL command"))
+        self.helpButton.setToolTip(self.tr("Help"))
+        self.modeButton.setToolTip(self.tr("Switch to Text View"))
+        self.resetButton.setToolTip(self.tr("Restore Default Request Headers"))
         for button in (self.helpButton, self.modeButton, self.resetButton):
             button.installEventFilter(ToolTipFilter(button))
 
@@ -277,7 +277,7 @@ class HeadersEditor(QWidget):
     def reset(self) -> None:
         self.setHeaders(self._defaults)
 
-    # 行的顺序只有 tableLayout 一个所有者，不另存一份列表
+    # the row order has only one owner, tableLayout; no separate list is kept
     def _rows(self) -> list[HeaderRow]:
         return [self.tableLayout.itemAt(i).widget()
                 for i in range(self.tableLayout.count())]
@@ -306,19 +306,19 @@ class HeadersEditor(QWidget):
         self.table.setVisible(not self._isTextMode)
         self.textEdit.setVisible(self._isTextMode)
         self.modeButton.setToolTip(
-            self.tr("切换到表格视图") if self._isTextMode else self.tr("切换到文本视图"))
+            self.tr("Switch to Table View") if self._isTextMode else self.tr("Switch to Text View"))
         self._setRows(rows)
 
     def _onHelpClicked(self) -> None:
         TeachingTip.create(
             self.helpButton,
-            self.tr("使用帮助"),
+            self.tr("Help"),
             self.tr(
-                "粘贴即可识别 cURL 或 名称: 值（每行一个）\n"
-                "多条 cURL 只取第一条\n"
+                "Paste to recognize cURL or name: value (one per line)\n"
+                "Multiple cURL entries; only the first is taken\n"
                 "\n"
-                "模拟身份开启时 User-Agent 和 sec-ch-ua 不生效，\n"
-                "设为不模拟可原样发送"
+                "When spoof identity is on, User-Agent and sec-ch-ua have no effect,\n"
+                "Set to no-spoof to send as-is"
             ),
             tailPosition=TeachingTipTailPosition.BOTTOM,
             isClosable=True,
@@ -327,7 +327,7 @@ class HeadersEditor(QWidget):
         )
 
     def _onPaste(self, edit: HeaderCellEdit, text: str) -> bool:
-        # 换行在标头名与标头值里都非法，所以含换行的粘贴一定不是「填这一格」的意图
+        # newlines are illegal in both header name and value, so a paste containing a newline is never intended to "fill this cell"
         if "\n" not in text and "\r" not in text:
             if not edit.isName or edit.text():
                 return False
@@ -354,7 +354,7 @@ class HeadersEditor(QWidget):
     def _removeRow(self, row: HeaderRow) -> None:
         if row is self._lastRow():
             return
-        # setParent(None) 让它立刻退出布局，deleteLater 要等到事件循环才生效
+        # setParent(None) makes it leave the layout immediately; deleteLater only takes effect at the event loop
         row.setParent(None)
         row.deleteLater()
         self._refreshDuplicates()

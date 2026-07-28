@@ -63,7 +63,7 @@ class FFmpegStep(TaskStep):
         ffmpegPath = ffmpegRuntime.path()
         ffprobePath = ffmpegRuntime.ffprobePath()
         if not ffmpegPath or not ffprobePath:
-            raise TaskError("{name} 未安装，请在设置中安装", name="FFmpeg")
+            raise TaskError("{name} is not installed, please install it in settings", name="FFmpeg")
 
         Path(self.outputFile).parent.mkdir(parents=True, exist_ok=True)
 
@@ -94,11 +94,11 @@ class FFmpegStep(TaskStep):
                             boxType = f.read(8)[4:8]
                         if boxType not in ISOBMFF_BOX_TYPES:
                             raise TaskError(
-                                "文件不是有效的媒体格式，可能受 DRM 保护或下载不完整：{name}",
+                                "The file is not a valid media format; it may be DRM-protected or incompletely downloaded: {name}",
                                 name=inputPath.name,
                             )
                 raise TaskError(
-                    "FFmpeg 合并失败（{code}）：{detail}",
+                    "FFmpeg merge failed ({code}): {detail}",
                     code=process.returncode,
                     detail=stderr or "unknown error",
                 )
@@ -151,7 +151,7 @@ class FFmpegStep(TaskStep):
         )
         stdout, stderr = await process.communicate()
         if process.returncode != 0:
-            logger.warning("ffprobe 获取时长失败: {}", videoPath)
+            logger.warning("ffprobe failed to get duration: {}", videoPath)
             return 0.0
         try:
             return max(0.0, float(stdout.decode("utf-8", errors="ignore").strip()))

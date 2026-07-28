@@ -45,14 +45,14 @@ class FtpParser(TaskParser):
             sourceInfo = await client.stat(sourcePath)
             sourceType = sourceInfo["type"]
             if sourceType not in {"file", "dir"}:
-                raise ValueError("当前 FTP 路径既不是普通文件，也不是目录")
+                raise ValueError("The current FTP path is neither a regular file nor a directory")
 
             try:
                 await client.command("TYPE I", "200")
                 await client.command("REST 1", "350")
                 canUseRangeRequests = True
             except Exception as e:
-                logger.info("FTP 服务器不支持 REST 断点续传: {}", repr(e))
+                logger.info("FTP server does not support REST resume: {}", repr(e))
                 canUseRangeRequests = False
 
             files: list[FtpFile] = []
@@ -83,7 +83,7 @@ class FtpParser(TaskParser):
                     index += 1
 
                 if not files:
-                    raise ValueError("该 FTP 目录中没有可下载的普通文件")
+                    raise ValueError("This FTP directory has no downloadable regular files")
 
             name = toSafeFilename(
                 sourcePath.name or connectionInfo.host,
