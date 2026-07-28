@@ -3,18 +3,11 @@ from __future__ import annotations
 
 
 def loadEngine(application):
-    from PySide6.QtCore import QTranslator
-    from app.config.cfg import cfg
     from app.services.category_service import CategoryService
     from app.services.coroutine_runner import CoroutineRunner
     from app.services.speed_meter import SpeedMeter
 
     import app.assets.resources  # noqa: F401
-
-    locale = cfg.language.value.value
-    translator = QTranslator(application)
-    translator.load(locale, "gd3", ".", ":/i18n")
-    application.installTranslator(translator)
 
     coroutineRunner = CoroutineRunner(parent=application)
     categoryService = CategoryService()

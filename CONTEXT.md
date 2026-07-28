@@ -1,133 +1,133 @@
 # Ghost Downloader
 
-基于 PySide6 的多协议下载器。桌面端（Windows、macOS、Linux）和 Android 共享同一业务引擎，浏览器扩展捕获资源并发送到桌面应用。
+A multi-protocol downloader built on PySide6. The desktop (Windows, macOS, Linux) and Android share the same business engine; the browser extension captures resources and sends them to the desktop app.
 
 ## Language
 
-### 任务
+### Tasks
 
 **Task**:
-用户可见的下载项。拥有 Name（成品文件的基本名）和 Output Folder（下载目标目录）。
-单文件任务的最终路径为 Output Folder / Name；多文件任务为包含各文件的目录。
-五个状态：WAITING（排队等待）、RUNNING（正在下载）、PAUSED（用户暂停）、COMPLETED（已完成）、FAILED（失败）。
-持久化为 Task Record；应用启动时从上次运行加载的 Task Record 称为 Saved Tasks。
-_Avoid_: download、job；Name 不叫 title 或 filename；Output Folder 不叫 directory
+A user-visible download item. Owns a Name (the base name of the finished file) and an Output Folder (the download target directory).
+For a single-file task the final path is Output Folder / Name; for a multi-file task it is a directory containing the individual files.
+Five states: WAITING (queued), RUNNING (downloading), PAUSED (user paused), COMPLETED (finished), FAILED (failed).
+Persisted as a Task Record; the Task Records loaded from the previous run at app startup are called Saved Tasks.
+_Avoid_: download, job; Name is not called title or filename; Output Folder is not called directory
 
 **Task Files**:
-一个 Task 产生的下载文件和分片临时文件。
-_Avoid_: 与 Selectable File 混淆
+The download files and temporary segment files a Task produces.
+_Avoid_: confusing with Selectable File
 
 **Pausable**:
-Task 的可暂停性，派生属性。取决于当前运行 Step 是否能从断点恢复
-（对传输类 Step，取决于服务器是否支持 byte-range）。
+A Task's pausability, a derived property. Depends on whether the currently running Step can resume from a checkpoint
+(for transfer-type Steps, on whether the server supports byte-range).
 
 **Task Error**:
-任务执行过程中的已知失败——服务器错误、磁盘空间不足、运行时未安装等。
-携带用户可见的消息模板（同时作为 i18n key）和格式化参数。Task 有单一错误边界。
-失败后 Step 上记录 Step Error（message + params），仅运行时存在，不持久化。
+A known failure during task execution — server error, insufficient disk space, runtime not installed, etc.
+Carries a user-visible message template (which also serves as an i18n key) and formatting parameters. A Task has a single error boundary.
+After a failure, a Step Error (message + params) is recorded on the Step; it exists only at runtime and is not persisted.
 
-### 文件选择
+### File selection
 
 **Selectable File**:
-多文件 Task 内的一个可勾选下载单元——仓库文件、播放列表视频、多分 P 页面或种子文件。
-通过稳定索引标识，索引不随选择变化。改变选择不创建或销毁 Step，任何 Task 状态下都允许；
-取消选择的文件保留部分进度。
-_Avoid_: 与 Task Files 混淆
+A checkable download unit inside a multi-file Task — a repository file, a playlist video, a multi-part page, or a torrent file.
+Identified by a stable index that does not change with selection. Changing the selection does not create or destroy Steps and is allowed in any Task state;
+unselected files keep their partial progress.
+_Avoid_: confusing with Task Files
 
 **Revive**:
-已完成的 Task 因新选中的文件有待下载工作而回到下载状态。
-清除完成时间戳并自动启动 Task。仅对 COMPLETED 状态的 Task 生效。
+A completed Task returning to the downloading state because newly selected files have pending download work.
+Clears the completion timestamp and automatically starts the Task. Only applies to Tasks in the COMPLETED state.
 
-### 任务创建
+### Task creation
 
 **Task Options**:
-用于解析、创建或编辑 Task 的应用层选项。
-四种来源：浏览器 Resource、页面媒体、合并请求、二进制安装。
-_Avoid_: payload（仅在原始传输 seam 使用）
+Application-layer options used to parse, create, or edit a Task.
+Four sources: browser Resource, page media, merge request, binary installation.
+_Avoid_: payload (used only at the raw-transfer seam)
 
 **Task Parser**:
-FeaturePack 提供的能力，将 Task Options 转为 Task。
-声明优先级和匹配规则；高优先级的 Parser 先检查。
+A capability provided by a FeaturePack that turns Task Options into a Task.
+Declares a priority and matching rules; higher-priority Parsers are checked first.
 
 **Task Draft**:
-用户确认前的未确认任务状态。内含一个或多个 Draft Item，每个 Draft Item 跟踪一条 URL，
-处于三个状态之一：Parsing（解析中）、Resolved（解析成功，持有 Task）、Failed（解析失败）。
-用户确认时尚在解析的 item 会在后台等待解析完成后自动提交（延迟确认）。
-Task Service 不理解 draft 状态。
-_Avoid_: pending task、unconfirmed task
+The unconfirmed task state before the user confirms. Contains one or more Draft Items, each tracking one URL,
+in one of three states: Parsing, Resolved (parsed successfully, holds a Task), or Failed (parse failed).
+An item still parsing when the user confirms will wait in the background and auto-submit once parsing completes (deferred confirmation).
+The Task Service does not understand draft states.
+_Avoid_: pending task, unconfirmed task
 
 **Resource**:
-浏览器扩展捕获的可下载物。由 Browser Service 接收后转换为 Task Options 进入任务创建流程。
-_Avoid_: 与泛义"资源"混淆
+A downloadable item captured by the browser extension. Received by the Browser Service and converted into Task Options to enter the task-creation flow.
+_Avoid_: confusing with the generic sense of "resource"
 
-### 任务执行
+### Task execution
 
 **Task Run**:
-Task 在下载循环中的当前执行。一个 Task 同时只有零或一个活跃的 Task Run。
-Task Run 按待完成 Step 的顺序迭代 Task Step。
-_Avoid_: execution、session
+A Task's current execution in the download loop. A Task has at most zero or one active Task Run at a time.
+The Task Run iterates the Task Steps in the order of the Steps still to complete.
+_Avoid_: execution, session
 
 **Task Step**:
-Task 内的一个可执行步骤。一个 Task 可能有一个或多个 Step。
-_Avoid_: stage、phase、action
+An executable step inside a Task. A Task may have one or more Steps.
+_Avoid_: stage, phase, action
 
 **Subworker**:
-HTTP 或 FTP Step 内的一个分片传输单元，负责一个 byte-range 区间。
-_Avoid_: worker、thread、chunk
+A segment-transfer unit inside an HTTP or FTP Step, responsible for one byte-range interval.
+_Avoid_: worker, thread, chunk
 
-### 应用角色
+### Application actors
 
 **Task Service**:
-拥有用户可见任务工作流的唯一公共入口：add、start、pause、delete、
-redownload、edit、setCategory、applySelection、resumeSaved、stop。
-_Avoid_: 直接操作 Task 的状态转换
+The single public entry point owning the user-visible task workflow: add, start, pause, delete,
+redownload, edit, setCategory, applySelection, resumeSaved, stop.
+_Avoid_: directly manipulating a Task's state transitions
 
 **Feature Service**:
-拥有 pack 发现、parser 优先级路由和 pack 生命周期。
-将 Task Options 路由到匹配的 Parser。若无 parser match，失败；
-此失败发生在 Task 创建之前，不属于 Task Error。
+Owns pack discovery, parser priority routing, and the pack lifecycle.
+Routes Task Options to the matching Parser. If no parser matches, it fails;
+this failure happens before Task creation and is not a Task Error.
 
 **FeaturePack**:
-插件包。可提供 task parser、card、file type、binary runtime、page 或 setting group。
-_Avoid_: module、extension
+A plugin package. May provide a task parser, card, file type, binary runtime, page, or setting group.
+_Avoid_: module, extension
 
 **Binary Runtime**:
-FeaturePack 可探测或提供安装任务的外部可执行文件家族。
+A family of external executables that a FeaturePack can probe for or provide install tasks for.
 
 **Browser Service**:
-浏览器扩展的协议适配器：接收扩展消息，翻译为 Task Service 动词，返回结果。
+The protocol adapter for the browser extension: receives extension messages, translates them into Task Service verbs, and returns results.
 
 **Clipboard Listener**:
-剪贴板监听器。监控剪贴板变化，过滤出 URL 后发出通知。
+The clipboard listener. Monitors clipboard changes, filters out URLs, and emits a notification.
 
 **Category**:
-下载分类和目标目录规则。将文件扩展名匹配到分类并解析下载目录。
-_Avoid_: group、tag、type
+Download categorization and target-directory rules. Matches file extensions to a category and resolves the download directory.
+_Avoid_: group, tag, type
 
 **Coroutine Runner**:
-运行异步工作并桥接回 UI 线程的应用 actor。对 Task 一无所知。
+The application actor that runs async work and bridges results back to the UI thread. Knows nothing about Tasks.
 
 **Speed Meter**:
-全局下载速度监视器。下载引擎喂入字节数据，聚合后每秒发出速度变更通知。
-同时提供全局限速门控。
+The global download-speed monitor. The download engine feeds it byte counts, and it aggregates them and emits a speed-change notification every second.
+It also provides a global rate-limit gate.
 
 **Signal Bus**:
-进程级事件总线。只承载跨模块的应用级事件，不承载任务或业务信号——那些在各自的 Service 上。
+A process-level event bus. Carries only cross-module application-level events, not task or business signals — those live on their respective Services.
 
 **Client**:
-带可选 TLS 指纹模拟的 HTTP 客户端。
+An HTTP client with optional TLS-fingerprint spoofing.
 
 **Plan**:
-"所有任务完成后做 X" 的意图：关机、重启、休眠或打开文件。
+A "do X after all tasks complete" intent: shut down, restart, sleep, or open a file.
 
 **Settings**:
-应用级用户配置。
-_Avoid_: options（options 是每个 Task 的输入，不是应用配置）
+Application-level user configuration.
+_Avoid_: options (options are per-Task input, not application configuration)
 
 ## Example dialogue
 
-> **Dev:** "用户按暂停时，我们删除 Task 吗？"
-> **Domain expert:** "不。Pause 停止 Task Run。Task Record 和 Task Files 保留。"
+> **Dev:** "When the user presses pause, do we delete the Task?"
+> **Domain expert:** "No. Pause stops the Task Run. The Task Record and Task Files are kept."
 
-> **Dev:** "用户按重新下载时，我们创建新 Task 吗？"
-> **Domain expert:** "不。Redownload 停止 Task Run、删除 Task Files、重置同一个 Task、启动新的 Task Run。"
+> **Dev:** "When the user presses redownload, do we create a new Task?"
+> **Domain expert:** "No. Redownload stops the Task Run, deletes the Task Files, resets the same Task, and starts a new Task Run."

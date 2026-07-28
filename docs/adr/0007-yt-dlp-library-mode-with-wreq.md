@@ -13,7 +13,7 @@ progress — it never touches YouTube's API directly.
 Switch yt_dlp_pack from subprocess mode to **library mode, extract-only**:
 
 - **Install:** download the `yt_dlp` wheel (~3–5 MB) and a QuickJS-NG `qjs`
-  binary (~2 MB) at runtime into the pack's vendor directory. One "一键安装"
+  binary (~2 MB) at runtime into the pack's vendor directory. One "one-click install"
   button, one Task with three steps (download whl, download qjs, extract/chmod).
   Total: ~7 MB vs ~130 MB.
 - **Isolation:** all yt-dlp imports are lazy (`importlib.import_module`), so

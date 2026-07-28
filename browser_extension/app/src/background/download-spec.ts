@@ -1,10 +1,10 @@
 import type {Resource} from "../shared/types";
 import {fileExtension, filenameFromUrl} from "../shared/utils";
 
-// ResourceTaskOptions 的权威。Per ADR-0001, the extension — not the desktop — decides
+// The authority for ResourceTaskOptions. Per ADR-0001, the extension — not the desktop — decides
 // the filename/size/supportsRange for a browser-sourced task, because only the browser has
 // the page context (title/poster) and the media's real response. This module is that
-// authority: pure functions turning a captured 资源 (Resource) into the options the desktop
+// authority: pure functions turning a captured resource (Resource) into the options the desktop
 // trusts. The two exported entry points are the test surface; the helpers stay internal.
 
 export interface ResourceTaskOptions {
@@ -100,7 +100,7 @@ export function taskNameForResource(resource: Resource): string {
   return filenameWithExtension(baseName, extension);
 }
 
-// 资源 → ResourceTaskOptions.
+// Resource → ResourceTaskOptions.
 export function toResourceTaskOptions(resource: Resource): ResourceTaskOptions {
   return {
     url: resource.url,

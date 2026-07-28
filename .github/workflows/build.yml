@@ -225,15 +225,15 @@ jobs:
         run: |
           echo "VERSION=${{ needs.prepare.outputs.version }}" >> "$GITHUB_ENV"
           uv run scripts/deploy.py
-          # framework Python (setup-python) 构建缺失冻结的 stdlib 子模块（如 http.cookies），
-          # 必须确认链接的是 uv python-build-standalone 的 libpython
+          # framework Python (setup-python) builds are missing frozen stdlib submodules (like http.cookies),
+          # must confirm it links against uv python-build-standalone libpython
           test -f "dist/Ghost-Downloader-3.app/Contents/MacOS/libpython3.11.dylib"
           chmod +x "dist/Ghost-Downloader-3.app/Contents/MacOS/Ghost-Downloader-3"
           rm -rf "dist/Ghost-Downloader-3.build"
           rm -rf "dist/Ghost-Downloader-3.dist"
           mv "dist/Ghost-Downloader-3.app" "dist/Ghost Downloader.app"
-          mv "app/assets/修复软件损坏" "dist/修复软件损坏"
-          chmod +x "dist/修复软件损坏"
+          mv "app/assets/Fix Damaged App" "dist/Fix Damaged App"
+          chmod +x "dist/Fix Damaged App"
 
       - name: Reinstall openssl libs
         if: ${{ matrix.openssl_workaround == 'true' }}
@@ -265,7 +265,7 @@ jobs:
             --icon "Ghost Downloader.app" 190 200 \
             --hide-extension "Ghost Downloader.app" \
             --app-drop-link 370 200 \
-            --add-file "修复软件损坏" "dist/修复软件损坏" 610 200 \
+            --add-file "Fix Damaged App" "dist/Fix Damaged App" 610 200 \
             --hdiutil-quiet \
             --hdiutil-retries 10 \
             "$DMG_NAME" \

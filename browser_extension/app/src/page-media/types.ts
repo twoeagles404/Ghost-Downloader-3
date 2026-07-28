@@ -13,7 +13,7 @@ export type VideoSessionFormKind = "muxed" | "dash" | "unknown";
 
 export type AttributionTier = 0 | 1 | 2 | 3 | "mse";
 
-// Metadata about one 归属 URL (Attributed URL) within a session; the URL itself is the map key.
+// Metadata about one attributed URL (Attributed URL) within a session; the URL itself is the map key.
 export type AttributedUrlMeta = {
   contentType: string;
   capturedAt: number;

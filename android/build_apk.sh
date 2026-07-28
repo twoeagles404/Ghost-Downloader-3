@@ -63,14 +63,14 @@ mkdir -p "$ANDROID_DIR/dist"
 FRESH_APK=$(find "$STAGE" -name "*.apk" -newer "$BUILD_MARKER" -printf "%T@ %p\n" 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
 rm -f "$BUILD_MARKER"
 if [ -z "$FRESH_APK" ]; then
-    echo "[build] 错误：未找到本次新生成的 APK！" >&2
+    echo "[build] Error: the newly generated APK was not found!" >&2
     exit 1
 fi
 cp -v "$FRESH_APK" "$ANDROID_DIR/dist/"
 
 if [ -n "${GD3_KEYSTORE:-}" ]; then
     BUILD_TOOLS=$(ls -d "$HOME"/.buildozer/android/platform/android-sdk/build-tools/*/ 2>/dev/null | sort -V | tail -1)
-    if [ -z "$BUILD_TOOLS" ]; then echo "[build] 错误：找不到 build-tools(apksigner/zipalign)" >&2; exit 1; fi
+    if [ -z "$BUILD_TOOLS" ]; then echo "[build] Error: build-tools not found (apksigner/zipalign)" >&2; exit 1; fi
     DEBUG_APK="$ANDROID_DIR/dist/$(basename "$FRESH_APK")"
     RELEASE_APK="${DEBUG_APK%-debug.apk}-release.apk"
     "${BUILD_TOOLS}zipalign" -f -p 4 "$DEBUG_APK" "$RELEASE_APK"
@@ -79,9 +79,9 @@ if [ -n "${GD3_KEYSTORE:-}" ]; then
         --ks-key-alias "$GD3_KEY_ALIAS" \
         --key-pass "pass:${GD3_KEY_PASS:-$GD3_KEYSTORE_PASS}" \
         "$RELEASE_APK"
-    "${BUILD_TOOLS}apksigner" verify --print-certs "$RELEASE_APK" >/dev/null && echo "[build] 已签名 release: $RELEASE_APK"
+    "${BUILD_TOOLS}apksigner" verify --print-certs "$RELEASE_APK" >/dev/null && echo "[build] Signed release: $RELEASE_APK"
     rm -f "$DEBUG_APK"
 fi
 
-echo "[build] 产物（本次新构建）："
+echo "[build] Artifacts (this new build):"
 ls -la "$ANDROID_DIR/dist"

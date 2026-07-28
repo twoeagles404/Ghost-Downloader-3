@@ -2,9 +2,9 @@
     if (window.CatCatchFluentUI?.installed) { return; }
 
     const panelTitles = {
-        catCatchRecorder: "视频录制",
-        catCatchWebRTC: "录制 WebRTC",
-        CatCatchCatch: "缓存捕捉",
+        catCatchRecorder: "Video recording",
+        catCatchWebRTC: "Record WebRTC",
+        CatCatchCatch: "Cache capture",
     };
     const nativeAttachShadow = Element.prototype.attachShadow;
     const nativeAttachShadowSource = nativeAttachShadow.toString();

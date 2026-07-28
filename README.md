@@ -1,5 +1,5 @@
 <h4 align="right">
-  <a href="README_zh.md">简体中文</a> | English
+  English
 </h4>
 
 > [!TIP]
@@ -179,7 +179,7 @@ Copyright © 2024-2026 XiaoYouChR.
 ## Acknowledgments
 
 * [@zhiyiYo](https://github.com/zhiyiYo/) is amazing and provided a lot of help for this project.
-* [@空糖_SuGar](https://github.com/SuGar0218/) created the project banner.
+* [@SuGar0218](https://github.com/SuGar0218/) created the project banner.
 
 <picture>
   <source

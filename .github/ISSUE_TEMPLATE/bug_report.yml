@@ -1,6 +1,6 @@
-name: Bug 报告
-description: 如果你在使用过程中遇到了问题，请按照下面的模板提交一个 Bug 报告，我们会尽快调查并修复这个问题。
-title: "[Bug] 我的标题"
+name: Bug report
+description: If you run into a problem while using the app, please fill out the template below to submit a bug report, and we will investigate and fix it as soon as possible.
+title: "[Bug] My title"
 assignees: XiaoYouChR
 labels:
   - "🐛Bug"
@@ -8,55 +8,55 @@ body:
 - type: markdown
   attributes:
     value: |
-      ## 写在开头
-      🚨 请务必完整填写下面的内容，如果缺少必要的信息，开发者可能会在未调查的情况下直接关闭问题 🚨
+      ## Before you start
+      🚨 Please fill out everything below completely. If required information is missing, the developer may close the issue without investigating it. 🚨
 
 - type: textarea
   id: description
   validations:
     required: true
   attributes:
-     label: Bug 描述
-     description: 请简短的描述你遇到的问题
+     label: Bug description
+     description: Briefly describe the problem you encountered
 
 - type: textarea
   id: repro-steps
   validations:
     required: true
   attributes:
-     label: 复现问题的步骤
+     label: Steps to reproduce
      render: markdown
-     description: 请提供复现问题的步骤，如果不能，请写明原因
+     description: Please provide the steps to reproduce the problem; if you cannot, explain why
      placeholder: |
-        干净清晰的复现步骤有助于开发者更快定位问题所在，你所遇到的问题也会获得更高的优先级.
+        Clean, clear reproduction steps help the developer locate the problem faster, and your issue will get a higher priority.
 
-        示例步骤:
-        1. 打开应用
-        2. 进入 '...'
-        3. 点击 '....'
-        4. 滚动至 '....'
-        5. 发现问题
+        Example steps:
+        1. Open the app
+        2. Go to '...'
+        3. Click '....'
+        4. Scroll to '....'
+        5. See the problem
 
 - type: textarea
   id: expected-behavior
   validations:
     required: false
   attributes:
-     label: 预期行为
-     description: 简要描述你希望看到什么样的结果
+     label: Expected behavior
+     description: Briefly describe what result you expected to see
      render: markdown
 
 - type: textarea
   id: screenshots
   attributes:
-     label: 截图
-     description: 如果可以，提交截图更有助于我们分析问题
+     label: Screenshots
+     description: If possible, attaching screenshots helps us analyze the problem
 
 - type: checkboxes
   id: environment-app-target-version
   attributes:
-     label: 系统版本
-     description: 选择一个你发现问题的系统版本
+     label: System version
+     description: Select the system version where you found the problem
      options:
        - label: Windows 10 2004 - 22H2 (Build 19041 - 19045)
        - label: Windows 11 21H2 (Build 22000)
@@ -64,29 +64,29 @@ body:
        - label: Windows 11 23H2 (Build 22631)
        - label: Windows 11 24H2 (Build 26100)
        - label: Windows 11 25H2 (Build 26200)
-       - label: 其它 (macOS 或 Linux, 请在下方备注系统版本)
+       - label: Other (macOS or Linux, please note the system version below)
 
 - type: input
   id: environment-app-target-other-version
   attributes:
-     label: 其它系统版本
-     description: 如果你是在特别的系统版本中运行应用，请注明系统版本
+     label: Other system version
+     description: If you are running the app on a specific system version, please note it here
 
 - type: input
   id: form-factor
   attributes:
-      label: 处理器型号
-      description: 处理器架构和指令集信息有助于我们分析问题
+      label: Processor model
+      description: Processor architecture and instruction-set info helps us analyze the problem
 
 - type: textarea
   id: log-info
   attributes:
-     label: 日志记录
-     description: 请`粘贴报错时自动复制的报错内容`或者打开软件后依次点击`设置->关于->提供反馈->查看日志`后上传`GhostDownloader.log`文件
+     label: Logs
+     description: Please `paste the error content that was automatically copied when the error occurred`, or open the app and click `Settings -> About -> Provide feedback -> View logs`, then upload the `GhostDownloader.log` file
 
 - type: textarea
   id: additional-context
   attributes:
-     label: 备注
-     description: 添加你认为必要的其他信息, 比如是否愿意提交 Pull Request 来修复这个问题
+     label: Notes
+     description: Add any other information you think is relevant, such as whether you are willing to submit a Pull Request to fix this
      render: markdown

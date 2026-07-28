@@ -214,7 +214,7 @@ export function MediaControlPanel({
             icon={playbackState.isPaused ? <PlayRegular /> : <PauseRegular />}
             onClick={() => onAction("toggle_play")}
           >
-            {playbackState.isPaused ? chrome.i18n.getMessage("play") : "暂停"}
+            {playbackState.isPaused ? chrome.i18n.getMessage("play") : "Pause"}
           </Button>
 
           <div className={styles.inlineActions}>

@@ -27,7 +27,7 @@ from app.platform.android import IS_ANDROID
 
 BASE_HEADERS = {
     "accept-encoding": "deflate, br, gzip",
-    "accept-language": "zh-CN,zh;q=0.9",
+    "accept-language": "en-US,en;q=0.9",
     "cookie": "down_ip=1",
     "sec-fetch-dest": "document",
     "sec-fetch-mode": "navigate",
@@ -37,25 +37,13 @@ BASE_HEADERS = {
 }
 
 class Language(Enum):
-    CHINESE_SIMPLIFIED = QLocale(QLocale.Language.Chinese, QLocale.Country.China)
-    CHINESE_TRADITIONAL = QLocale(QLocale.Language.Chinese, QLocale.Country.Taiwan)
-    CANTONESE = QLocale(QLocale.Language.Cantonese, QLocale.Country.HongKong)
     ENGLISH_UNITED_STATES = QLocale(QLocale.Language.English, QLocale.Country.UnitedStates)
-    JAPANESE = QLocale(QLocale.Language.Japanese, QLocale.Country.Japan)
-    RUSSIAN = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
-    PORTUGUESE_BRAZIL = QLocale(QLocale.Language.Portuguese, QLocale.Country.Brazil)
     AUTO = QLocale()
 
 
 # the display label of the language; AUTO is translated by the view layer
 LANGUAGE_TEXTS = {
-    Language.CHINESE_SIMPLIFIED: "Simplified Chinese (China)",
-    Language.CHINESE_TRADITIONAL: "Traditional Chinese (Taiwan)",
-    Language.CANTONESE: "Cantonese (Hong Kong)",
     Language.ENGLISH_UNITED_STATES: "English (US)",
-    Language.JAPANESE: "Japanese (Japan)",
-    Language.RUSSIAN: "Русский (Россия)",
-    Language.PORTUGUESE_BRAZIL: "Português (Brasil)",
 }
 
 
@@ -103,7 +91,12 @@ class LanguageSerializer(ConfigSerializer):
         return language.value.name() if language != Language.AUTO else "Auto"
 
     def deserialize(self, value: str):
-        return Language(QLocale(value)) if value != "Auto" else Language.AUTO
+        if value == "Auto":
+            return Language.AUTO
+        try:
+            return Language(QLocale(value))
+        except ValueError:
+            return Language.ENGLISH_UNITED_STATES
 
 
 class ThemeSerializer(ConfigSerializer):

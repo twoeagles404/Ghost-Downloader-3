@@ -1,35 +1,35 @@
-# 忽略.vscode文件夹
+# Ignore the .vscode folder
 .vscode/
 .VSCodeCounter
 
-# 忽略工作区文件
+# Ignore workspace files
 *.code-workspace
 .DS_Store
 
-# 忽略 .idea
+# Ignore .idea
 .idea/
 
-# 忽略python缓存文件
+# Ignore Python cache files
 */__pycache__
 *.py[cod]
 
-# 忽略日志文件
+# Ignore log files
 log/
 *.log
 
-# 忽略 ui 文件
+# Ignore UI files
 *.ui
 
-# 忽略构建文件
+# Ignore build files
 build/
 dist/
 output/
 *.spec
 
-# 忽略本地 Python 环境
+# Ignore the local Python environment
 .venv/
 
-# 忽略浏览器扩展依赖与构建产物
+# Ignore browser-extension dependencies and build artifacts
 browser_extension/app/node_modules/
 browser_extension/chromium/
 browser_extension/firefox/

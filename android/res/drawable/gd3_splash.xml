@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 冷启动开屏: Qt 未起时由系统绘制, 铺到 app 首帧。底色 @color/gd3_splash_bg 有 values-night 覆盖, 随深浅切。 -->
+<!-- Cold-start splash: drawn by the system before Qt starts, up to the app first frame. The base color @color/gd3_splash_bg is overridden by values-night to switch with light/dark. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/gd3_splash_bg" />
     <item>

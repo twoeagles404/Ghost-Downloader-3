@@ -1,95 +1,95 @@
 # CLAUDE.md
 
-## 思想（宪法——遇到下面任何规则没覆盖的场景，回到这里判断）
+## Philosophy (the constitution — when a scenario isn't covered by the rules below, come back here to decide)
 
 - **Simple is better than complex.** (Zen)
-- **Flat is better than nested.** (Zen) — 函数优于类、内联优于跳转、三行重复优于过早抽象
-- **Explicit is better than implicit.** (Zen) — 依赖显式传入、配置显式注入、不靠模块级全局状态做隐式耦合
-- **Readability counts.** (Zen) — 代码被读 > 被写。从业务角度命名，不用生僻词；「注释只写 Why」的前提是代码本身能说明 What
-- **Signal-driven actors.** — Service 拥有私有状态，对外通信仅通过信号；Service 不持 View 引用（View 持 Service 引用以 connect 信号是允许的）
-- **YAGNI — trust internals, validate at boundaries.** — 不写 hypothetical 防御，删除胜于注释掉，不留向后兼容别名
-- **If the implementation is hard to explain, it's a bad idea.** (Zen) — 解释起来绕的设计，多半是错的
+- **Flat is better than nested.** (Zen) — functions over classes, inlining over jumping around, three lines of repetition over premature abstraction
+- **Explicit is better than implicit.** (Zen) — pass dependencies explicitly, inject configuration explicitly, don't create implicit coupling through module-level global state
+- **Readability counts.** (Zen) — code is read more than it is written. Name things from the business domain, avoid obscure words; "comments only explain Why" assumes the code itself already explains What
+- **Signal-driven actors.** — a Service owns private state and communicates outward only through signals; a Service does not hold a View reference (a View holding a Service reference to connect signals is allowed)
+- **YAGNI — trust internals, validate at boundaries.** — don't write hypothetical defenses, delete rather than comment out, don't keep backward-compatibility aliases
+- **If the implementation is hard to explain, it's a bad idea.** (Zen) — a design that's convoluted to explain is probably wrong
 
-## 命名
+## Naming
 
-- 类名 PascalCase，函数和变量 camelCase
-- 函数名用动词前缀（PowerShell 风格）：`taskService.add()`、`featureService.parse()`
-- 选短词、常见词，第一次读代码的人也能看懂
-- 类名提供了上下文后，去掉冗余名词：`taskService.add()` 不写 `addTask()`
-- 名词锁定到 CONTEXT.md，不用近义词：`task` 不写 `download`，`name` 不写 `title`
-- 不用 `_` 前缀标记模块内部函数——模块边界本身就是封装
-- Actor 以它拥有的业务概念命名，禁用 manager、controller、coordinator、provider、repository、facade、pipeline、context
-- 布尔值用 `is*` / `has*` / `can*` / `should*` 前缀
-- 信号 `{noun}{PastParticiple}`（`taskAdded`、`speedChanged`）；类名已提供上下文时可只用 `{PastParticiple}`。槽 `_on{Noun}{PastParticiple}`
-- 名词查找用名词形式：`taskById(id)`、`categoryById(id)`。`find*` 留给磁盘/PATH 搜索
-- 文件系统词：`folder`（确定是目录）、`file`（确定是文件）、`path`（可能是文件或目录）
+- Class names PascalCase, functions and variables camelCase
+- Function names use a verb prefix (PowerShell style): `taskService.add()`, `featureService.parse()`
+- Choose short, common words that a first-time reader can understand
+- When the class name provides context, drop the redundant noun: `taskService.add()`, not `addTask()`
+- Lock nouns to CONTEXT.md, don't use synonyms: `task` not `download`, `name` not `title`
+- Don't use a `_` prefix to mark module-internal functions — the module boundary is itself the encapsulation
+- Name an Actor after the business concept it owns; ban manager, controller, coordinator, provider, repository, facade, pipeline, context
+- Booleans use an `is*` / `has*` / `can*` / `should*` prefix
+- Signals `{noun}{PastParticiple}` (`taskAdded`, `speedChanged`); when the class name already provides context you may use just `{PastParticiple}`. Slots `_on{Noun}{PastParticiple}`
+- Noun lookups use the noun form: `taskById(id)`, `categoryById(id)`. `find*` is reserved for disk/PATH searches
+- Filesystem words: `folder` (definitely a directory), `file` (definitely a file), `path` (could be a file or a directory)
 
-## 动词表
+## Verb table
 
-封闭词汇表——函数名只能从这里选动词。选不出说明职责不清或 seam 错了。
+A closed vocabulary — function names may only pick a verb from here. If none fits, the responsibility is unclear or the seam is wrong.
 
-| 动词 | 语义 |
+| Verb | Meaning |
 |---|---|
-| `load` | 读取本地持久化数据或资源。非 fetch |
-| `save` | 持久化应用状态 |
-| `fetch` | 一次网络请求获取数据。非 load |
-| `probe` | 查询能力或元数据，不创建任务 |
-| `parse` | 将文本/协议输出转为应用对象 |
-| `match` | 判断候选是否符合规则 |
-| `find` | 搜索本地磁盘或 PATH |
-| `build` | 从已知数据纯构造，无副作用。非 create |
-| `create` | 创建真实资源（spawn、allocate、connect）。非 build |
-| `to*` | 转换表示：`toSafeFilename`、`toPosixPath` |
-| `set` | 赋值本地状态，调用者提供最终值。非 update |
-| `update` | 从调用者输入重算状态。非 refresh |
-| `refresh` | 自发重查，无调用者输入。非 update |
-| `add` | 添加业务对象 |
-| `start` / `pause` / `stop` | 开始执行 / 用户可见暂停 / 停止当前执行 |
-| `resume` | 启动恢复 |
-| `remove` | 从内存/模型/UI 脱离，不删磁盘。非 delete |
-| `delete` | 从磁盘或持久记录破坏性删除。非 remove |
-| `clear` | 清空集合、输入、选择或缓存 |
-| `mount` / `unmount` | 创建/回收进出视口的懒管理控件 |
-| `flush` | 将缓冲状态写入磁盘 |
-| `cancel` | 放弃异步工作，不删记录 |
-| `open` / `close` | 打开/关闭文件、URL、socket、dialog |
-| `reveal` | 在文件管理器中显示 |
-| `run` | 执行当前 actor 拥有的工作流步骤 |
-| `supervise` | worker 内部监管器：采样进度、存恢复数据 |
-| `install` | 将运行时或二进制放到磁盘 |
-| `send` | 向另一系统推送数据，单向无响应 |
-| `request` | 请求另一 actor 执行动作 |
-| `on*` | Qt slot、信号反应、事件反应 |
+| `load` | Read local persisted data or resources. Not fetch |
+| `save` | Persist application state |
+| `fetch` | Get data with a single network request. Not load |
+| `probe` | Query a capability or metadata, without creating a task |
+| `parse` | Turn text/protocol output into application objects |
+| `match` | Judge whether a candidate satisfies a rule |
+| `find` | Search the local disk or PATH |
+| `build` | Purely construct from known data, no side effects. Not create |
+| `create` | Create a real resource (spawn, allocate, connect). Not build |
+| `to*` | Convert a representation: `toSafeFilename`, `toPosixPath` |
+| `set` | Assign local state, caller provides the final value. Not update |
+| `update` | Recompute state from caller input. Not refresh |
+| `refresh` | Re-query on its own, no caller input. Not update |
+| `add` | Add a business object |
+| `start` / `pause` / `stop` | Begin execution / user-visible pause / stop the current execution |
+| `resume` | Start recovery |
+| `remove` | Detach from memory/model/UI, doesn't delete on disk. Not delete |
+| `delete` | Destructively delete from disk or a persistent record. Not remove |
+| `clear` | Empty a collection, input, selection, or cache |
+| `mount` / `unmount` | Create/reclaim lazily-managed widgets entering/leaving the viewport |
+| `flush` | Write buffered state to disk |
+| `cancel` | Abandon async work, doesn't delete records |
+| `open` / `close` | Open/close a file, URL, socket, dialog |
+| `reveal` | Show in the file manager |
+| `run` | Execute a workflow step owned by the current actor |
+| `supervise` | The worker's internal supervisor: sample progress, store recovery data |
+| `install` | Place a runtime or binary on disk |
+| `send` | Push data to another system, one-way with no response |
+| `request` | Ask another actor to perform an action |
+| `on*` | Qt slot, signal reaction, event reaction |
 
-## 四阶段 `__init__`
+## Four-phase `__init__`
 
-QWidget / QDialog 子类统一使用四阶段初始化：
+QWidget / QDialog subclasses uniformly use four-phase initialization:
 
 ```python
 def __init__(self, parent=None):
     super().__init__(parent)
-    self._initWidget()   # 创建和配置子控件，不连接信号
-    self._initLayout()   # 组装布局：margins、spacing、addWidget
-    self._bind()         # 连接信号到槽，所有控件已存在
+    self._initWidget()   # create and configure child widgets, don't connect signals
+    self._initLayout()   # assemble layout: margins, spacing, addWidget
+    self._bind()         # connect signals to slots, all widgets already exist
 ```
 
-## 反模式（看到就改）
+## Anti-patterns (fix them on sight)
 
-**违反 Flat is better than nested：**
-- 只做 if/elif 分发的包装函数 → 让调用方直接调对应函数
-- 把类嵌在方法里但不用闭包 → 提升为模块级
-- 类名已提供上下文时函数名还重复名词 → 砍掉名词
+**Violating "Flat is better than nested":**
+- A wrapper function that only does if/elif dispatch → let the caller call the corresponding function directly
+- A class nested inside a method without using a closure → hoist it to module level
+- A function name repeating a noun the class name already provides → drop the noun
 
-**违反 Explicit is better than implicit：**
-- 模块级 `global` 可变状态伪装成单例 → 提升为类，或 frozen dataclass 显式注入
-- 用 dict 传结构化数据 → 用 dataclass
-- 传整个对象但只用其中一个方法 → 传 callable，依赖保持最窄
+**Violating "Explicit is better than implicit":**
+- Module-level `global` mutable state disguised as a singleton → hoist to a class, or inject explicitly as a frozen dataclass
+- Passing structured data as a dict → use a dataclass
+- Passing a whole object but using only one of its methods → pass a callable, keep the dependency narrowest
 
-**违反 YAGNI：**
-- 多处文档描述同一个事实 → 一个事实一个位置，其余用链接
+**Violating YAGNI:**
+- The same fact described in multiple docs → one fact in one place, link to it elsewhere
 
-**违反 Simple is better than complex：**
-- 把不属于本模块职责的逻辑混进来"顺手做了" → 保持单一职责
+**Violating "Simple is better than complex":**
+- Mixing in logic that isn't this module's responsibility because it was "convenient" → keep a single responsibility
 
-**违反 Readability counts：**
-- 注释或文档复述代码已经说明的事 → 删掉，代码自己说 What
+**Violating "Readability counts":**
+- A comment or doc restating what the code already says → delete it, the code says the What itself

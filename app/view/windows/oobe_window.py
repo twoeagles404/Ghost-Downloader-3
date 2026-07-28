@@ -864,13 +864,7 @@ class OobeWindow(FluentWidget):
         QTimer.singleShot(0, self._reloadLanguage)
 
     def _reloadLanguage(self) -> None:
-        from PySide6.QtCore import QTranslator
-        application = QApplication.instance()
-        if self._translator is not None:
-            application.removeTranslator(self._translator)
-        self._translator = QTranslator(application)
-        self._translator.load(cfg.language.value.value, "gd3", ".", ":/i18n")
-        application.installTranslator(self._translator)
+        # English is the app's native language; no translator to install.
         self._rebuildContent()
 
     def _rebuildContent(self) -> None:

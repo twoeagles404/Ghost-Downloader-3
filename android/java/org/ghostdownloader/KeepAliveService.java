@@ -24,7 +24,7 @@ public class KeepAliveService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String text = (intent != null) ? intent.getStringExtra("text") : null;
         if (text == null) {
-            text = "正在后台运行";
+            text = "Running in background";
         }
         Notification notification = buildNotification(text);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -40,7 +40,7 @@ public class KeepAliveService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID, "后台任务", NotificationManager.IMPORTANCE_LOW);
+                    CHANNEL_ID, "Background task", NotificationManager.IMPORTANCE_LOW);
             manager.createNotificationChannel(channel);
         }
 

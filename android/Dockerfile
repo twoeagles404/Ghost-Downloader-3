@@ -42,7 +42,7 @@ RUN DEPLOY_BZ=/usr/local/lib/python3.11/site-packages/PySide6/scripts/deploy_lib
     && DEPLOY_UTIL=/usr/local/lib/python3.11/site-packages/PySide6/scripts/deploy_lib/deploy_util.py \
     && DEPLOY_AND=/usr/local/lib/python3.11/site-packages/PySide6/scripts/android_deploy.py \
     && sed -i 's|modls = self.get_value("qt", "modules")|modls = __import__("os").environ.get("GD3_QT_MODULES", "") or self.get_value("qt", "modules")|' "$DEPLOY_CFG" \
-    && grep -q 'GD3_QT_MODULES' "$DEPLOY_CFG" && echo "[patch] GD3_QT_MODULES 注入 OK" \
+    && grep -q 'GD3_QT_MODULES' "$DEPLOY_CFG" && echo "[patch] GD3_QT_MODULES injected OK" \
     && sed -i 's|"requirements", "python3,shiboken6,PySide6"|"requirements", "python3==3.11.15,hostpython3==3.11.15,shiboken6,PySide6" + __import__("os").environ.get("GD3_EXTRA_REQ", "")|' "$DEPLOY_BZ" \
     && grep -q 'python3==3.11.15' "$DEPLOY_BZ" && echo "[patch] python pin OK" \
     && sed -i 's|f"{include_exts},qml,js"|f"{include_exts},qml,js,toml"|' "$DEPLOY_BZ" \
@@ -73,24 +73,24 @@ RUN git clone --depth 1 -b develop "${P4A_GIT_URL}" /opt/p4a \
     && sed -i 's|LOCAL_SRC_FILES := start.c|LOCAL_SRC_FILES := start.c pyjniusjni.c|' "$QTSRC/Android.mk" \
     && grep -q 'start.c pyjniusjni.c' "$QTSRC/Android.mk" && echo "[patch] qt bootstrap pyjniusjni OK" \
     && cp -r /opt/gd3-recipes/* /opt/p4a/pythonforandroid/recipes/ \
-    && ls -d /opt/p4a/pythonforandroid/recipes/jh2 && echo "[patch] gd3 recipes 装入 OK" \
+    && ls -d /opt/p4a/pythonforandroid/recipes/jh2 && echo "[patch] gd3 recipes loaded OK" \
     && sed -i 's|pip install -U pip"|pip install -U \\"pip==24.3.1\\""|' /opt/p4a/pythonforandroid/build.py \
-    && grep -q 'pip==24.3.1' /opt/p4a/pythonforandroid/build.py && echo "[patch] venv pip 钉死 24.3.1 OK" \
+    && grep -q 'pip==24.3.1' /opt/p4a/pythonforandroid/build.py && echo "[patch] venv pip pinned to 24.3.1 OK" \
     && sed -i 's|--no-deps -r requirements.txt|--no-deps --no-binary charset-normalizer -r requirements.txt|' /opt/p4a/pythonforandroid/build.py \
-    && grep -q 'no-binary charset-normalizer' /opt/p4a/pythonforandroid/build.py && echo "[patch] charset-normalizer 强制纯Python OK" \
+    && grep -q 'no-binary charset-normalizer' /opt/p4a/pythonforandroid/build.py && echo "[patch] charset-normalizer forced pure-Python OK" \
     && COMMONBUILD=/opt/p4a/pythonforandroid/bootstraps/common/build/build.py \
     && sed -i 's#^\( *\)with open(join(res_dir, .mipmap-anydpi-v26/icon.xml.), .w.) as fd:#\1ensure_dir(join(res_dir, "mipmap-anydpi-v26"))\n&#' "$COMMONBUILD" \
     && grep -q 'ensure_dir(join(res_dir, "mipmap-anydpi-v26"))' "$COMMONBUILD" && echo "[patch] p4a adaptive icon mkdir fix OK" \
     && cp /opt/gd3_prune.py /opt/p4a/pythonforandroid/gd3_prune.py \
     && sed -i 's|            self.distribute_libs(arch, \[self.ctx.get_libs_dir(arch.arch)\])|            from pythonforandroid import gd3_prune as _gp; _gp.pruneQt(self.ctx.get_libs_dir(arch.arch), join(self.ctx.get_python_install_dir(arch.arch), "PySide6"), info)\n            self.distribute_libs(arch, [self.ctx.get_libs_dir(arch.arch)])|' /opt/p4a/pythonforandroid/bootstraps/qt/__init__.py \
-    && grep -q 'gd3_prune' /opt/p4a/pythonforandroid/bootstraps/qt/__init__.py && echo "[patch] gd3 Qt 瘦身钩子注入 OK" \
+    && grep -q 'gd3_prune' /opt/p4a/pythonforandroid/bootstraps/qt/__init__.py && echo "[patch] gd3 Qt slimming hook injected OK" \
     && QTPA=/opt/p4a/pythonforandroid/bootstraps/qt/build/src/main/java/org/kivy/android/PythonActivity.java \
     && sed -i '/protected void onActivityResult(int requestCode, int resultCode, Intent intent) {/a\        super.onActivityResult(requestCode, resultCode, intent);' "$QTPA" \
     && grep -q 'super.onActivityResult' "$QTPA" && echo "[patch] qt PythonActivity super.onActivityResult OK" \
     && sed -i '/public boolean onKeyDown(int keyCode, KeyEvent event) {/a\        if (keyCode == KeyEvent.KEYCODE_BACK) { moveTaskToBack(true); return true; }' "$QTPA" \
-    && grep -q 'moveTaskToBack' "$QTPA" && echo "[patch] qt PythonActivity 返回键退后台 OK" \
+    && grep -q 'moveTaskToBack' "$QTPA" && echo "[patch] qt PythonActivity back-key-to-background OK" \
     && sed -i '/protected void onNewIntent(Intent intent) {/a\        setIntent(intent);' "$QTPA" \
-    && grep -q 'setIntent(intent)' "$QTPA" && echo "[patch] qt PythonActivity onNewIntent setIntent(热启分享 getIntent 生效) OK" \
+    && grep -q 'setIntent(intent)' "$QTPA" && echo "[patch] qt PythonActivity onNewIntent setIntent (warm-start share getIntent effective) OK" \
     && QTSTR=/opt/p4a/pythonforandroid/bootstraps/qt/build/templates/strings.tmpl.xml \
     && sed -i '/<item name="android:windowNoTitle">true<\/item>/a\        <item name="android:windowBackground">@drawable/gd3_splash</item>\n        <item name="android:windowSplashScreenBackground">@color/gd3_splash_bg</item>' "$QTSTR" \
     && sed -i '/<resources>/a\    <color name="gd3_splash_bg">#f3f3f3</color>' "$QTSTR" \
@@ -114,8 +114,8 @@ RUN mkdir -p /opt/gd3-ffmpeg && cd /opt/gd3-ffmpeg \
     && rm -f /tmp/nm3u8.tar.gz /tmp/N_m3u8DL-RE \
     && chmod a+rx libffmpeg.so libffprobe.so libnm3u8dlre.so \
     && ls -la /opt/gd3-ffmpeg \
-    && file libffmpeg.so | grep -q "ARM aarch64" && echo "[ffmpeg] minimal arm64 预置 OK" \
-    && file libnm3u8dlre.so | grep -q "ARM aarch64" && echo "[nm3u8] bionic arm64 预置 OK"
+    && file libffmpeg.so | grep -q "ARM aarch64" && echo "[ffmpeg] minimal arm64 prebuilt OK" \
+    && file libnm3u8dlre.so | grep -q "ARM aarch64" && echo "[nm3u8] bionic arm64 prebuilt OK"
 
 # QuickJS-NG for yt-dlp YouTube JS challenge solving.
 # Static musl binary from releases works on Android (issue #1512).
@@ -123,18 +123,18 @@ ARG QJS_VERSION=v0.15.1
 RUN mkdir -p /opt/gd3-qjs && cd /opt/gd3-qjs \
     && wget -q "https://github.com/quickjs-ng/quickjs/releases/download/${QJS_VERSION}/qjs-linux-aarch64" -O libqjs.so \
     && chmod a+rx libqjs.so \
-    && file libqjs.so | grep -q "ARM aarch64" && echo "[qjs] static arm64 预置 OK"
+    && file libqjs.so | grep -q "ARM aarch64" && echo "[qjs] static arm64 prebuilt OK"
 
 RUN DEPLOY_BASECFG=/usr/local/lib/python3.11/site-packages/PySide6/scripts/deploy_lib/config.py \
     && DEPLOY_BZ=/usr/local/lib/python3.11/site-packages/PySide6/scripts/deploy_lib/android/buildozer.py \
     && sed -i 's|config_icon = self.get_value("app", "icon")|config_icon = __import__("os").environ.get("GD3_ICON", "") or self.get_value("app", "icon")|' "$DEPLOY_BASECFG" \
-    && grep -q 'GD3_ICON' "$DEPLOY_BASECFG" && echo "[patch] GD3_ICON 注入 OK" \
+    && grep -q 'GD3_ICON' "$DEPLOY_BASECFG" && echo "[patch] GD3_ICON injected OK" \
     && sed -i 's|        self.set_value("app", "icon.filename", pysidedeploy_config.icon)|&\n        self.set_value("app", "icon.adaptive_foreground.filename", __import__("os").environ.get("GD3_ICON_FG", ""), raise_warning=False)\n        self.set_value("app", "icon.adaptive_background.filename", __import__("os").environ.get("GD3_ICON_BG", ""), raise_warning=False)\n        self.set_value("app", "android.add_resources", __import__("os").environ.get("GD3_RES", ""), raise_warning=False)|' "$DEPLOY_BZ" \
-    && grep -q 'GD3_ICON_FG' "$DEPLOY_BZ" && grep -q 'add_resources' "$DEPLOY_BZ" && echo "[patch] GD3 adaptive icon + add_resources 注入 OK" \
+    && grep -q 'GD3_ICON_FG' "$DEPLOY_BZ" && grep -q 'add_resources' "$DEPLOY_BZ" && echo "[patch] GD3 adaptive icon + add_resources injected OK" \
     && sed -i 's|"title", pysidedeploy_config.title)|"title", __import__("os").environ.get("GD3_APP_TITLE", "") or pysidedeploy_config.title)|' "$DEPLOY_BZ" \
     && sed -i 's|"package.name", pysidedeploy_config.title)|"package.name", __import__("os").environ.get("GD3_PKG_NAME", "") or pysidedeploy_config.title)|' "$DEPLOY_BZ" \
     && sed -i 's|f"org.{pysidedeploy_config.title}")|(__import__("os").environ.get("GD3_PKG_DOMAIN", "") or f"org.{pysidedeploy_config.title}"))|' "$DEPLOY_BZ" \
-    && grep -q 'GD3_APP_TITLE' "$DEPLOY_BZ" && grep -q 'GD3_PKG_NAME' "$DEPLOY_BZ" && grep -q 'GD3_PKG_DOMAIN' "$DEPLOY_BZ" && echo "[patch] GD3 包名/显示名注入 OK"
+    && grep -q 'GD3_APP_TITLE' "$DEPLOY_BZ" && grep -q 'GD3_PKG_NAME' "$DEPLOY_BZ" && grep -q 'GD3_PKG_DOMAIN' "$DEPLOY_BZ" && echo "[patch] GD3 package name / display name injected OK"
 
 ARG GD3_GRADLE_CN=0
 RUN useradd -m -u 1000 builder \
@@ -148,13 +148,13 @@ RUN QTSTR=/opt/p4a/pythonforandroid/bootstraps/qt/build/templates/strings.tmpl.x
     && sed -i '/<color name="gd3_splash_bg">#f3f3f3<\/color>/a\    <bool name="gd3_light_status_bar">true</bool>' "$QTSTR" \
     && grep -q 'statusBarColor' "$QTSTR" \
     && chown builder:builder "$QTSTR" \
-    && echo "[patch] qt 状态栏沉浸 statusBarColor+windowLightStatusBar OK"
+    && echo "[patch] qt status-bar immersive statusBarColor+windowLightStatusBar OK"
 
-# minapi=28: Qt 6.10 库硬要求 ≥28(Android 9)。app 存储授权按 SDK 分支(≥30 All Files / <30 WRITE + manifest
-# requestLegacyExternalStorage), 故下限贴齐 Qt 的 Android 9; minapi 与 ndk_api 一并设, 否则声明 SDK 与 .so 编译 API 错位。
+# minapi=28: the Qt 6.10 libraries hard-require >=28 (Android 9). App storage permission branches by SDK (>=30 All Files / <30 WRITE + manifest
+# requestLegacyExternalStorage), so the floor is aligned to Qt Android 9; set minapi and ndk_api together, otherwise the declared SDK and the .so compile API mismatch.
 RUN DEPLOY_BZ=/usr/local/lib/python3.11/site-packages/PySide6/scripts/deploy_lib/android/buildozer.py \
     && sed -i '/self.set_value("app", "title",/a\        self.set_value("app", "version", __import__("os").environ.get("GD3_VERSION", "") or "0.1")\n        self.set_value("app", "android.accept_sdk_license", "True")\n        self.set_value("buildozer", "log_level", "1")\n        self.set_value("app", "android.minapi", __import__("os").environ.get("GD3_MINAPI", "") or "28")\n        self.set_value("app", "android.ndk_api", __import__("os").environ.get("GD3_MINAPI", "") or "28")' "$DEPLOY_BZ" \
-    && grep -q 'GD3_VERSION' "$DEPLOY_BZ" && grep -q 'accept_sdk_license' "$DEPLOY_BZ" && grep -q 'log_level' "$DEPLOY_BZ" && grep -q 'android.minapi' "$DEPLOY_BZ" && echo "[patch] GD3_VERSION + accept_sdk_license + log_level + minapi/ndk_api=28 注入 OK"
+    && grep -q 'GD3_VERSION' "$DEPLOY_BZ" && grep -q 'accept_sdk_license' "$DEPLOY_BZ" && grep -q 'log_level' "$DEPLOY_BZ" && grep -q 'android.minapi' "$DEPLOY_BZ" && echo "[patch] GD3_VERSION + accept_sdk_license + log_level + minapi/ndk_api=28 injected OK"
 
 COPY java/org/ghostdownloader/KeepAliveService.java /opt/p4a/pythonforandroid/bootstraps/common/build/src/main/java/org/ghostdownloader/KeepAliveService.java
 RUN QTMAN=/opt/p4a/pythonforandroid/bootstraps/qt/build/templates/AndroidManifest.tmpl.xml \
@@ -167,9 +167,9 @@ RUN QTMAN=/opt/p4a/pythonforandroid/bootstraps/qt/build/templates/AndroidManifes
     && grep -q 'requestLegacyExternalStorage' "$QTMAN" \
     && grep -q 'android.intent.action.SEND' "$QTMAN" \
     && chown -R builder:builder /opt/p4a/pythonforandroid/bootstraps/common/build/src/main/java/org/ghostdownloader \
-    && echo "[patch] KeepAliveService + background_running + requestLegacyExternalStorage + SEND intent-filter(分享入口) 注入 OK"
+    && echo "[patch] KeepAliveService + background_running + requestLegacyExternalStorage + SEND intent-filter (share entry) injected OK"
 
-# 隔离的新版 cmake 专供 wreq 的 btls-sys/BoringSSL（系统 cmake 3.25 在 NDK toolchain 下 FindThreads 会炸）
+# An isolated newer cmake dedicated to wreq btls-sys/BoringSSL (the system cmake 3.25 blows up on FindThreads under the NDK toolchain)
 RUN python3 -m venv /opt/cmake4 \
     && for i in 1 2 3 4 5; do /opt/cmake4/bin/pip install --no-cache-dir --timeout 300 --retries 10 "cmake>=4.0" && break || sleep 5; done \
     && /opt/cmake4/bin/cmake --version
