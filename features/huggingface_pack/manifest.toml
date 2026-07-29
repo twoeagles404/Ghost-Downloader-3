@@ -1,0 +1,4 @@
+[pack]
+entry = "pack.py"
+class = "HuggingFacePack"
+dependencies = ["http_pack"]

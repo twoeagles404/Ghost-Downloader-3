@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cold-start splash: drawn by the system before Qt starts, up to the app first frame. The base color @color/gd3_splash_bg is overridden by values-night to switch with light/dark. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/gd3_splash_bg" />
+    <item>
+        <bitmap android:src="@drawable/gd3_splash_logo" android:gravity="center" />
+    </item>
+</layer-list>

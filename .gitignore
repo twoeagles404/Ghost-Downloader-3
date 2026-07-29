@@ -1,0 +1,40 @@
+# Ignore the .vscode folder
+.vscode/
+.VSCodeCounter
+
+# Ignore workspace files
+*.code-workspace
+.DS_Store
+
+# Ignore .idea
+.idea/
+
+# Ignore Python cache files
+*/__pycache__
+*.py[cod]
+
+# Ignore log files
+log/
+*.log
+
+# Ignore UI files
+*.ui
+
+# Ignore build files
+build/
+dist/
+output/
+*.spec
+
+# Ignore the local Python environment
+.venv/
+
+# Ignore browser-extension dependencies and build artifacts
+browser_extension/app/node_modules/
+browser_extension/chromium/
+browser_extension/firefox/
+
+.playwright-mcp
+*.jks
+*.keystore
+/config/docs/research/

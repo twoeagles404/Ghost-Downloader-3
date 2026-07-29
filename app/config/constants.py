@@ -1,0 +1,11 @@
+YEAR = 2026
+AUTHOR = "XiaoYouChR"
+VERSION = "4.2.0"
+DESKTOP_ID = "io.github.xiaoyouchr.GhostDownloader"
+DESKTOP_OBJECT_PATH = "/" + DESKTOP_ID.replace(".", "/")
+LATEST_EXTENSION_VERSION = "2.1.1"
+AUTHOR_URL = "https://github.com/twoeagles404"
+FEEDBACK_URL = "https://github.com/twoeagles404/Ghost-Downloader-3/issues"
+FIREFOX_ADDONS_URL = "https://addons.mozilla.org/zh-CN/firefox/addon/ghost-downloader/"
+EDGE_ADDONS_URL = "https://microsoftedge.microsoft.com/addons/detail/ghost-downloader-browser/odaohmfjjbompdkmfbambadnagplcmce"
+CHROME_WEBSTORE_URL = "https://chromewebstore.google.com/detail/ghost-downloader-for-brow/lagbjgkmaafnlinaeonbhjchnjinjpeh"

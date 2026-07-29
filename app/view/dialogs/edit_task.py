@@ -1,0 +1,125 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from PySide6.QtWidgets import QWidget
+from qfluentwidgets import (
+    IndeterminateProgressBar, InfoBar, InfoBarPosition,
+    MessageBox, MessageBoxBase, SubtitleLabel,
+)
+
+from app.format import toReadableSize
+from app.view.components.card_groups import OptionCardGroup
+
+if TYPE_CHECKING:
+    from app.models.task import Task
+
+
+class EditTaskDialog(MessageBoxBase):
+
+    def __init__(self, task: Task, cards: list[QWidget], parent=None):
+        super().__init__(parent)
+        self._task = task
+
+        self.titleLabel = SubtitleLabel(self.tr("Edit Task Options"), self)
+        self.cardGroup = OptionCardGroup(self)
+        self.progressBar = IndeterminateProgressBar(self)
+
+        self.widget.setMinimumWidth(680)
+        self.progressBar.hide()
+        self.yesButton.setText(self.tr("Application"))
+        self.cancelButton.setText(self.tr("Cancel"))
+
+        for card in cards:
+            self.cardGroup.addCard(card)
+
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addWidget(self.progressBar)
+        self.viewLayout.addWidget(self.cardGroup)
+
+
+class DraftEditDialog(EditTaskDialog):
+
+    def accept(self):
+        self._task.setOptions(self.cardGroup.options())
+        super().accept()
+
+
+class LiveEditDialog(EditTaskDialog):
+
+    def __init__(self, task: Task, cards: list[QWidget], coroutineRunner, featureService, taskService, parent=None):
+        super().__init__(task, cards, parent)
+        self._coroutineRunner = coroutineRunner
+        self._featureService = featureService
+        self._taskService = taskService
+        self._pendingParseId: str = ""
+
+    def accept(self):
+        from app.models.task import TaskOptions
+
+        options = self.cardGroup.options()
+        newUrl = options.pop("url", "").strip()
+
+        if not newUrl or newUrl == self._task.url:
+            self._taskService.edit(self._task, options)
+            super().accept()
+            return
+
+        self._setInteractive(False)
+        taskOptions = TaskOptions.fromOptions({**options, "url": newUrl})
+        self._pendingParseId = self._coroutineRunner.submit(
+            self._featureService.parse(taskOptions),
+            done=self._onReparsed,
+            failed=self._onReparseFailed,
+            options=options,
+            owner=self,
+        )
+
+    def reject(self):
+        self._cancelPendingParse()
+        super().reject()
+
+    def _cancelPendingParse(self, *_args) -> None:
+        if not self._pendingParseId:
+            return
+        self._coroutineRunner.cancel(self._pendingParseId)
+        self._pendingParseId = ""
+
+    def _setInteractive(self, enabled: bool) -> None:
+        self.progressBar.setVisible(not enabled)
+        self.yesButton.setEnabled(enabled)
+
+    def _onReparsed(self, newTask: Task, options: dict) -> None:
+        self._pendingParseId = ""
+
+        if self._task.canReuseProgress(newTask):
+            self._taskService.edit(self._task, options, newTask)
+            super().accept()
+            return
+
+        receivedBytes = self._task.currentSnapshot()[2]
+        if receivedBytes > 0:
+            confirm = MessageBox(
+                self.tr("Confirm URL Update"),
+                self.tr("The new URL differs from the original; {0} of existing data will be cleared. Continue?").format(
+                    toReadableSize(receivedBytes)
+                ),
+                self,
+            )
+            if not confirm.exec():
+                self._setInteractive(True)
+                return
+
+        self._taskService.edit(self._task, options, newTask)
+        super().accept()
+
+    def _onReparseFailed(self, error: str, **_) -> None:
+        self._pendingParseId = ""
+        self._setInteractive(True)
+        InfoBar.error(
+            title=self.tr("Link Parsing Failed"),
+            content=error,
+            duration=4000,
+            position=InfoBarPosition.TOP,
+            parent=self,
+        )

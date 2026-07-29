@@ -1,0 +1,4 @@
+[pack]
+entry = "pack.py"
+class = "HttpPack"
+dependencies = []

@@ -1,0 +1,4 @@
+[pack]
+entry = "pack.py"
+class = "ED2kPack"
+dependencies = ["disk_pack"]

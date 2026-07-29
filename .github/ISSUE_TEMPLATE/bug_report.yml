@@ -1,0 +1,92 @@
+name: Bug report
+description: If you run into a problem while using the app, please fill out the template below to submit a bug report, and we will investigate and fix it as soon as possible.
+title: "[Bug] My title"
+assignees: XiaoYouChR
+labels:
+  - "🐛Bug"
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## Before you start
+      🚨 Please fill out everything below completely. If required information is missing, the developer may close the issue without investigating it. 🚨
+
+- type: textarea
+  id: description
+  validations:
+    required: true
+  attributes:
+     label: Bug description
+     description: Briefly describe the problem you encountered
+
+- type: textarea
+  id: repro-steps
+  validations:
+    required: true
+  attributes:
+     label: Steps to reproduce
+     render: markdown
+     description: Please provide the steps to reproduce the problem; if you cannot, explain why
+     placeholder: |
+        Clean, clear reproduction steps help the developer locate the problem faster, and your issue will get a higher priority.
+
+        Example steps:
+        1. Open the app
+        2. Go to '...'
+        3. Click '....'
+        4. Scroll to '....'
+        5. See the problem
+
+- type: textarea
+  id: expected-behavior
+  validations:
+    required: false
+  attributes:
+     label: Expected behavior
+     description: Briefly describe what result you expected to see
+     render: markdown
+
+- type: textarea
+  id: screenshots
+  attributes:
+     label: Screenshots
+     description: If possible, attaching screenshots helps us analyze the problem
+
+- type: checkboxes
+  id: environment-app-target-version
+  attributes:
+     label: System version
+     description: Select the system version where you found the problem
+     options:
+       - label: Windows 10 2004 - 22H2 (Build 19041 - 19045)
+       - label: Windows 11 21H2 (Build 22000)
+       - label: Windows 11 22H2 (Build 22621)
+       - label: Windows 11 23H2 (Build 22631)
+       - label: Windows 11 24H2 (Build 26100)
+       - label: Windows 11 25H2 (Build 26200)
+       - label: Other (macOS or Linux, please note the system version below)
+
+- type: input
+  id: environment-app-target-other-version
+  attributes:
+     label: Other system version
+     description: If you are running the app on a specific system version, please note it here
+
+- type: input
+  id: form-factor
+  attributes:
+      label: Processor model
+      description: Processor architecture and instruction-set info helps us analyze the problem
+
+- type: textarea
+  id: log-info
+  attributes:
+     label: Logs
+     description: Please `paste the error content that was automatically copied when the error occurred`, or open the app and click `Settings -> About -> Provide feedback -> View logs`, then upload the `GhostDownloader.log` file
+
+- type: textarea
+  id: additional-context
+  attributes:
+     label: Notes
+     description: Add any other information you think is relevant, such as whether you are willing to submit a Pull Request to fix this
+     render: markdown

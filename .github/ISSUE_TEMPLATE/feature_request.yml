@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest an idea or improvement for the project
+title: "[Feature] My title"
+labels:
+  - "✨Enhancement"
+assignees: XiaoYouChR
+body:
+- type: markdown
+  attributes: 
+    value: |
+      ## Before you start
+      🚨 Please fill out everything below completely. If required information is missing, the developer may close the issue without investigating it. 🚨
+
+- type: textarea
+  id: problem-description
+  validations: 
+    required: true
+  attributes: 
+    label: Problem description
+    description: Describe the problem you want to solve or the use case for the feature
+    placeholder: |
+      Please describe the problem you encountered, or link to an existing issue.
+      Start with a user story and concisely explain the scenario where this feature applies.
+      Explain what trouble the app currently causes you without this feature, and what value the feature would create for users.
+
+- type: textarea
+  id: solution-description
+  validations: 
+    required: true
+  attributes: 
+    label: Describe the solution
+    description: Describe the solution you expect for this problem
+    placeholder: |
+      Describe your expected solution as clearly as possible and how it would solve the problem you encountered; this helps the developer build an update that matches your expectations.
+
+- type: textarea
+  id: alternatives
+  attributes: 
+    label: Alternatives
+    description: There is often more than one way to solve a problem; maybe you have a fallback option
+    placeholder: |
+      If the preferred solution is hard to implement, have you considered alternatives? Is there a minimal, acceptable implementation target?
+
+- type: textarea
+  id: additional-info
+  attributes:
+    label: Additional information
+    description: Add any notes you think are relevant, or sketches that show your thinking, and whether you are willing to submit a Pull Request to implement this feature
+    render: markdown
